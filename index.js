@@ -1,8 +1,7 @@
-"use strict";
+const parser = require("./src/syntax");
 
 module.exports = {
   compile(src) {
-    // TODO
-    return "";
+    parser.parse(src);
   }
 };

@@ -4,6 +4,7 @@
   "description": "An statically-typed altJS",
   "main": "index.js",
   "scripts": {
+    "pegjs": "pegjs src/syntax.pegjs",
     "test": "mocha --require ./babel-hook"
   },
   "author": "",
