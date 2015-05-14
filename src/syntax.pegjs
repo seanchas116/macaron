@@ -1,5 +1,30 @@
 {
-  const {BinaryExpression, UnaryExpression, NumberLiteral} = require("./ast");
+  const BinaryExpression = require("./ast/BinaryExpression");
+  const NumberLiteral = require("./ast/NumberLiteral");
+  const UnaryExpression = require("./ast/UnaryExpression");
+
+  const binaryOperators = [
+    ["*", "/"],
+    ["+", "-"]
+  ];
+
+  function buildBinaryExpression(first, rest) {
+    let operands = [first, ...rest.map(t => t[2])];
+    let operators = rest.map(t => t[0]);
+    console.log(operands);
+    console.log(operators);
+
+    for (const reducingOperators of binaryOperators) {
+      for (let i = 0; i < operators.length; ++i) {
+        if (reducingOperators.indexOf(operators[i]) >= 0) {
+          operands[i] = new BinaryExpression(operands[i], operators[i], operands[i + 1]);
+          operands.splice(i + 1, 1);
+          operators.splice(i, 1);
+        }
+      }
+    }
+    return operands[0];
+  }
 }
 
 Start
@@ -30,13 +55,9 @@ Expression
 }
 
 BinaryExpression
-  = first:UnaryExpression _ rest:(BinaryOperator _ BinaryExpression)?
+  = first:UnaryExpression _ rest:(BinaryOperator _ UnaryExpression _)*
 {
-  if (rest) {
-    return new BinaryExpression(first, rest[0], rest[2]);
-  } else {
-    return first;
-  }
+  return buildBinaryExpression(first, rest);
 }
 
 UnaryExpression
