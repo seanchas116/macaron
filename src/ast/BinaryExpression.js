@@ -1,5 +1,4 @@
 
-module.exports =
 class BinaryExpression {
   constructor(left, op, right) {
     this.left = left;
@@ -7,3 +6,5 @@ class BinaryExpression {
     this.right = right;
   }
 }
+
+module.exports = BinaryExpression;
