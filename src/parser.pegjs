@@ -140,10 +140,10 @@ Block
 }
 
 ParameterList
-  = "(" _ params:(Identifier ("," _ Identifier)*)? ")" _
+  = "(" _ first:Identifier? rest:("," _ Identifier)* ")" _
 {
-  if (params) {
-    return [params[0], ...params[1].map(p => p[2])];
+  if (first) {
+    return [first, ...rest.map(p => p[2])];
   } else {
     return [];
   }
