@@ -22,6 +22,7 @@
           operands[i] = new BinaryAST(operands[i], operators[i], operands[i + 1]);
           operands.splice(i + 1, 1);
           operators.splice(i, 1);
+          --i;
         }
       }
     }
