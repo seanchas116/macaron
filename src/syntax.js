@@ -107,7 +107,7 @@ module.exports = (function() {
         peg$c48 = { type: "literal", value: ",", description: "\",\"" },
         peg$c49 = function(params) {
           if (params) {
-            return [params[0], params[1].map(p => p[2])];
+            return [params[0], ...params[1].map(p => p[2])];
           } else {
             return [];
           }
