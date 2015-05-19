@@ -110,6 +110,12 @@ module.exports = (function() {
         peg$c51 = function(parameters, expressions) {
           return new FunctionAST(parameters, expressions);
         },
+        peg$c52 = function(args) {
+          return args;
+        },
+        peg$c53 = function(func, argLists) {
+          return argLists.reduce((func, args) => new FunctionCallAST(func, args), func);
+        },
 
         peg$currPos          = 0,
         peg$reportedPos      = 0,
@@ -736,14 +742,14 @@ module.exports = (function() {
     function peg$parseUnaryExpression() {
       var s0, s1, s2, s3;
 
-      s0 = peg$parseValue();
+      s0 = peg$parseFunctionCall();
       if (s0 === peg$FAILED) {
         s0 = peg$currPos;
         s1 = peg$parseUnaryOperator();
         if (s1 !== peg$FAILED) {
           s2 = peg$parse_();
           if (s2 !== peg$FAILED) {
-            s3 = peg$parseUnaryExpression();
+            s3 = peg$parseFunctionCall();
             if (s3 !== peg$FAILED) {
               peg$reportedPos = s0;
               s1 = peg$c32(s1, s3);
@@ -1211,12 +1217,94 @@ module.exports = (function() {
       return s0;
     }
 
+    function peg$parseArgumentList() {
+      var s0, s1, s2, s3, s4;
+
+      s0 = peg$currPos;
+      if (input.charCodeAt(peg$currPos) === 40) {
+        s1 = peg$c34;
+        peg$currPos++;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c35); }
+      }
+      if (s1 !== peg$FAILED) {
+        s2 = peg$parseLines();
+        if (s2 !== peg$FAILED) {
+          if (input.charCodeAt(peg$currPos) === 41) {
+            s3 = peg$c36;
+            peg$currPos++;
+          } else {
+            s3 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c37); }
+          }
+          if (s3 !== peg$FAILED) {
+            s4 = peg$parse_();
+            if (s4 !== peg$FAILED) {
+              peg$reportedPos = s0;
+              s1 = peg$c52(s2);
+              s0 = s1;
+            } else {
+              peg$currPos = s0;
+              s0 = peg$c0;
+            }
+          } else {
+            peg$currPos = s0;
+            s0 = peg$c0;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$c0;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$c0;
+      }
+
+      return s0;
+    }
+
+    function peg$parseFunctionCall() {
+      var s0, s1, s2, s3, s4;
+
+      s0 = peg$currPos;
+      s1 = peg$parseValue();
+      if (s1 !== peg$FAILED) {
+        s2 = peg$parse_();
+        if (s2 !== peg$FAILED) {
+          s3 = [];
+          s4 = peg$parseArgumentList();
+          while (s4 !== peg$FAILED) {
+            s3.push(s4);
+            s4 = peg$parseArgumentList();
+          }
+          if (s3 !== peg$FAILED) {
+            peg$reportedPos = s0;
+            s1 = peg$c53(s1, s3);
+            s0 = s1;
+          } else {
+            peg$currPos = s0;
+            s0 = peg$c0;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$c0;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$c0;
+      }
+
+      return s0;
+    }
+
 
       const BinaryAST = require("./ast/Binary");
       const NumberAST = require("./ast/Number");
       const UnaryAST = require("./ast/Unary");
       const IdentifierAST = require("./ast/Identifier");
       const FunctionAST = require("./ast/Function");
+      const FunctionCallAST = require("./ast/FunctionCall");
       const AssignmentAST = require("./ast/Assignment");
 
       const binaryOperators = [

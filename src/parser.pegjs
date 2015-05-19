@@ -4,6 +4,7 @@
   const UnaryAST = require("./ast/Unary");
   const IdentifierAST = require("./ast/Identifier");
   const FunctionAST = require("./ast/Function");
+  const FunctionCallAST = require("./ast/FunctionCall");
   const AssignmentAST = require("./ast/Assignment");
 
   const binaryOperators = [
@@ -91,8 +92,8 @@ BinaryExpression
 }
 
 UnaryExpression
-  = Value
-  / operator:UnaryOperator _ argument:UnaryExpression
+  = FunctionCall
+  / operator:UnaryOperator _ argument:FunctionCall
 {
   return new UnaryAST(operator, argument);
 }
@@ -163,4 +164,16 @@ Function
   = parameters:ParameterList "=>" _ expressions:Block _
 {
   return new FunctionAST(parameters, expressions);
+}
+
+ArgumentList
+  = "(" args:Lines ")" _
+{
+  return args;
+}
+
+FunctionCall
+  = func:Value _ argLists:ArgumentList*
+{
+  return argLists.reduce((func, args) => new FunctionCallAST(func, args), func);
 }
