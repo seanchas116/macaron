@@ -65,8 +65,11 @@ IdentifierTail
 
 _ = Whitespace*
 
-Linebreak
-  = Separator _
+// whitespaces and >=0 separator
+__ = (Whitespace / Separator)*
+
+// whitespaces and >0 separator
+___ = _ Separator (_ Separator)* _
 
 Expression
   = expr:AssignmentExpression _
@@ -125,7 +128,7 @@ Identifier
 }
 
 Lines
-  = Linebreak* first:Expression? rest:(Linebreak Expression)* Linebreak*
+  = __ first:Expression? rest:(___ Expression)* __
 {
   if (first) {
     return [first, ...rest.map(l => l[1])];
@@ -141,7 +144,7 @@ Block
 }
 
 ParameterLines
-  = Linebreak* first:Identifier? rest:(Linebreak Identifier)* Linebreak*
+  = __ first:Identifier? rest:(___ Identifier)* __
 {
   if (first) {
     return [first, ...rest.map(l => l[1])];
