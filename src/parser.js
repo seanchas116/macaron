@@ -91,7 +91,7 @@ module.exports = (function() {
         peg$c40 = null,
         peg$c41 = function(lines) {
           if (lines) {
-            return [lines[0], ...lines[1].map(l => l[0])];
+            return [lines[0], ...lines[1].map(l => l[1])];
           } else {
             return [];
           }
@@ -1188,8 +1188,6 @@ module.exports = (function() {
       function buildBinaryExpression(first, rest) {
         let operands = [first, ...rest.map(t => t[2])];
         let operators = rest.map(t => t[0]);
-        console.log(operands);
-        console.log(operators);
 
         for (const reducingOperators of binaryOperators) {
           for (let i = 0; i < operators.length; ++i) {

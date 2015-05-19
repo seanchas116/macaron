@@ -1,4 +1,4 @@
-const parser = require("./src/syntax");
+const parser = require("./src/parser");
 
 module.exports = {
   compile(src) {
