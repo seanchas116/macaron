@@ -140,14 +140,20 @@ Block
   return expressions;
 }
 
-ParameterList
-  = "(" _ first:Identifier? rest:("," _ Identifier)* ")" _
+ParameterLines
+  = Linebreak* first:Identifier? rest:(Linebreak Identifier)* Linebreak*
 {
   if (first) {
-    return [first, ...rest.map(p => p[2])];
+    return [first, ...rest.map(l => l[1])];
   } else {
     return [];
   }
+}
+
+ParameterList
+  = "(" lines:ParameterLines ")" _
+{
+  return lines;
 }
 
 Function
