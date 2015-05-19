@@ -42,6 +42,7 @@ Whitespace
 
 Separator
   = "\n"
+  / ","
 
 BinaryOperator
   = "+"
@@ -124,10 +125,10 @@ Identifier
 }
 
 Lines
-  = Linebreak* lines:(Expression (Linebreak Expression)* Linebreak*)?
+  = Linebreak* first:Expression? rest:(Linebreak Expression)* Linebreak*
 {
-  if (lines) {
-    return [lines[0], ...lines[1].map(l => l[1])];
+  if (first) {
+    return [first, ...rest.map(l => l[1])];
   } else {
     return [];
   }
