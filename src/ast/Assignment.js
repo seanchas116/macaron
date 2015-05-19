@@ -1,5 +1,5 @@
 
-class BinaryExpression {
+class AssignmentAST {
   constructor(left, op, right) {
     this.left = left;
     this.op = op;
@@ -7,4 +7,4 @@ class BinaryExpression {
   }
 }
 
-module.exports = BinaryExpression;
+module.exports = AssignmentAST;

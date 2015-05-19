@@ -1,9 +1,9 @@
 
-class UnaryExpression {
+class UnaryAST {
   constructor(op, expr) {
     this.op = op;
     this.expr = expr;
   }
 }
 
-module.exports = UnaryExpression;
+module.exports = UnaryAST;

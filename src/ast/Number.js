@@ -1,8 +1,8 @@
 
-class NumberLiteral {
+class NumberAST {
   constructor(value) {
     this.value = value;
   }
 }
 
-module.exports = NumberLiteral;
+module.exports = NumberAST;
