@@ -56,6 +56,10 @@ UnaryOperator
   = "+"
   / "-"
 
+DeclarationKeyword
+  = "let"
+  / "var"
+
 AssignmentOperator
   = "="
 
@@ -80,9 +84,9 @@ Expression
 }
 
 AssignmentExpression
-  = left:Assignable _ operator:AssignmentOperator _ right:AssignmentExpression
+  = declaration:DeclarationKeyword? _ left:Assignable _ operator:AssignmentOperator _ right:AssignmentExpression
 {
-  return new AssignmentAST(left, operator, right);
+  return new AssignmentAST(declaration, left, operator, right);
 }
   / BinaryExpression
 
