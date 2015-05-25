@@ -6,6 +6,7 @@
   const FunctionAST = require("./ast/Function");
   const FunctionCallAST = require("./ast/FunctionCall");
   const AssignmentAST = require("./ast/Assignment");
+  const ParameterAST = require("./ast/Parameter");
 
   const binaryOperators = [
     ["*", "/"],
@@ -149,8 +150,14 @@ Block
   return expressions;
 }
 
-ParameterLines
-  = __ first:Identifier? rest:(___ Identifier)* __
+Parameter
+  = name:Identifier type:Identifier
+{
+  return new ParameterAST(name, type);
+}
+
+Parameters
+  = __ first:Parameter? rest:(___ Parameter)* __
 {
   if (first) {
     return [first, ...rest.map(l => l[1])];
@@ -160,9 +167,9 @@ ParameterLines
 }
 
 ParameterList
-  = "(" lines:ParameterLines ")" _
+  = "(" params:Parameters ")" _
 {
-  return lines;
+  return params;
 }
 
 Function
