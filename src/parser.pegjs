@@ -7,6 +7,7 @@
   const FunctionCallAST = require("./ast/FunctionCall");
   const AssignmentAST = require("./ast/Assignment");
   const ParameterAST = require("./ast/Parameter");
+  const OperatorAST = require("./ast/Operator");
 
   const binaryOperators = [
     ["*", "/"],
@@ -48,21 +49,26 @@ Separator
   / ","
 
 BinaryOperator
-  = "+"
-  / "-"
-  / "*"
-  / "/"
+  = op:[+\-*/]
+{
+  return new OperatorAST(op);
+}
 
 UnaryOperator
-  = "+"
-  / "-"
+  = op:[+\-]
+{
+  return new OperatorAST(op);
+}
 
 DeclarationKeyword
   = "let"
   / "var"
 
 AssignmentOperator
-  = "="
+  = op:"="
+{
+  return new OperatorAST(op);
+}
 
 IdentifierHead
   = [a-zA-Z$_]
