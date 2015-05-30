@@ -66,7 +66,7 @@ IdentifierHead
   = [a-zA-Z$_]
 
 IdentifierTail
-  = [a-zA-Z$_0-9]*
+  = [a-zA-Z$_0-9]
 
 _ = Whitespace*
 
@@ -127,9 +127,9 @@ Number
 }
 
 Identifier
-  = head:IdentifierHead tail:IdentifierTail _
+  = head:IdentifierHead tail:IdentifierTail* _
 {
-  return new AST.IdentifierAST(head + tail);
+  return new AST.IdentifierAST(head + tail.reduce((a, b) => a + b, ""));
 }
 
 Lines
