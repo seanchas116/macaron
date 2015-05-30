@@ -7,9 +7,7 @@
     "pegjs": "src/parser.pegjs"
   },
   "scripts": {
-    "pegjs": "pegjs src/parser.pegjs",
-    "test": "mocha --require ./babel-hook",
-    "watch": "npm-watch"
+    "test": "mocha --require ./babel-hook"
   },
   "author": "",
   "license": "MIT",
@@ -17,6 +15,8 @@
     "babel": "^5.4.7",
     "babel-core": "^5.4.7",
     "babel-plugin-espower": "^0.4.1",
+    "gulp": "^3.8.11",
+    "gulp-shell": "^0.4.1",
     "mocha": "^2.2.5",
     "pegjs": "^0.8.0",
     "power-assert": "^0.11.0"
