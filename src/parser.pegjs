@@ -1,13 +1,5 @@
 {
-  const BinaryAST = require("./ast/Binary");
-  const NumberAST = require("./ast/Number");
-  const UnaryAST = require("./ast/Unary");
-  const IdentifierAST = require("./ast/Identifier");
-  const FunctionAST = require("./ast/Function");
-  const FunctionCallAST = require("./ast/FunctionCall");
-  const AssignmentAST = require("./ast/Assignment");
-  const ParameterAST = require("./ast/Parameter");
-  const OperatorAST = require("./ast/Operator");
+  const AST = require("./AST");
 
   const binaryOperators = [
     ["*", "/"],
@@ -21,7 +13,7 @@
     for (const reducingOperators of binaryOperators) {
       for (let i = 0; i < operators.length; ++i) {
         if (reducingOperators.indexOf(operators[i]) >= 0) {
-          operands[i] = new BinaryAST(operands[i], operators[i], operands[i + 1]);
+          operands[i] = new AST.BinaryAST(operands[i], operators[i], operands[i + 1]);
           operands.splice(i + 1, 1);
           operators.splice(i, 1);
           --i;
@@ -51,13 +43,13 @@ Separator
 BinaryOperator
   = op:[+\-*/]
 {
-  return new OperatorAST(op);
+  return new AST.OperatorAST(op);
 }
 
 UnaryOperator
   = op:[+\-]
 {
-  return new OperatorAST(op);
+  return new AST.OperatorAST(op);
 }
 
 DeclarationKeyword
@@ -67,7 +59,7 @@ DeclarationKeyword
 AssignmentOperator
   = op:"="
 {
-  return new OperatorAST(op);
+  return new AST.OperatorAST(op);
 }
 
 IdentifierHead
@@ -93,7 +85,7 @@ Expression
 AssignmentExpression
   = declaration:DeclarationKeyword? _ left:Assignable _ operator:AssignmentOperator _ right:AssignmentExpression
 {
-  return new AssignmentAST(declaration, left, operator, right);
+  return new AST.AssignmentAST(declaration, left, operator, right);
 }
   / BinaryExpression
 
@@ -107,7 +99,7 @@ UnaryExpression
   = FunctionCall
   / operator:UnaryOperator _ argument:FunctionCall
 {
-  return new UnaryAST(operator, argument);
+  return new AST.UnaryAST(operator, argument);
 }
 
 Assignable
@@ -131,13 +123,13 @@ Literal
 Number
   = str:[0-9]+
 {
-  return new NumberAST(Number.parseFloat(str));
+  return new AST.NumberAST(Number.parseFloat(str));
 }
 
 Identifier
   = head:IdentifierHead tail:IdentifierTail _
 {
-  return new IdentifierAST(head + tail);
+  return new AST.IdentifierAST(head + tail);
 }
 
 Lines
@@ -159,7 +151,7 @@ Block
 Parameter
   = name:Identifier type:Identifier
 {
-  return new ParameterAST(name, type);
+  return new AST.ParameterAST(name, type);
 }
 
 Parameters
@@ -181,7 +173,7 @@ ParameterList
 Function
   = parameters:ParameterList "=>" _ expressions:Block _
 {
-  return new FunctionAST(parameters, expressions);
+  return new AST.FunctionAST(parameters, expressions);
 }
 
 ArgumentList
@@ -193,5 +185,5 @@ ArgumentList
 FunctionCall
   = func:Value _ argLists:ArgumentList*
 {
-  return argLists.reduce((func, args) => new FunctionCallAST(func, args), func);
+  return argLists.reduce((func, args) => new AST.FunctionCallAST(func, args), func);
 }
