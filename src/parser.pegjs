@@ -149,7 +149,7 @@ Block
 }
 
 Parameter
-  = name:Identifier type:Identifier
+  = name:Identifier type:Expression
 {
   return new AST.ParameterAST(name, type);
 }
