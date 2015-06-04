@@ -7,7 +7,8 @@
     "pegjs": "src/parser.pegjs"
   },
   "scripts": {
-    "test": "mocha --require ./babel-hook"
+    "test": "mocha --require ./babel-hook",
+    "example": "babel-node ./example.js"
   },
   "author": "",
   "license": "MIT",
