@@ -1,4 +1,6 @@
 import parser from "./src/parser";
+import Environment from "./src/Environment";
+import TypeEvaluator from "./src/TypeEvaluator";
 
 const source = `
 let f = (a Number, b Number) => {
@@ -16,5 +18,11 @@ try {
   console.log(e.message);
 }
 
-const json = JSON.stringify(parsed, null, 2);
-console.log(json);
+console.dir(parsed);
+
+const env = new Environment();
+const evaluator = new TypeEvaluator();
+
+const expr = evaluator.evaluate(parsed, env);
+
+console.dir(expr);
