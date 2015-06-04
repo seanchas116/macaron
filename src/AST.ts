@@ -1,109 +1,83 @@
+import SourceLocation from "./SourceLocation";
+import Environment from "./Environment";
+
 export
 class AST {
+  // TODO
+  location = new SourceLocation(1, 1, 0);
 }
 
 export
 class ExpressionAST extends AST {
+  toExpression(env: Environment) {
+    throw new Error("not implemented");
+  }
 }
 
 export
 class AssignmentAST extends ExpressionAST {
-  declaration: String;
-  left: IdentifierAST;
-  op: OperatorAST;
-  right: ExpressionAST;
-
-  constructor(declaration: String, left: IdentifierAST, op: OperatorAST, right: ExpressionAST) {
+  constructor(public declaration: String, public left: IdentifierAST, public operator: OperatorAST, public right: ExpressionAST) {
     super()
-    this.declaration = declaration;
-    this.left = left;
-    this.op = op;
-    this.right = right;
   }
 }
 
 export
 class BinaryAST extends ExpressionAST {
-  left: ExpressionAST;
-  op: OperatorAST;
-  right: ExpressionAST;
-
-  constructor(left: ExpressionAST, op: OperatorAST, right: ExpressionAST) {
+  constructor(public left: ExpressionAST, public operator: OperatorAST, public right: ExpressionAST) {
     super()
-    this.left = left;
-    this.op = op;
-    this.right = right;
   }
 }
 
 export
 class FunctionAST extends ExpressionAST {
-  params: ParameterAST[];
-  expressions: ExpressionAST[];
-
-  constructor(parameters: ParameterAST[], expressions: ExpressionAST[]) {
+  constructor(public parameters: ParameterAST[], public expressions: ExpressionAST[]) {
     super();
-    this.params = parameters;
-    this.expressions = expressions;
   }
 }
 
 export
-class FunctionCallAST {
-  func: IdentifierAST[];
-  args: ExpressionAST[];
+class FunctionCallAST extends ExpressionAST {
+  function: ExpressionAST;
+  arguments: ExpressionAST[];
 
-  constructor(func: IdentifierAST[], args: ExpressionAST[]) {
-    this.func = func;
-    this.args = args;
+  constructor(func: ExpressionAST, args: ExpressionAST[]) {
+    super();
+    this.function = func;
+    this.arguments = args;
   }
 }
 
 export
-class IdentifierAST {
-  name: String;
-
-  constructor(name: String) {
-    this.name = name;
+class IdentifierAST extends ExpressionAST {
+  constructor(public name: string) {
+    super();
   }
 }
 
 export
-class NumberAST {
-  value: Number;
-
-  constructor(value: Number) {
-    this.value = value;
+class NumberAST extends ExpressionAST {
+  constructor(public value: number) {
+    super();
   }
 }
 
 export
-class OperatorAST {
-  name: String;
-
-  constructor(name: String) {
-    this.name = name;
+class OperatorAST extends AST {
+  constructor(public name: string) {
+    super();
   }
 }
 
 export
-class ParameterAST {
-  name: IdentifierAST;
-  type: ExpressionAST;
-
-  constructor(name: IdentifierAST, type: ExpressionAST) {
-    this.name = name;
-    this.type = type;
+class ParameterAST extends AST {
+  constructor(public name: IdentifierAST, public type: ExpressionAST) {
+    super();
   }
 }
 
 export
-class UnaryAST {
-  op: OperatorAST;
-  expr: ExpressionAST;
-
-  constructor(op: OperatorAST, expr: ExpressionAST) {
-    this.op = op;
-    this.expr = expr;
+class UnaryAST extends ExpressionAST {
+  constructor(public operator: OperatorAST, public expression: ExpressionAST) {
+    super();
   }
 }
