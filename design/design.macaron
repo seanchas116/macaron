@@ -1,0 +1,131 @@
+class Point {
+  constructor(@x Number, @y Number) {
+  }
+}
+
+interface Point {
+  x Number
+  y Number
+
+  operator + add(other Point) {
+    { x: @x + other.x, y: @y + other.y }
+  }
+  dot(other Point) {
+    @x * other.x + @y * other.y
+  }
+}
+
+enum List {
+  Cons(List, List)
+  Nil
+}
+
+List.Cons = (a, b) => {0: a, 1: b, type: 0}
+List[0] = "Cons"
+List[List.Nil = 1] = "Nil"
+
+interface ListExt<T> : List<T> {
+  map<T, U>(f T => U) {
+    case this {
+      when .Cons(car, cdr) {
+        List<U>.Cons(f(car), cdr.map(f))
+      }
+      when .Nil {
+        List<U>.Nil
+      }
+    }
+  }
+}
+
+var foo Number
+let foo = if true { hoge } else { piyo }
+
+xs.forEach { x, i =>
+
+}
+
+describe("Point") {
+  describe("#add") {
+    it("adds two points") {
+
+    }
+  }
+}
+
+case elem {
+  when canvas HTMLCanvasElement {
+
+  }
+  else {
+  }
+}
+
+let xs = [1,2,3]
+
+async {
+  let hoge = await fetchHoge()
+}
+
+var elem HTMLElement?
+elem = document.getElementById("hoge")
+
+case type {
+  "foo": {
+  }
+  "bar": {
+  }
+}
+
+case expr {
+  1: {
+  }
+  let value .Value: {
+    value
+  }
+  let .Add(a, b): {
+    Expr.Value(a + b)
+  }
+  let .Sub(a, b): {
+    Expr.Value(a - b)
+  }
+  else {
+    expr
+  }
+}
+
+case str {
+  let /([a-z]+)([0-9]+)/(a, b): {
+  }
+}
+
+interface Iterable<out T> {
+
+}
+
+class Array<T> : Iterable<T> {
+
+}
+
+let foo = getFooOrNull()
+foo.bar() # error
+foo?.bar()
+foo!.bar() # ok
+
+if foo? {
+}
+
+// TODO: how to unwrap optionals in pattern matching
+
+case foo {
+  let f! {
+    console.log("foo is not null")
+  }
+  else {
+    console.log("foo is null")
+  }
+}
+
+class Foo {
+  name String
+  shared type = "foo"
+}
