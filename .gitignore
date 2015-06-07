@@ -30,4 +30,5 @@ build/Release
 node_modules
 
 /src/*.js
+/src/*.js.map
 /src/tsconfig.json
