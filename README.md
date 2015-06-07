@@ -15,7 +15,9 @@ What to do
 What to implement
 
 * Optional value
-* Compile-time property/method extension and operator overload
+* Compile-time property/method extension
+* Compile-time operator overload
+* Compile-time function overload
 * Covariant/contravariant generics
 * Algebraic data type
 * Pattern matching
