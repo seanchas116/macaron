@@ -2,12 +2,15 @@ import parser from "./src/parser";
 import Environment from "./src/Environment";
 import TypeEvaluator from "./src/TypeEvaluator";
 
+// const source = `
+// let f = (a Number, b Number) => {
+//   a + b
+// }
+// 1 + 2 * 1 * f(1, 2)
+// `;
 const source = `
-let f = (a Number, b Number) => {
-  a + b
-}
-1 + 2 * 1 * f(1, 2)
-`;
+1 + 2 * 3
+`
 
 let parsed;
 
@@ -23,6 +26,6 @@ console.log(JSON.stringify(parsed, null, 2));
 const env = new Environment();
 const evaluator = new TypeEvaluator();
 
-const expr = evaluator.evaluate(parsed, env);
+const expressions = parsed.map(ast => evaluator.evaluate(ast, env));
 
-console.log(JSON.stringify(expr, null, 2));
+console.log(JSON.stringify(expressions, null, 2));
