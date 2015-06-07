@@ -12,7 +12,7 @@ class CodeEmitter {
       const left = this.emitCode(expr.left);
       const right = this.emitCode(expr.right);
 
-      return `${left} ${expr.operator} ${right}`;
+      return `(${left} ${expr.operator} ${right})`;
     }
     else if (expr instanceof NumberExpression) {
       return expr.value.toString();
