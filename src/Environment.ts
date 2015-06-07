@@ -55,7 +55,7 @@ class Environment {
   get(name: IdentifierAST) {
     const variable = this.getOrNull(name.name);
     if (!variable) {
-      throw new TypeCheckError(`No variable ${name.name}`, name.location);
+      throw new TypeCheckError(`No variable "${name.name}"`, name.location);
     }
     return variable;
   }

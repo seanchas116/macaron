@@ -9,7 +9,7 @@ import TypeEvaluator from "./src/TypeEvaluator";
 // 1 + 2 * 1 * f(1, 2)
 // `;
 const source = `
-1 + 2 * 3
+a = 1 + 2 * 3
 `
 
 let parsed;
