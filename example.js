@@ -1,6 +1,7 @@
 import parser from "./src/parser";
 import Environment from "./src/Environment";
 import TypeEvaluator from "./src/TypeEvaluator";
+import CodeEmitter from "./src/CodeEmitter";
 require('source-map-support').install();
 
 // const source = `
@@ -10,7 +11,7 @@ require('source-map-support').install();
 // 1 + 2 * 1 * f(1, 2)
 // `;
 const source = `
-a = 1 + 2 * 3
+1 + 2 * 3
 `
 
 let parsed;
@@ -30,3 +31,8 @@ const evaluator = new TypeEvaluator();
 const expressions = parsed.map(ast => evaluator.evaluate(ast, env));
 
 console.log(JSON.stringify(expressions, null, 2));
+
+const emitter = new CodeEmitter();
+const code = expressions.map(expr => emitter.emitCode(expr) + "\n").join("");
+
+console.log(code);
