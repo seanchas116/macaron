@@ -31,4 +31,4 @@ node_modules
 
 /src/**/*.js
 /src/**/*.js.map
-/src/tsconfig.json
+tsconfig.json
