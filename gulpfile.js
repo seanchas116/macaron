@@ -12,7 +12,7 @@ function pegjs() {
 
 function tsc() {
   return shell([
-    "tsc <%= file.path %> --target ES6"
+    "tsc <%= file.path %> --target ES6 --sourceMap"
   ]);
 }
 
