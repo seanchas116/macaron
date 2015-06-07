@@ -1,7 +1,7 @@
-macaron
+[WIP] macaron
 ========
 
-macaron will be a statically typed programming language that compiles to JavaScript
+macaron is a statically typed programming language that compiles to JavaScript
 
 What to do
 
