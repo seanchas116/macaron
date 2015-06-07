@@ -18,11 +18,11 @@ try {
   console.log(e.message);
 }
 
-console.dir(parsed);
+console.log(JSON.stringify(parsed, null, 2));
 
 const env = new Environment();
 const evaluator = new TypeEvaluator();
 
 const expr = evaluator.evaluate(parsed, env);
 
-console.dir(expr);
+console.log(JSON.stringify(expr, null, 2));
