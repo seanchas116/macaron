@@ -1,6 +1,7 @@
 import parser from "./src/parser";
 import Environment from "./src/Environment";
 import TypeEvaluator from "./src/TypeEvaluator";
+require('source-map-support').install();
 
 // const source = `
 // let f = (a Number, b Number) => {
