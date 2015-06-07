@@ -12,7 +12,7 @@
 
     for (const reducingOperators of binaryOperators) {
       for (let i = 0; i < operators.length; ++i) {
-        if (reducingOperators.indexOf(operators[i]) >= 0) {
+        if (reducingOperators.indexOf(operators[i].name) >= 0) {
           operands[i] = new AST.BinaryAST(operands[i], operators[i], operands[i + 1]);
           operands.splice(i + 1, 1);
           operators.splice(i, 1);
