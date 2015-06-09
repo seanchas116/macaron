@@ -14,7 +14,7 @@ class Environment {
   variables = new Map<string, Variable>();
   parent: Environment;
 
-  constructor(parent: Environment) {
+  constructor(parent: Environment = null) {
     this.parent = parent;
   }
 
