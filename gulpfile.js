@@ -3,6 +3,7 @@ var shell = require("gulp-shell");
 
 var PARSER_PEGJS = "./src/parser.pegjs";
 var SRC = "./src/*.ts";
+var TEST_SRC = "./test/*.ts";
 
 function pegjs() {
   return shell([
@@ -32,5 +33,14 @@ gulp.task("watch", ["build"], function () {
   gulp.watch(PARSER_PEGJS, ["pegjs"]);
   gulp.watch(SRC, ["tsc"]);
 });
+
+gulp.task("tsc:test", function () {
+  return gulp.src(TEST_SRC)
+    .pipe(tsc());
+});
+
+gulp.task("test", ["tsc:test"], shell.task([
+  "mocha --require ./babel-hook"
+]));
 
 gulp.task("default", ["watch"]);
