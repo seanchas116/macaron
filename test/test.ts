@@ -1,12 +1,14 @@
+/// <reference path="../typings/bundle.d.ts"/>
+
 "use strict";
 
-const assert = require("power-assert");
-const macaron = require("..");
+import assert from "power-assert";
 
 describe("macaron", () => {
   it("should compile arithmetic expression", () => {
     const src = "1 + (2 * 3) / 2 - 6";
-    const result = macaron.compile(src);
+    const result = "";
+    //const result = macaron.compile(src);
     assert(src === result);
   });
 });
