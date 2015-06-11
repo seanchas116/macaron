@@ -23,12 +23,13 @@ class AssignmentExpression extends Expression {
   }
 }
 
-/*export
+export
 class FunctionCallExpression extends Expression {
   function: Expression;
   arguments: Expression[];
 
-  constructor(func: Expression, args: Expression[]) {
+  constructor(func: Expression, args: Expression[], type: Type) {
+    super(type);
     this.function = func;
     this.arguments = args;
   }
@@ -37,14 +38,14 @@ class FunctionCallExpression extends Expression {
 export
 class FunctionExpression extends Expression {
   parameters: IdentifierExpression[];
-  Expression: Expression[];
+  expressions: Expression[];
 
   constructor(params: IdentifierExpression[], expressions: Expression[], type: Type) {
     super(type);
     this.parameters = params;
     this.expressions = expressions;
   }
-}*/
+}
 
 export
 class NumberExpression extends Expression {
