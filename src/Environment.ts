@@ -18,6 +18,13 @@ class Environment {
     this.parent = parent;
   }
 
+  addVariable(type: DeclarationType, name: IdentifierAST, value: Expression) {
+    if (this.variables.has(name.name)) {
+      throw new TypeCheckError(`Variable "${name.name}" is already defined`, name.location);
+    }
+    this.variables.set(name.name, new Variable(value.type, type == DeclarationType.Constant));
+  }
+
   addVariableExpression(type: DeclarationType, name: IdentifierAST, value: Expression) {
     if (type == DeclarationType.Assignment) {
       const variable = this.get(name);
@@ -34,10 +41,7 @@ class Environment {
         value
       );
     } else {
-      if (this.variables.has(name.name)) {
-        throw new TypeCheckError(`Variable "${name.name}" is already defined`, name.location);
-      }
-      this.variables.set(name.name, new Variable(value.type, type == DeclarationType.Constant));
+      this.addVariable(type, name, value);
 
       return new AssignmentExpression(
         type,
