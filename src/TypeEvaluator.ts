@@ -33,7 +33,7 @@ class TypeEvaluator {
         }
       })();
 
-      return env.addVariable(type, ast.left, right);
+      return env.addVariableExpression(type, ast.left, right);
     }
     else if (ast instanceof BinaryAST) {
       const left = this.evaluate(ast.left, env);
@@ -47,7 +47,7 @@ class TypeEvaluator {
       return new OperatorExpression(ast.operator.name, ast.operator.location, left, right);
     }
     else if (ast instanceof IdentifierAST) {
-      return env.getVariable(ast);
+      return env.getVariableExpression(ast);
     }
     else if (ast instanceof NumberAST) {
       return new NumberExpression(ast.value, ast.location);

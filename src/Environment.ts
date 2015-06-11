@@ -18,7 +18,7 @@ class Environment {
     this.parent = parent;
   }
 
-  addVariable(type: DeclarationType, name: IdentifierAST, value: Expression) {
+  addVariableExpression(type: DeclarationType, name: IdentifierAST, value: Expression) {
     if (type == DeclarationType.Assignment) {
       const variable = this.get(name);
       if (variable.isConstant) {
@@ -47,7 +47,7 @@ class Environment {
     }
   }
 
-  getVariable(name: IdentifierAST) {
+  getVariableExpression(name: IdentifierAST) {
     const variable = this.get(name);
     return new IdentifierExpression(name.name, name.location, variable.type);
   }
