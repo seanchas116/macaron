@@ -11,16 +11,9 @@ function pegjs() {
   ]);
 }
 
-function tsc() {
-  return shell([
-    "tsc <%= file.path %> --target ES6 --sourceMap"
-  ]);
-}
-
-gulp.task("tsc", function () {
-  return gulp.src(SRC)
-    .pipe(tsc());
-});
+gulp.task("tsc", shell.task([
+  "tsc"
+]));
 
 gulp.task("pegjs", function () {
   return gulp.src(PARSER_PEGJS)
@@ -34,12 +27,7 @@ gulp.task("watch", ["build"], function () {
   gulp.watch(SRC, ["tsc"]);
 });
 
-gulp.task("tsc:test", function () {
-  return gulp.src(TEST_SRC)
-    .pipe(tsc());
-});
-
-gulp.task("test", ["tsc:test"], shell.task([
+gulp.task("test", ["tsc"], shell.task([
   "mocha --require ./babel-hook"
 ]));
 
