@@ -18,7 +18,7 @@ class Compiler {
     const expressions = parsed.map(ast => evaluator.evaluate(ast, env));
 
     const emitter = new CodeEmitter();
-    const code = expressions.map(expr => emitter.emitCode(expr) + "\n").join("");
+    const code = expressions.map(expr => emitter.emitCode(expr) + ";\n").join();
 
     return code;
   }
