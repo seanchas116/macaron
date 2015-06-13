@@ -7,8 +7,7 @@
     "pegjs": "src/parser.pegjs"
   },
   "scripts": {
-    "test": "gulp test",
-    "example": "babel-node ./example.js"
+    "test": "gulp test"
   },
   "author": "",
   "license": "MIT",
