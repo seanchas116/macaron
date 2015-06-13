@@ -27,7 +27,7 @@ gulp.task("watch", ["build"], function () {
   gulp.watch(SRC, ["tsc"]);
 });
 
-gulp.task("test", ["tsc"], shell.task([
+gulp.task("test", ["build"], shell.task([
   "mocha --require ./babel-hook"
 ]));
 
