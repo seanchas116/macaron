@@ -1,5 +1,3 @@
-declare function require(path: string): any;
-
 import defaultEnviromnent from "./defaultEnvironment";
 import TypeEvaluator from "./TypeEvaluator";
 import CodeEmitter from "./CodeEmitter";
