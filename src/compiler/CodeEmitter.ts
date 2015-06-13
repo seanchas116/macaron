@@ -1,5 +1,6 @@
 import {
   Expression,
+  IdentifierExpression,
   BinaryExpression,
   NumberExpression,
   FunctionExpression,
@@ -21,7 +22,10 @@ class CodeEmitter {
   }
 
   emitExpression(expr: Expression): string {
-    if (expr instanceof BinaryExpression) {
+    if (expr instanceof IdentifierExpression) {
+      return this.emitIdentifier(expr);
+    }
+    else if (expr instanceof BinaryExpression) {
       return this.emitBinary(expr);
     }
     else if (expr instanceof NumberExpression) {
@@ -36,6 +40,10 @@ class CodeEmitter {
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
     }
+  }
+
+  emitIdentifier(expr: IdentifierExpression) {
+    return expr.name;
   }
 
   emitBinary(expr: BinaryExpression) {
