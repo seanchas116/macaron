@@ -7,7 +7,7 @@
     "pegjs": "src/parser.pegjs"
   },
   "scripts": {
-    "test": "mocha --require ./babel-hook",
+    "test": "gulp test",
     "example": "babel-node ./example.js"
   },
   "author": "",
