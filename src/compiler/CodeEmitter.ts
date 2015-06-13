@@ -4,8 +4,11 @@ import {
   BinaryExpression,
   NumberExpression,
   FunctionExpression,
-  FunctionCallExpression
+  FunctionCallExpression,
+  AssignmentExpression
 } from "./Expression";
+
+import DeclarationType from "./DeclarationType";
 
 export default
 class CodeEmitter {
@@ -36,6 +39,9 @@ class CodeEmitter {
     }
     else if (expr instanceof FunctionCallExpression) {
       return this.emitFunctionCall(expr);
+    }
+    else if (expr instanceof AssignmentExpression) {
+      return this.emitAssignment(expr);
     }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
@@ -72,5 +78,19 @@ class CodeEmitter {
     const func = this.emitExpression(expr.function);
     const args = expr.arguments.map(expr => this.emitExpression(expr)).join(", ");
     return `${func}(${args})`;
+  }
+
+  emitAssignment(expr: AssignmentExpression) {
+    const value = this.emitExpression(expr.value);
+    const name = expr.ideitifier.name;
+
+    switch (expr.declarationType) {
+    case DeclarationType.Variable:
+      return `let ${name} = ${value}`;
+    case DeclarationType.Constant:
+      return `const ${name} = ${value}`;
+    default:
+      return `${name} = ${value}`;
+    }
   }
 }
