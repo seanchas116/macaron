@@ -29,8 +29,11 @@
         "./src/compiler/defaultEnvironment.ts",
         "./src/compiler/nativeTypes.ts",
         "./src/test/compilerTest.ts",
-        "./typings/assert/assert.d.ts",
         "./typings/bundle.d.ts",
-        "./typings/mocha/mocha.d.ts"
+        "./typings/empower/empower.d.ts",
+        "./typings/mocha/mocha.d.ts",
+        "./typings/node/node.d.ts",
+        "./typings/power-assert-formatter/power-assert-formatter.d.ts",
+        "./typings/power-assert/power-assert.d.ts"
     ]
 }
