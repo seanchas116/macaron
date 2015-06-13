@@ -2,8 +2,7 @@ var gulp = require("gulp");
 var shell = require("gulp-shell");
 
 var PARSER_PEGJS = "./src/parser.pegjs";
-var SRC = "./src/*.ts";
-var TEST_SRC = "./test/*.ts";
+var SRC = "./**/*.ts";
 
 function pegjs() {
   return shell([
