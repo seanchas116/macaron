@@ -12,10 +12,8 @@ class Compiler {
   compile(source: string) {
     const parsed: ExpressionAST[] = parser.parse(source);
 
-    const env = defaultEnviromnent();
-    const evaluator = new TypeEvaluator();
-
-    const expressions = parsed.map(ast => evaluator.evaluate(ast, env));
+    const evaluator = new TypeEvaluator(defaultEnviromnent());
+    const expressions = parsed.map(ast => evaluator.evaluate(ast));
 
     const emitter = new CodeEmitter();
     const code = expressions.map(expr => emitter.emitCode(expr) + ";\n").join();

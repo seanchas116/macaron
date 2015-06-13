@@ -32,43 +32,47 @@ function returnType(expressions: Expression[]) {
 export default
 class TypeEvaluator {
 
-  evaluateExpressions(asts: ExpressionAST[], env: Environment) {
+  constructor(public environment: Environment) {
+
+  }
+
+  evaluateExpressions(asts: ExpressionAST[]) {
     const expressions: Expression[] = [];
 
     for (const ast of asts) {
       // TODO: catch and collect errors
-      expressions.push(this.evaluate(ast, env));
+      expressions.push(this.evaluate(ast));
     }
 
     return expressions;
   }
 
-  evaluate(ast: ExpressionAST, env: Environment): Expression {
+  evaluate(ast: ExpressionAST): Expression {
     if (ast instanceof AssignmentAST) {
-      return this.evaluateAssignment(ast, env);
+      return this.evaluateAssignment(ast);
     }
     else if (ast instanceof BinaryAST) {
-      return this.evaluateBinary(ast, env);
+      return this.evaluateBinary(ast);
     }
     else if (ast instanceof IdentifierAST) {
-      return this.evaluateIdentifier(ast, env);
+      return this.evaluateIdentifier(ast);
     }
     else if (ast instanceof NumberAST) {
-      return this.evalauteNumber(ast, env);
+      return this.evalauteNumber(ast);
     }
     else if (ast instanceof FunctionAST) {
-      return this.evaluateFunction(ast, env);
+      return this.evaluateFunction(ast);
     }
     else if (ast instanceof FunctionCallAST) {
-      return this.evaluateFunctionCall(ast, env);
+      return this.evaluateFunctionCall(ast);
     }
     else {
       throw new Error(`Not supported AST: ${ast.constructor.name}`);
     }
   }
 
-  evaluateAssignment(ast: AssignmentAST, env: Environment) {
-    const right = this.evaluate(ast.right, env);
+  evaluateAssignment(ast: AssignmentAST) {
+    const right = this.evaluate(ast.right);
     const type = (() => {
       switch (ast.declaration) {
       case "let":
@@ -80,12 +84,12 @@ class TypeEvaluator {
       }
     })();
 
-    return env.addVariableExpression(type, ast.left, right);
+    return this.environment.addVariableExpression(type, ast.left, right);
   }
 
-  evaluateBinary(ast: BinaryAST, env: Environment) {
-    const left = this.evaluate(ast.left, env);
-    const right = this.evaluate(ast.right, env);
+  evaluateBinary(ast: BinaryAST) {
+    const left = this.evaluate(ast.left);
+    const right = this.evaluate(ast.right);
     if (left.type !== right.type) {
       throw new TypeCheckError(
         `Cannot perform "${ast.operator.name}" operation between "${left.type}" and "right.type"`,
@@ -95,19 +99,19 @@ class TypeEvaluator {
     return new BinaryExpression(ast.operator.name, ast.operator.location, left, right);
   }
 
-  evaluateIdentifier(ast: IdentifierAST, env: Environment) {
-    return env.getVariableExpression(ast);
+  evaluateIdentifier(ast: IdentifierAST) {
+    return this.environment.getVariableExpression(ast);
   }
 
-  evalauteNumber(ast: NumberAST, env: Environment) {
+  evalauteNumber(ast: NumberAST) {
     return new NumberExpression(ast.value, ast.location);
   }
 
-  evaluateFunction(ast: FunctionAST, env: Environment) {
-    const subEnv = new Environment(env);
+  evaluateFunction(ast: FunctionAST) {
+    const subEnv = new Environment(this.environment);
     const params: IdentifierExpression[] = [];
     for (const {name, type} of ast.parameters) {
-      const metaType = this.evaluate(type, env).type;
+      const metaType = this.evaluate(type).type;
       if (metaType instanceof MetaType) {
         subEnv.addVariable(DeclarationType.Constant, name, metaType.type);
         params.push(new IdentifierExpression(name.name, name.location, metaType.type));
@@ -119,17 +123,17 @@ class TypeEvaluator {
         );
       }
     }
-    const expressions = this.evaluateExpressions(ast.expressions, subEnv);
+    const expressions = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
     const paramTypes = params.map(p => p.type);
     const type = new FunctionType(paramTypes, [], returnType(expressions));
     return new FunctionExpression(params, expressions, type);
   }
 
-  evaluateFunctionCall(ast: FunctionCallAST, env: Environment) {
-    const func = this.evaluate(ast.function, env);
+  evaluateFunctionCall(ast: FunctionCallAST) {
+    const func = this.evaluate(ast.function);
     const funcType = func.type;
 
-    const args = this.evaluateExpressions(ast.arguments, env);
+    const args = this.evaluateExpressions(ast.arguments);
 
     if (funcType instanceof FunctionType) {
       if (args.length < funcType.minParamCount || funcType.maxParamCount < args.length) {
