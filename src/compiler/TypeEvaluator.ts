@@ -10,7 +10,7 @@ import {
 
 import {
   Expression,
-  OperatorExpression,
+  BinaryExpression,
   NumberExpression,
   FunctionExpression,
   IdentifierExpression,
@@ -92,7 +92,7 @@ class TypeEvaluator {
         ast.operator.location
       );
     }
-    return new OperatorExpression(ast.operator.name, ast.operator.location, left, right);
+    return new BinaryExpression(ast.operator.name, ast.operator.location, left, right);
   }
 
   evaluateIdentifier(ast: IdentifierAST, env: Environment) {

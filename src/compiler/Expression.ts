@@ -55,7 +55,7 @@ class NumberExpression extends Expression {
 }
 
 export
-class OperatorExpression extends Expression {
+class BinaryExpression extends Expression {
   constructor(public operator: string, public location: SourceLocation, public left: Expression, public right: Expression) {
     super(left.type);
   }

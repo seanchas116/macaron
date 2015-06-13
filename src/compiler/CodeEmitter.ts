@@ -1,6 +1,6 @@
 import {
   Expression,
-  OperatorExpression,
+  BinaryExpression,
   NumberExpression
 } from "./Expression";
 
@@ -8,7 +8,7 @@ export default
 class CodeEmitter {
 
   emitCode(expr: Expression): string {
-    if (expr instanceof OperatorExpression) {
+    if (expr instanceof BinaryExpression) {
       const left = this.emitCode(expr.left);
       const right = this.emitCode(expr.right);
 
