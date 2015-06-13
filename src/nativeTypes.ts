@@ -1,4 +1,4 @@
-import Type from "./Type";
+import {Type} from "./Type";
 
 export
 const numberType = new Type("number");

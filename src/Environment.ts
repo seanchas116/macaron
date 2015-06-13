@@ -2,7 +2,7 @@ import {IdentifierAST} from "./AST";
 import {Expression, AssignmentExpression, IdentifierExpression} from "./Expression";
 import DeclarationType from "./DeclarationType";
 import TypeCheckError from "./TypeCheckError";
-import Type from "./Type";
+import {Type} from "./Type";
 
 class Variable {
   constructor(public type: Type, public isConstant: boolean) {
@@ -18,11 +18,11 @@ class Environment {
     this.parent = parent;
   }
 
-  addVariable(type: DeclarationType, name: IdentifierAST, value: Expression) {
+  addVariable(declarationType: DeclarationType, name: IdentifierAST, type: Type) {
     if (this.variables.has(name.name)) {
       throw new TypeCheckError(`Variable "${name.name}" is already defined`, name.location);
     }
-    this.variables.set(name.name, new Variable(value.type, type == DeclarationType.Constant));
+    this.variables.set(name.name, new Variable(type, declarationType == DeclarationType.Constant));
   }
 
   addVariableExpression(type: DeclarationType, name: IdentifierAST, value: Expression) {
@@ -41,7 +41,7 @@ class Environment {
         value
       );
     } else {
-      this.addVariable(type, name, value);
+      this.addVariable(type, name, value.type);
 
       return new AssignmentExpression(
         type,

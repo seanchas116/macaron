@@ -1,11 +1,14 @@
 import DeclarationType from "./DeclarationType";
 import {numberType} from "./nativeTypes";
-import Type from "./Type";
+import {Type, FunctionType} from "./Type";
 import SourceLocation from "./SourceLocation";
 
 export
 class Expression {
-  constructor(public type: Type) {
+  // let x = class { ... }
+  //   type: Function
+  //   typeValue: class { .. }
+  constructor(public type: Type, public typeValue: Type = null) {
   }
 }
 
@@ -28,8 +31,8 @@ class FunctionCallExpression extends Expression {
   function: Expression;
   arguments: Expression[];
 
-  constructor(func: Expression, args: Expression[], type: Type) {
-    super(type);
+  constructor(func: Expression, args: Expression[]) {
+    super((<FunctionType>func.type).returnType);
     this.function = func;
     this.arguments = args;
   }

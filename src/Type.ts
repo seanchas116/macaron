@@ -1,5 +1,5 @@
 
-export default
+export
 class Type {
   constructor(public name: string) {
   }
@@ -20,8 +20,20 @@ function functionTypeName(requiredParams: Type[], optionalParams: Type[], return
 
 export
 class FunctionType extends Type {
-  constructor(public requiredParameters: Type[], public optionalParameters: Type[], public returnType: Type) {
-    super(functionTypeName(requiredParameters, optionalParameters, returnType));
+  constructor(public requiredParams: Type[], public optionalParams: Type[], public returnType: Type) {
+    super(functionTypeName(requiredParams, optionalParams, returnType));
+  }
+
+  get parameters() {
+    return this.requiredParams.concat(this.optionalParams);
+  }
+
+  get minParamCount() {
+    return this.requiredParams.length;
+  }
+
+  get maxParamCount() {
+    return this.requiredParams.length + this.optionalParams.length;
   }
 
   isCastableTo(other: Type) {
@@ -34,20 +46,20 @@ class FunctionType extends Type {
       if (!this.returnType.isCastableTo(other.returnType)) {
         return false;
       }
-      if (other.requiredParameters.length !== this.requiredParameters.length) {
+      if (other.requiredParams.length !== this.requiredParams.length) {
         return false;
       }
-      if (this.optionalParameters.length < other.optionalParameters.length) {
+      if (this.optionalParams.length < other.optionalParams.length) {
         return false;
       }
 
-      for (let i = 0; i < other.requiredParameters.length; ++i) {
-        if (!other.requiredParameters[i].isCastableTo(this.requiredParameters[i])) {
+      for (let i = 0; i < other.requiredParams.length; ++i) {
+        if (!other.requiredParams[i].isCastableTo(this.requiredParams[i])) {
           return false;
         }
       }
-      for (let i = 0; i < other.optionalParameters.length; ++i) {
-        if (!other.optionalParameters[i].isCastableTo(this.optionalParameters[i])) {
+      for (let i = 0; i < other.optionalParams.length; ++i) {
+        if (!other.optionalParams[i].isCastableTo(this.optionalParams[i])) {
           return false;
         }
       }
@@ -56,4 +68,6 @@ class FunctionType extends Type {
       return false;
     }
   }
+
+
 }
