@@ -1,6 +1,6 @@
 declare function require(path: string): any;
 
-import Environment from "./Environment";
+import defaultEnviromnent from "./defaultEnvironment";
 import TypeEvaluator from "./TypeEvaluator";
 import CodeEmitter from "./CodeEmitter";
 import {ExpressionAST} from "./AST";
@@ -12,7 +12,7 @@ class Compiler {
   compile(source: string) {
     const parsed: ExpressionAST[] = parser.parse(source);
 
-    const env = new Environment();
+    const env = defaultEnviromnent();
     const evaluator = new TypeEvaluator();
 
     const expressions = parsed.map(ast => evaluator.evaluate(ast, env));
