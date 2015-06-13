@@ -64,9 +64,13 @@ class Environment {
     return variable;
   }
 
-  getOrNull(name: string) {
+  getOrNull(name: string): Variable {
     if (this.parent) {
-      return this.parent.getOrNull(name) || this.variables.get(name);
+      const parentVariable = this.parent.getOrNull(name);
+      if (parentVariable) {
+        return parentVariable;
+      }
+      return this.variables.get(name);
     } else {
       return this.variables.get(name);
     }
