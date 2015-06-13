@@ -5,10 +5,7 @@ import SourceLocation from "./SourceLocation";
 
 export
 class Expression {
-  // let x = class { ... }
-  //   type: Function
-  //   typeValue: class { .. }
-  constructor(public type: Type, public typeValue: Type = null) {
+  constructor(public type: Type) {
   }
 }
 
