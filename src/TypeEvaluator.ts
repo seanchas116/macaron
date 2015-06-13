@@ -93,7 +93,9 @@ class TypeEvaluator {
         }
       }
       const expressions = this.evaluateExpressions(ast.expressions, subEnv);
-      return new FunctionExpression(params, expressions, returnType(expressions));
+      const paramTypes = params.map(p => p.type);
+      const type = new FunctionType(paramTypes, [], returnType(expressions));
+      return new FunctionExpression(params, expressions, type);
     }
     else if (ast instanceof FunctionCallAST) {
       const func = this.evaluate(ast.function, env);
