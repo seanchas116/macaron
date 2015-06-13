@@ -30,6 +30,9 @@ class CodeEmitter {
     else if (expr instanceof FunctionExpression) {
       return this.emitFunction(expr);
     }
+    else if (expr instanceof FunctionCallExpression) {
+      return this.emitFunctionCall(expr);
+    }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
     }
@@ -55,5 +58,11 @@ class CodeEmitter {
     const body = bodyEmitter.emitExpressions(expr.expressions);
 
     return `(${params}) {\n${expr}\n}`;
+  }
+
+  emitFunctionCall(expr: FunctionCallExpression) {
+    const func = this.emitExpression(expr.function);
+    const args = expr.arguments.map(expr => this.emitExpression(expr)).join(", ");
+    return `${func}(${args})`;
   }
 }
