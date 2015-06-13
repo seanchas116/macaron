@@ -1,7 +1,7 @@
 "use strict";
 
 import assert from "power-assert";
-import Compiler from "../src/Compiler";
+import Compiler from "../compiler/Compiler";
 
 const testCases = [
   {
