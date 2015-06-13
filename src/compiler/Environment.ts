@@ -12,10 +12,8 @@ class Variable {
 export default
 class Environment {
   variables = new Map<string, Variable>();
-  parent: Environment;
 
-  constructor(parent: Environment = null) {
-    this.parent = parent;
+  constructor(public parent: Environment = null) {
   }
 
   addVariable(declarationType: DeclarationType, name: IdentifierAST, type: Type) {

@@ -37,13 +37,8 @@ class FunctionCallExpression extends Expression {
 
 export
 class FunctionExpression extends Expression {
-  parameters: IdentifierExpression[];
-  expressions: Expression[];
-
-  constructor(params: IdentifierExpression[], expressions: Expression[], type: Type) {
+  constructor(public parameters: IdentifierExpression[], public expressions: Expression[], type: Type) {
     super(type);
-    this.parameters = params;
-    this.expressions = expressions;
   }
 }
 
