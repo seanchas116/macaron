@@ -4,15 +4,12 @@ import TypeEvaluator from "./src/TypeEvaluator";
 import CodeEmitter from "./src/CodeEmitter";
 require('source-map-support').install();
 
-// const source = `
-// let f = (a Number, b Number) => {
-//   a + b
-// }
-// 1 + 2 * 1 * f(1, 2)
-// `;
 const source = `
-1 + 2 * 3
-`
+let f = (a Number, b Number) => {
+  a + b
+}
+1 + 2 * 1 * f(1, 2)
+`;
 
 let parsed;
 

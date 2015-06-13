@@ -14,6 +14,21 @@ const testCases = [
     expected: `
       ((1 + ((2 * 3) / 2)) - 6)
     `
+  },
+  {
+    title: "function call",
+    src: `
+      let f = (a number, b number) => {
+        a + b
+      }
+      1 + 2 * 1 * f(1, 2)
+    `,
+    expected: `
+      const f = (a, b) => {
+        return (a + b);
+      };
+      (1 + ((2 * 1) * f(1, 2)))
+    `
   }
 ];
 
