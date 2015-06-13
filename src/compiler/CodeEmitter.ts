@@ -71,7 +71,7 @@ class CodeEmitter {
     const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel);
     const body = bodyEmitter.emitExpressions(expr.expressions);
 
-    return `(${params}) {\n${body}\n}`;
+    return `(${params}) => {\n${body}\n}`;
   }
 
   emitFunctionCall(expr: FunctionCallExpression) {
