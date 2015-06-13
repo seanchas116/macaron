@@ -19,6 +19,13 @@ function functionTypeName(requiredParams: Type[], optionalParams: Type[], return
 }
 
 export
+class MetaType extends Type {
+  constructor(public type: Type) {
+    super(`type:${type.name}`);
+  }
+}
+
+export
 class FunctionType extends Type {
   constructor(public requiredParams: Type[], public optionalParams: Type[], public returnType: Type) {
     super(functionTypeName(requiredParams, optionalParams, returnType));
