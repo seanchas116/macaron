@@ -9,16 +9,24 @@ class CodeEmitter {
 
   emitCode(expr: Expression): string {
     if (expr instanceof BinaryExpression) {
-      const left = this.emitCode(expr.left);
-      const right = this.emitCode(expr.right);
-
-      return `(${left} ${expr.operator} ${right})`;
+      return this.emitBinary(expr);
     }
     else if (expr instanceof NumberExpression) {
-      return expr.value.toString();
+      return this.emitNumber(expr);
     }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
     }
+  }
+
+  emitBinary(expr: BinaryExpression) {
+    const left = this.emitCode(expr.left);
+    const right = this.emitCode(expr.right);
+
+    return `(${left} ${expr.operator} ${right})`;
+  }
+
+  emitNumber(expr: NumberExpression) {
+    return expr.value.toString();
   }
 }
