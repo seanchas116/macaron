@@ -9,9 +9,6 @@ class AST {
 
 export
 class ExpressionAST extends AST {
-  toExpression(env: Environment) {
-    throw new Error("not implemented");
-  }
 }
 
 export
