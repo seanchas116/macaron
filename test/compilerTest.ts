@@ -1,5 +1,3 @@
-/// <reference path="../typings/bundle.d.ts"/>
-
 "use strict";
 
 import assert from "power-assert";
