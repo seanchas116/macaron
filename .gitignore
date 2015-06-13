@@ -33,4 +33,3 @@ node_modules
 /src/**/*.js.map
 /test/**/*.js
 /test/**/*.js.map
-tsconfig.json

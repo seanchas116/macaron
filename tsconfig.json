@@ -1,0 +1,35 @@
+{
+    "version": "1.5.0-beta",
+    "compilerOptions": {
+        "target": "es6",
+        "declaration": false,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "sourceMap": true
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "!./node_modules/**/*.ts"
+    ],
+    "files": [
+        "./src/AST.ts",
+        "./src/CodeEmitter.ts",
+        "./src/Compiler.ts",
+        "./src/DeclarationType.ts",
+        "./src/Environment.ts",
+        "./src/Expression.ts",
+        "./src/SourceLocation.ts",
+        "./src/Type.ts",
+        "./src/TypeCheckError.ts",
+        "./src/TypeEvaluator.ts",
+        "./src/defaultEnvironment.ts",
+        "./src/nativeTypes.ts",
+        "./test/compilerTest.ts",
+        "./typings/assert/assert.d.ts",
+        "./typings/bundle.d.ts",
+        "./typings/mocha/mocha.d.ts"
+    ]
+}
