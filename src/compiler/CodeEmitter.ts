@@ -72,7 +72,7 @@ class CodeEmitter {
       .map(p => p.name)
       .join(", ");
 
-    const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel);
+    const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
     const body = bodyEmitter.emitExpressions(expr.expressions);
 
     return `(${params}) => {\n${body}\n}`;
