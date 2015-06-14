@@ -3,7 +3,14 @@
 import assert from "power-assert";
 import Compiler from "../compiler/Compiler";
 
-const testCases = [
+interface TestCase {
+  title: string;
+  src: string;
+  expected?: string;
+  error?: RegExp;
+}
+
+const testCases: TestCase[] = [
   {
     title: "arithmetic expression",
     src: `
@@ -27,6 +34,16 @@ const testCases = [
       };
       (1 + ((2 * 1) * f(1, 2)));
     `
+  },
+  {
+    title: "function call with wrong arguments",
+    src: `
+      let f = (a number) => {
+        a
+      }
+      f(1, 2)
+    `,
+    error: /Cannot pass 2 arguments/
   }
 ];
 
@@ -39,10 +56,21 @@ function toLines(source: string) {
 describe("Compiler", () => {
 
   for (const testCase of testCases) {
-    it(`should compile ${testCase.title}`, () => {
-      const result = toLines(new Compiler().compile(testCase.src));
-      const expected = toLines(testCase.expected);
-      assert.deepEqual(result, expected);
-    });
+    const compile = () => new Compiler().compile(testCase.src);
+
+    if (testCase.expected != null) {
+      it(`should compile ${testCase.title}`, () => {
+
+        const result = toLines(compile());
+        const expected = toLines(testCase.expected);
+        assert.deepEqual(result, expected);
+      });
+    }
+
+    if (testCase.error != null) {
+      it(`should emit error on ${testCase.title}`, () => {
+        assert.throws(compile, testCase.error);
+      });
+    }
   }
 });
