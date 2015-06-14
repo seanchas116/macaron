@@ -1,10 +1,15 @@
 {
   const AST = require("./AST");
+  const SourceLocation = require("./SourceLocation");
 
   const binaryOperators = [
     ["*", "/"],
     ["+", "-"]
   ];
+
+  function currentLocation() {
+    return new SourceLocation(line(), column(), offset());
+  }
 
   function buildBinaryExpression(first, rest) {
     let operands = [first, ...rest.map(t => t[2])];
@@ -13,7 +18,7 @@
     for (const reducingOperators of binaryOperators) {
       for (let i = 0; i < operators.length; ++i) {
         if (reducingOperators.indexOf(operators[i].name) >= 0) {
-          operands[i] = new AST.BinaryAST(operands[i], operators[i], operands[i + 1]);
+          operands[i] = new AST.BinaryAST(operators[i].location, operands[i], operators[i], operands[i + 1]);
           operands.splice(i + 1, 1);
           operators.splice(i, 1);
           --i;
@@ -43,13 +48,13 @@ Separator
 BinaryOperator
   = op:[+\-*/]
 {
-  return new AST.OperatorAST(op);
+  return new AST.OperatorAST(currentLocation(), op);
 }
 
 UnaryOperator
   = op:[+\-]
 {
-  return new AST.OperatorAST(op);
+  return new AST.OperatorAST(currentLocation(), op);
 }
 
 DeclarationKeyword
@@ -59,7 +64,7 @@ DeclarationKeyword
 AssignmentOperator
   = op:"="
 {
-  return new AST.OperatorAST(op);
+  return new AST.OperatorAST(currentLocation(), op);
 }
 
 IdentifierHead
@@ -85,7 +90,7 @@ Expression
 AssignmentExpression
   = declaration:DeclarationKeyword? _ left:Assignable _ operator:AssignmentOperator _ right:AssignmentExpression
 {
-  return new AST.AssignmentAST(declaration, left, operator, right);
+  return new AST.AssignmentAST(currentLocation(), declaration, left, operator, right);
 }
   / BinaryExpression
 
@@ -99,7 +104,7 @@ UnaryExpression
   = FunctionCall
   / operator:UnaryOperator _ argument:FunctionCall
 {
-  return new AST.UnaryAST(operator, argument);
+  return new AST.UnaryAST(currentLocation(), operator, argument);
 }
 
 Assignable
@@ -123,13 +128,13 @@ Literal
 Number
   = str:[0-9]+
 {
-  return new AST.NumberAST(Number.parseFloat(str));
+  return new AST.NumberAST(currentLocation(), Number.parseFloat(str));
 }
 
 Identifier
   = head:IdentifierHead tail:IdentifierTail* _
 {
-  return new AST.IdentifierAST(head + tail.reduce((a, b) => a + b, ""));
+  return new AST.IdentifierAST(currentLocation(), head + tail.reduce((a, b) => a + b, ""));
 }
 
 Lines
@@ -151,7 +156,7 @@ Block
 Parameter
   = name:Identifier type:Expression
 {
-  return new AST.ParameterAST(name, type);
+  return new AST.ParameterAST(currentLocation(), name, type);
 }
 
 Parameters
@@ -173,7 +178,7 @@ ParameterList
 Function
   = parameters:ParameterList "=>" _ expressions:Block _
 {
-  return new AST.FunctionAST(parameters, expressions);
+  return new AST.FunctionAST(currentLocation(), parameters, expressions);
 }
 
 ArgumentList
@@ -185,5 +190,5 @@ ArgumentList
 FunctionCall
   = func:Value _ argLists:ArgumentList*
 {
-  return argLists.reduce((func, args) => new AST.FunctionCallAST(func, args), func);
+  return argLists.reduce((func, args) => new AST.FunctionCallAST(currentLocation(), func, args), func);
 }
