@@ -1,16 +1,21 @@
 import SourceLocation from "./SourceLocation";
+import * as util from "util";
 
-
-// TODO: subclass Error
+// TODO: extends Error
 export default
 class TypeCheckError implements Error {
   name = "TypeCheckError";
   message: string;
-  stack: any;
+  error: Error;
+
+  get stack() {
+    return this.error["stack"];
+  }
 
   constructor(message: string, public location: SourceLocation) {
-    var error = new Error(message);
-    this.message = error.message;
-    this.stack = error["stack"];
+    this.error = new Error(message);
+    this.message = this.error.message;
   }
 }
+
+util.inherits(TypeCheckError, Error);
