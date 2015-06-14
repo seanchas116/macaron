@@ -44,6 +44,13 @@ const testCases: TestCase[] = [
       f(1, 2)
     `,
     error: /Cannot pass 2 arguments/
+  },
+  {
+    title: "reference of non-existing variable",
+    src: `
+      a + b
+    `,
+    error: /No variable/
   }
 ];
 
