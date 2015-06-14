@@ -14,7 +14,8 @@ import {
   NumberExpression,
   FunctionExpression,
   IdentifierExpression,
-  FunctionCallExpression
+  FunctionCallExpression,
+  ReturnExpression
 } from "./Expression";
 
 import Environment from "./Environment";
@@ -24,6 +25,17 @@ import {
   FunctionType,
   MetaType
 } from "./Type";
+
+function appendReturnType(expressions: Expression[]) {
+  const len = expressions.length;
+  if (len === 0) {
+    return [];
+  }
+  const init = expressions.slice(0, len - 1);
+  const last = expressions[len - 1];
+
+  return init.concat([new ReturnExpression(last)]);
+}
 
 function returnType(expressions: Expression[]) {
   return expressions[expressions.length - 1].type;
@@ -123,7 +135,7 @@ class TypeEvaluator {
         );
       }
     }
-    const expressions = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
+    const expressions = appendReturnType(new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions));
     const paramTypes = params.map(p => p.type);
     const type = new FunctionType(paramTypes, [], returnType(expressions));
     return new FunctionExpression(params, expressions, type);
