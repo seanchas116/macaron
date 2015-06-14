@@ -5,7 +5,8 @@ import {
   NumberExpression,
   FunctionExpression,
   FunctionCallExpression,
-  AssignmentExpression
+  AssignmentExpression,
+  ReturnExpression
 } from "./Expression";
 
 import DeclarationType from "./DeclarationType";
@@ -42,6 +43,9 @@ class CodeEmitter {
     }
     else if (expr instanceof AssignmentExpression) {
       return this.emitAssignment(expr);
+    }
+    else if (expr instanceof ReturnExpression) {
+      return this.emitReturn(expr);
     }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
@@ -92,5 +96,9 @@ class CodeEmitter {
     default:
       return `${name} = ${value}`;
     }
+  }
+
+  emitReturn(expr: ReturnExpression) {
+    return `return ${this.emitExpression(expr.expression)}`;
   }
 }
