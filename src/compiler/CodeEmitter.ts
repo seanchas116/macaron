@@ -85,6 +85,8 @@ class CodeEmitter {
   }
 
   emitAssignment(expr: AssignmentExpression) {
+    // TODO: AssignmentExpression must be top-level
+
     const value = this.emitExpression(expr.value);
     const name = expr.ideitifier.name;
 
