@@ -55,3 +55,10 @@ class BinaryExpression extends Expression {
     super(left.type);
   }
 }
+
+export
+class ReturnExpression extends Expression {
+  constructor(public expression: Expression) {
+    super(expression.type);
+  }
+}
