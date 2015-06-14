@@ -30,13 +30,19 @@ const testCases = [
   }
 ];
 
+function toLines(source: string) {
+  return source.split("\n")
+    .map(line => line.trim())
+    .filter(line => line != "");
+}
+
 describe("Compiler", () => {
 
   for (const testCase of testCases) {
     it(`should compile ${testCase.title}`, () => {
-      const result = new Compiler().compile(testCase.src).trim();
-      const expected = testCase.expected.trim();
-      assert(result === expected);
+      const result = toLines(new Compiler().compile(testCase.src));
+      const expected = toLines(testCase.expected);
+      assert.deepEqual(result, expected);
     });
   }
 });
