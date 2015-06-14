@@ -66,7 +66,7 @@ describe("Compiler", () => {
     const compile = () => new Compiler().compile(testCase.src);
 
     if (testCase.expected != null) {
-      it(`should compile ${testCase.title}`, () => {
+      it(`compiles ${testCase.title}`, () => {
 
         const result = toLines(compile());
         const expected = toLines(testCase.expected);
@@ -75,7 +75,7 @@ describe("Compiler", () => {
     }
 
     if (testCase.error != null) {
-      it(`should emit error on ${testCase.title}`, () => {
+      it(`emits error on ${testCase.title}`, () => {
         assert.throws(compile, testCase.error);
       });
     }
