@@ -63,7 +63,7 @@ function toLines(source: string) {
 describe("Compiler", () => {
 
   for (const testCase of testCases) {
-    const compile = () => new Compiler().compile(testCase.src);
+    const compile = () => new Compiler().compile(testCase.src, {implicitReturn: true});
 
     if (testCase.expected != null) {
       it(`compiles ${testCase.title}`, () => {
