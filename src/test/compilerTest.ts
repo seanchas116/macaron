@@ -64,11 +64,11 @@ function toLines(source: string) {
 
 describe("Compiler", () => {
 
-  for (const testCase of testCases) {
-    const compile = () => new Compiler().compile(testCase.src, {implicitReturn: true});
+  for (const {src, title, error, expected} of testCases) {
+    const compile = () => new Compiler().compile(src, {implicitReturn: true});
 
-    if (testCase.expected != null) {
-      it(`compiles ${testCase.title}`, () => {
+    if (expected != null) {
+      it(`compiles ${title}`, () => {
         const compiled = compile();
         const func: any = evalIsolated(`
           (() => {
@@ -76,13 +76,13 @@ describe("Compiler", () => {
           })`
         );
         const result = func();
-        assert.equal(result, testCase.expected);
+        assert.equal(result, expected);
       });
     }
 
-    if (testCase.error != null) {
-      it(`emits error on ${testCase.title}`, () => {
-        assert.throws(compile, testCase.error);
+    if (error != null) {
+      it(`emits error on ${title}`, () => {
+        assert.throws(compile, error);
       });
     }
   }
