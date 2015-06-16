@@ -75,6 +75,4 @@ class FunctionType extends Type {
       return false;
     }
   }
-
-
 }
