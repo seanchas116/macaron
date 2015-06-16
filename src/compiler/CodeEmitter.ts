@@ -11,14 +11,28 @@ import {
 
 import DeclarationType from "./DeclarationType";
 
+function appendReturnType(expressions: Expression[]) {
+  const len = expressions.length;
+  if (len === 0) {
+    return [];
+  }
+  const init = expressions.slice(0, len - 1);
+  const last = expressions[len - 1];
+
+  return init.concat([new ReturnExpression(last)]);
+}
+
 export default
 class CodeEmitter {
 
   constructor(public indentationWidth = 2, public indentationLevel = 0) {
   }
 
-  emitExpressions(expressions: Expression[]) {
+  emitExpressions(expressions: Expression[], implicitReturn = false) {
     const indentation = " ".repeat(this.indentationWidth * this.indentationLevel);
+    if (implicitReturn) {
+      expressions = appendReturnType(expressions);
+    }
     return expressions
       .map(e => this.emitExpression(e))
       .map(line => `${indentation}${line};\n`)
@@ -73,7 +87,7 @@ class CodeEmitter {
       .join(", ");
 
     const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
-    const body = bodyEmitter.emitExpressions(expr.expressions);
+    const body = bodyEmitter.emitExpressions(expr.expressions, true);
 
     return `(${params}) => {\n${body}\n}`;
   }
