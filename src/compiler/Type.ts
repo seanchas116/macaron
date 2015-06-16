@@ -4,8 +4,8 @@ class Type {
   constructor(public name: string) {
   }
 
-  isCastableTo(other: Type) {
-    return this === other;
+  isCastableTo(superType: Type) {
+    return this === superType;
   }
 }
 
@@ -43,30 +43,30 @@ class FunctionType extends Type {
     return this.requiredParams.length + this.optionalParams.length;
   }
 
-  isCastableTo(other: Type) {
-    if (other instanceof FunctionType) {
+  isCastableTo(superType: Type) {
+    if (superType instanceof FunctionType) {
       // OK: (Object)=>HTMLElement to (HTMLElement)=>Object
       // NG: (HTMLElement)=>Object to (Object)=>HTMLElement
       // OK: (Object[, Object])=>void to (Object)=>void
       // NG: (Object)=>void to (Object[, Object])=>void
 
-      if (!this.returnType.isCastableTo(other.returnType)) {
+      if (!this.returnType.isCastableTo(superType.returnType)) {
         return false;
       }
-      if (other.requiredParams.length !== this.requiredParams.length) {
+      if (superType.requiredParams.length !== this.requiredParams.length) {
         return false;
       }
-      if (this.optionalParams.length < other.optionalParams.length) {
+      if (this.optionalParams.length < superType.optionalParams.length) {
         return false;
       }
 
-      for (let i = 0; i < other.requiredParams.length; ++i) {
-        if (!other.requiredParams[i].isCastableTo(this.requiredParams[i])) {
+      for (let i = 0; i < superType.requiredParams.length; ++i) {
+        if (!superType.requiredParams[i].isCastableTo(this.requiredParams[i])) {
           return false;
         }
       }
-      for (let i = 0; i < other.optionalParams.length; ++i) {
-        if (!other.optionalParams[i].isCastableTo(this.optionalParams[i])) {
+      for (let i = 0; i < superType.optionalParams.length; ++i) {
+        if (!superType.optionalParams[i].isCastableTo(this.optionalParams[i])) {
           return false;
         }
       }
