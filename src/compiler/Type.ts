@@ -23,7 +23,7 @@ class MetaType extends Type {
 
 export
 class FunctionType extends Type {
-  constructor(public requiredParams: Type[], public optionalParams: Type[], public returnType: Type) {
+  constructor(public selfType: Type, public requiredParams: Type[], public optionalParams: Type[], public returnType: Type) {
     super();
   }
 
@@ -32,11 +32,20 @@ class FunctionType extends Type {
     const optionalNames = this.optionalParams.map(t => t.name);
     const returnName = this.returnType.name;
 
-    if (optionalNames.length > 0) {
-      return `(${requiredNames.join()}[, ${optionalNames.join()}])=>${returnName}`;
+    const funcName = (() => {
+      if (optionalNames.length > 0) {
+        return `(${requiredNames.join()}[, ${optionalNames.join()}])=>${returnName}`;
+      }
+      else {
+        return `(${requiredNames.join()})=>${returnName}`
+      }
+    })();
+
+    if (this.selfType) {
+      return `(${this.selfType.name})${funcName}`;
     }
     else {
-      return `(${requiredNames.join()})=>${returnName}`
+      return funcName;
     }
   }
 
@@ -58,6 +67,10 @@ class FunctionType extends Type {
       // NG: (HTMLElement)=>Object to (Object)=>HTMLElement
       // OK: (Object[, Object])=>void to (Object)=>void
       // NG: (Object)=>void to (Object[, Object])=>void
+
+      if (!superType.selfType.isCastableTo(this.selfType)) {
+        return false;
+      }
 
       if (!this.returnType.isCastableTo(superType.returnType)) {
         return false;

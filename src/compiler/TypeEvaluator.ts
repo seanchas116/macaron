@@ -126,7 +126,7 @@ class TypeEvaluator {
     }
     const expressions = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
     const paramTypes = params.map(p => p.type);
-    const type = new FunctionType(paramTypes, [], returnType(expressions));
+    const type = new FunctionType(null, paramTypes, [], returnType(expressions));
     return new FunctionExpression(params, expressions, type);
   }
 
