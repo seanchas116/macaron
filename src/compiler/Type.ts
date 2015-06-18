@@ -76,3 +76,10 @@ class FunctionType extends Type {
     }
   }
 }
+
+export
+class TupleType extends Type {
+  constructor(public types: Type[]) {
+    super("");
+  }
+}
