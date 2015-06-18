@@ -94,6 +94,8 @@ AssignmentOperator
   return new AST.OperatorAST(currentLocation(), op);
 }
 
+// TODO: support non-ascii identifier
+
 IdentifierHead
   = [a-zA-Z$_]
 
