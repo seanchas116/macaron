@@ -3,6 +3,7 @@ import {
   IdentifierExpression,
   BinaryExpression,
   NumberExpression,
+  StringExpression,
   FunctionExpression,
   FunctionCallExpression,
   AssignmentExpression,
@@ -49,6 +50,9 @@ class CodeEmitter {
     else if (expr instanceof NumberExpression) {
       return this.emitNumber(expr);
     }
+    else if (expr instanceof StringExpression) {
+      return this.emitString(expr);
+    }
     else if (expr instanceof FunctionExpression) {
       return this.emitFunction(expr);
     }
@@ -79,6 +83,10 @@ class CodeEmitter {
 
   emitNumber(expr: NumberExpression) {
     return expr.value.toString();
+  }
+
+  emitString(expr: StringExpression) {
+    return JSON.stringify(expr.value);
   }
 
   emitFunction(expr: FunctionExpression) {
