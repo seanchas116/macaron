@@ -59,6 +59,13 @@ class NumberAST extends ExpressionAST {
 }
 
 export
+class StringAST extends ExpressionAST {
+  constructor(location: SourceLocation, public value: string) {
+    super(location);
+  }
+}
+
+export
 class OperatorAST extends AST {
   constructor(location: SourceLocation, public name: string) {
     super(location);
