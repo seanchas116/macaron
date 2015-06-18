@@ -23,9 +23,9 @@ const testCases: TestCase[] = [
   {
     title: "string concatenation",
     src: `
-      "foo" + 'bar'
+      "foo\\\"" + 'bar\\\''
     `,
-    expected: "foobar"
+    expected: "foo\"bar\'"
   },
   {
     title: "arithmetic expression",
