@@ -1,5 +1,5 @@
 import DeclarationType from "./DeclarationType";
-import {numberType} from "./nativeTypes";
+import {numberType, stringType} from "./nativeTypes";
 import {Type, FunctionType} from "./Type";
 import SourceLocation from "./SourceLocation";
 
@@ -46,6 +46,13 @@ export
 class NumberExpression extends Expression {
   constructor(public value: number, public location: SourceLocation) {
     super(numberType);
+  }
+}
+
+export
+class StringExpression extends Expression {
+  constructor(public value: string, public location: SourceLocation) {
+    super(stringType);
   }
 }
 
