@@ -1,7 +1,8 @@
 
 export
 class Type {
-  constructor(public name: string) {
+  get name() {
+    return "[anonymous type]";
   }
 
   isCastableTo(superType: Type) {
@@ -9,26 +10,34 @@ class Type {
   }
 }
 
-function functionTypeName(requiredParams: Type[], optionalParams: Type[], returnType: Type) {
-  if (optionalParams.length > 0) {
-    return `(${requiredParams.join()}[, ${optionalParams.join()}])=>${returnType.name}`;
-  }
-  else {
-    return `(${requiredParams.join()})=>${returnType.name}`
-  }
-}
-
 export
 class MetaType extends Type {
   constructor(public type: Type) {
-    super(`type:${type.name}`);
+    super();
+  }
+
+  get name() {
+    return `type:${this.type.name}`;
   }
 }
 
 export
 class FunctionType extends Type {
   constructor(public requiredParams: Type[], public optionalParams: Type[], public returnType: Type) {
-    super(functionTypeName(requiredParams, optionalParams, returnType));
+    super();
+  }
+
+  get name() {
+    const requiredNames = this.requiredParams.map(t => t.name);
+    const optionalNames = this.optionalParams.map(t => t.name);
+    const returnName = this.returnType.name;
+
+    if (optionalNames.length > 0) {
+      return `(${requiredNames.join()}[, ${optionalNames.join()}])=>${returnName}`;
+    }
+    else {
+      return `(${requiredNames.join()})=>${returnName}`
+    }
   }
 
   get parameters() {
@@ -80,6 +89,10 @@ class FunctionType extends Type {
 export
 class TupleType extends Type {
   constructor(public types: Type[]) {
-    super("");
+    super();
+  }
+
+  get name() {
+    return `[${this.types.join()}]`;
   }
 }
