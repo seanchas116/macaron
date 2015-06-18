@@ -11,6 +11,7 @@ interface GenericTypeParam {
   location: SourceLocation;
 }
 
+export
 class GenericType {
   constructor(public name: string, public typeParams: GenericTypeParam[]) {
     const variadicParams = typeParams.filter(p => p.variadic);
@@ -49,10 +50,12 @@ class GenericType {
           location
         );
       }
+      return new InstantiatedType(this, types);
     }
   }
 }
 
+export
 class InstantiatedType extends Type {
   constructor(public generic: GenericType, public typeArgs: Type[]) {
     super();
