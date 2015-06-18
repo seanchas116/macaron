@@ -21,6 +21,13 @@ function evalIsolated(code: string) {
 
 const testCases: TestCase[] = [
   {
+    title: "string concatenation",
+    src: `
+      "foo" + 'bar'
+    `,
+    expected: "foobar"
+  },
+  {
     title: "arithmetic expression",
     src: `
       1 + (2 * 3) / 2 - 6
