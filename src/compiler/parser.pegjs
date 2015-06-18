@@ -45,6 +45,33 @@ Separator
   = "\n"
   / ","
 
+Escaped
+  = "\\" char:.
+{
+  return char;
+}
+
+String1Char
+  = Escaped / [^']
+
+String1
+  = "'" chars:String1Char* "'"
+{
+  return chars.join("");
+}
+
+String2Char
+  = Escaped / [^"]
+
+String2
+  = '"' chars:String2Char* '"'
+{
+  return chars.join("");
+}
+
+String
+  = String1 / String2
+
 BinaryOperator
   = op:[+\-*/]
 {
@@ -123,12 +150,18 @@ Parentheses
 }
 
 Literal
-  = Number / Function
+  = NumberLiteral / StringLiteral / Function
 
-Number
+NumberLiteral
   = str:[0-9]+
 {
   return new AST.NumberAST(currentLocation(), Number.parseFloat(str));
+}
+
+StringLiteral
+  = str:String
+{
+  return new AST.StringAST(currentLocation(), str);
 }
 
 Identifier
