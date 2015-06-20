@@ -154,12 +154,14 @@ Parentheses
 Literal
   = NumberLiteral / StringLiteral / Function
 
+// TODO: parse other than integer
 NumberLiteral
   = str:[0-9]+
 {
   return new AST.NumberAST(currentLocation(), Number.parseFloat(str));
 }
 
+// TODO: parse escapes correctly
 StringLiteral
   = str:String
 {
