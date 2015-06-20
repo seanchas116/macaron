@@ -18,6 +18,7 @@ What to implement
 * Compile-time property/method extension
 * Compile-time operator overload
 * Compile-time function overload
+* Mixins
 * Covariant/contravariant generics
 * Algebraic data type
 * Pattern matching
