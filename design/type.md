@@ -2,6 +2,8 @@
 
 ## Hierarchy
 
+Type hierarchy is a DAG (directed acyclic graph)
+
 * void
   * any
     * Object
