@@ -26,6 +26,10 @@ func (this number) fooMethod(y number) {
 fooMethod = (this number)(y number) {
   this + y
 }
+
+// shorter form
+xs.map(x => x + 1)
+xs.reduce((x, y) => x + y)
 ```
 
 ## Trailing closure (block)
