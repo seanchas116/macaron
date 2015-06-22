@@ -24,7 +24,7 @@ TODO: how to handle primitive boxing
 ## Subtyping
 
 * Everything is structural
-* `(a Array) => Object` is a subtype of `(a Object) => Array`
+* `(a Object) => Array` is a subtype of `(a Array) => Object`
   * Function argument types are contravariant
   * Function return types are covariant
 * Read-only properties are covariant
