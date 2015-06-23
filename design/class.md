@@ -7,7 +7,7 @@ class Foo : Bar {
   foo = 123
 
   // prototype properties as methods
-  // Foo.method is a (Foo)(x number, y number) => number
+  // Foo.method is a (this Foo)(x number, y number) => number
   method(x number, y number) {
     x + y
   }
