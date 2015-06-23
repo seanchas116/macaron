@@ -7,11 +7,6 @@ foo = (x number, y number) {
   x + y
 }
 
-// same type
-foo = (x, y number) {
-  x + y
-}
-
 // receive arguments as Array
 foo = (...xs number[]) {
   x + y
