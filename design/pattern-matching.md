@@ -74,4 +74,8 @@ let [foo, bar] = [1, 2]
 
 // objects
 let {foo, bar} = {foo: 1, bar: 2}
+
+// function parameter
+func hoge({foo Foo, bar Bar?}) {
+}
 ```
