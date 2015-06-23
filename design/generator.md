@@ -9,13 +9,13 @@ func yielding() {
   yield 1
   yield 2
   yield 3
-  yield* [1,2,3]
+  yield ...[1,2,3]
 }
 yielding() //=> An Iterator
 
 // empty generator function
 func empty() {
-  yield* []
+  yield ...[]
 }
 ```
 
@@ -24,7 +24,7 @@ func empty() {
 ```
 func asyncOp() {
   await getData()
-  await* getDataList() // Promise.all
+  await ...getDataList() // Promise.all
 }
 asyncOp() //=> A Promise
 
