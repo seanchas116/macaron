@@ -152,7 +152,7 @@ Parentheses
 }
 
 Literal
-  = NumberLiteral / StringLiteral / Function
+  = NumberLiteral / StringLiteral / Function / Class
 
 // TODO: parse other than integer
 NumberLiteral
@@ -228,4 +228,29 @@ FunctionCall
   = func:Value _ argLists:ArgumentList*
 {
   return argLists.reduce((func, args) => new AST.FunctionCallAST(currentLocation(), func, args), func);
+}
+
+Class
+  = "class" _ name:Identifier __ "{" __ members:ClassMembers "}" _
+{
+  return new AST.ClassAST(currentLocation(), name, members);
+}
+
+ClassMembers
+  = first:ClassMember rest:(___ ClassMember)* __
+{
+  if (first) {
+    return [first, ...rest.map(l => l[1])];
+  } else {
+    return [];
+  }
+}
+
+ClassMember
+  = ClassMethod
+
+ClassMethod
+  = name:Identifier _ params:ParameterList _ exps:Block _
+{
+  return new AST.ClassMethodAST(currentLocation(), name, params, exps);
 }

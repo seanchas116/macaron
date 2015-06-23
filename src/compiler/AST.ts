@@ -99,7 +99,7 @@ class ClassMemberAST extends AST {
 
 export
 class ClassMethodAST extends ClassMemberAST {
-  constructor(location: SourceLocation, public parameters: ParameterAST[], public expressions: ExpressionAST[]) {
+  constructor(location: SourceLocation, public name: IdentifierAST, public parameters: ParameterAST[], public expressions: ExpressionAST[]) {
     super(location);
   }
 }
