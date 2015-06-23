@@ -31,6 +31,7 @@
         "./src/compiler/defaultEnvironment.ts",
         "./src/compiler/nativeTypes.ts",
         "./src/test/compilerTest.ts",
+        "./src/test/support/loadPattern.ts",
         "./typings/bundle.d.ts",
         "./typings/empower/empower.d.ts",
         "./typings/mocha/mocha.d.ts",
