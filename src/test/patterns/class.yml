@@ -6,5 +6,5 @@
       }
     }
     let foo = new Foo()
-    foo.foo()
-  expected: 2
+    foo.foo(1, 2)
+  expected: 3
