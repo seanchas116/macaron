@@ -44,8 +44,16 @@ xs.reduce((x, y) => x + y)
 
 ## Trailing closure (block)
 
-```
-xs.map { (x number) number =>
+FIXME: hard to parse
 
+```
+xs.map { x =>
+}
+xs.map { (x number) number =>
+}
+
+describe("Foo") {
+  it("do foo") {
+  }
 }
 ```
