@@ -6,6 +6,7 @@ var COMPILER_DEST = "./dest/compiler";
 var PEGJS_SRC = `${COMPILER_SRC}/parser.pegjs`;
 var PEGJS_DEST = `${COMPILER_DEST}/parser.js`;
 var SRC = "./**/*.ts";
+var OTHER_SRC = `./src/**/!(*.ts|*.pegjs)`;
 var TESTS = "./dest/test/**/*Test.js";
 
 gulp.task("tsc", shell.task([
@@ -17,7 +18,12 @@ gulp.task("pegjs", shell.task([
   `pegjs ${PEGJS_SRC} ${PEGJS_DEST}`
 ]));
 
-gulp.task("build", ["pegjs", "tsc"]);
+gulp.task("copy", function () {
+  return gulp.src(OTHER_SRC, {base: "./src"})
+    .pipe(gulp.dest("./dest"));
+});
+
+gulp.task("build", ["pegjs", "tsc", "copy"]);
 
 gulp.task("watch", ["build"], function () {
   gulp.watch(PEGJS_SRC, ["pegjs"]);
