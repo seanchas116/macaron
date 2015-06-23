@@ -1,0 +1,9 @@
+- title: number arithmetic
+  src: |
+    1 + (2 * 3) / 2 - 6
+  expected: -2
+
+- title: string concatenation
+  src: |
+    "foo" + 'bar'
+  expected: foobar

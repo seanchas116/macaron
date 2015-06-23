@@ -1,0 +1,9 @@
+- title: double quote string
+  src: |
+    "foo"
+  expected: foo
+
+- title: single quote string
+  src: |
+    'foo'
+  expected: foo

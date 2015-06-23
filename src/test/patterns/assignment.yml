@@ -1,0 +1,4 @@
+- title: reference of non-existing variable
+  src: |
+    a + b
+  error: No variable

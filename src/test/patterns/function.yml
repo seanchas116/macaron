@@ -1,0 +1,15 @@
+- title: function call
+  src: |
+    let f = (a number, b number) => {
+      a + b
+    }
+    1 + 2 * 1 * f(1, 2)
+  expected: 7
+
+- title: function call with wrong arguments
+  src: |
+    let f = (a number) => {
+      a
+    }
+    f(1, 2)
+  error: Cannot pass 2 arguments
