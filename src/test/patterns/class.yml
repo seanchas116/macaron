@@ -1,0 +1,10 @@
+- title: method call
+  src: |
+    class Foo {
+      foo(x number, y number) {
+        x + y
+      }
+    }
+    let foo = new Foo()
+    foo.foo()
+  expected: 2
