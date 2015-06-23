@@ -7,7 +7,7 @@ interface Point {
   y number
 
   // required method
-  length(): number
+  length() number
 
   // additional implementation
   dot(other Point) {
