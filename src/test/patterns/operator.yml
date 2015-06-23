@@ -1,9 +1,48 @@
 - title: number arithmetic
   src: |
-    1 + (2 * 3) / 2 - 6
-  expected: -2
+    1 + (2 * +3) / 2 - -6
+  expected: 10
 
 - title: string concatenation
   src: |
     "foo" + 'bar'
   expected: foobar
+
+- title: boolean operator
+  src: |
+    true || true && false
+  expected: true
+
+- title: boolean negation
+  src: |
+    !true || !true
+  expected: false
+
+- title: bitwise operation
+  src: |
+    11 | 22 ^ 33 & ~44
+  expected: 31
+
+- title: bit shift
+  src: |
+    11 << 2 + 22 >> 3 + 33 >> 4
+  expected: 720896
+
+- title: in
+  src: |
+    let obj any = {
+      foo: 1
+      bar: 2
+    }
+    "foo" in obj
+  expected: true
+
+- title: delete
+  src: |
+    let obj any = {
+      foo: 1
+      bar: 2
+    }
+    delete obj["foo"]
+    "foo" in obj
+  expected: false
