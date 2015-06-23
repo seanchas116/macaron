@@ -35,7 +35,7 @@ const Point = {
 export
 interface NumberTimes : number {
   times(block (i number) => number) {
-    for var i = 0, i < this; i += 1 {
+    for var i = 0, i < this, i += 1 {
       block(i)
     }
   }
