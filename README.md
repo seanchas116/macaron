@@ -34,3 +34,5 @@ Inspirations
 * TypeScript
 * Kotlin
 * Swift
+* CoffeeScript
+* Go
