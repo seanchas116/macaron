@@ -7,6 +7,21 @@ foo = (x number, y number) {
   x + y
 }
 
+// same type
+foo = (x, y number) {
+  x + y
+}
+
+// receive arguments as Array
+foo = (...xs number[]) {
+  x + y
+}
+
+// receive arguments as tuple
+foo = (...xy [number, number]) {
+  x + y
+}
+
 // named function
 func foo(x number, y number) {
   x + y
