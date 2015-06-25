@@ -110,6 +110,8 @@ __ = (Whitespace / Separator)*
 // whitespaces and >0 separator
 ___ = _ Separator (_ Separator)* _
 
+ClassKeyword = "class"
+
 Expression
   = expr:AssignmentExpression _
 {
@@ -231,7 +233,7 @@ ArgumentList
 }
 
 Class
-  = "class" _ name:Identifier __ "{" __ members:ClassMembers "}" _
+  = ClassKeyword _ name:Identifier __ "{" __ members:ClassMembers "}" _
 {
   return new AST.ClassAST(currentLocation(), name, members);
 }
