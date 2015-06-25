@@ -136,6 +136,12 @@ UnaryExpression
   return new AST.UnaryAST(currentLocation(), operator, argument);
 }
 
+FunctionCall
+  = func:Value _ argLists:ArgumentList*
+{
+  return argLists.reduce((func, args) => new AST.FunctionCallAST(currentLocation(), func, args), func);
+}
+
 Assignable
   = Identifier
 
@@ -222,12 +228,6 @@ ArgumentList
   = "(" args:Lines ")" _
 {
   return args;
-}
-
-FunctionCall
-  = func:Value _ argLists:ArgumentList*
-{
-  return argLists.reduce((func, args) => new AST.FunctionCallAST(currentLocation(), func, args), func);
 }
 
 Class
