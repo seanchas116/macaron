@@ -43,3 +43,11 @@ TODO
 ## Set
 
 TODO
+
+## Tuple
+
+Same as TypeScript
+
+```
+["foo", 123, /hoge/]
+```
