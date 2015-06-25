@@ -78,6 +78,13 @@ class StringAST extends ExpressionAST {
 }
 
 export
+class MemberAccessAST extends ExpressionAST {
+  constructor(location: SourceLocation, public object: ExpressionAST, public memberName: string) {
+    super(location);
+  }
+}
+
+export
 class OperatorAST extends AST {
   constructor(location: SourceLocation, public name: string) {
     super(location);
