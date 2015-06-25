@@ -35,7 +35,7 @@ for var i = 0, i < count, i += 1 {
 ## for-in (for Iterables)
 
 ```
-for let i in [1,2,3] {
+for let i : [1,2,3] {
 
 }
 ```
