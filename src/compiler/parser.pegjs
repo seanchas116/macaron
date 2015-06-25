@@ -140,7 +140,7 @@ UnaryExpression
 }
 
 FunctionCall
-  = news:(NewKeyword _)* func:Value _ argLists:ArgumentList*
+  = news:(NewKeyword _)* func:MemberAccess _ argLists:ArgumentList*
 {
   // Parse expressions like `new new new foo()()` or `new foo()()()`
   const count = Math.max(news.length, argLists.length);
@@ -161,6 +161,13 @@ FunctionCall
   }
   return ast;
 }
+
+MemberAccess
+  = obj:Value "." _ member:Identifier?
+{
+  return new AST.MemberAccessAST(currentLocation(), obj, member);
+}
+  / Value
 
 Assignable
   = Identifier

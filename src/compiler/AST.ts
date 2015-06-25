@@ -79,7 +79,7 @@ class StringAST extends ExpressionAST {
 
 export
 class MemberAccessAST extends ExpressionAST {
-  constructor(location: SourceLocation, public object: ExpressionAST, public memberName: string) {
+  constructor(location: SourceLocation, public object: ExpressionAST, public member: IdentifierAST) {
     super(location);
   }
 }
