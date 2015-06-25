@@ -27,6 +27,9 @@ import {
   FunctionType,
   MetaType
 } from "./Type";
+import {
+  voidType
+} from "./nativeTypes";
 
 function returnType(expressions: Expression[]) {
   return expressions[expressions.length - 1].type;
@@ -135,7 +138,7 @@ class TypeEvaluator {
     }
     const expressions = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
     const paramTypes = params.map(p => p.type);
-    const type = new FunctionType(null, paramTypes, [], returnType(expressions));
+    const type = new FunctionType(voidType, paramTypes, [], returnType(expressions));
     return new FunctionExpression(params, expressions, type);
   }
 
