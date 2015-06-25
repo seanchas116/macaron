@@ -1,11 +1,9 @@
-import TypeVariance from "./TypeVariance";
 import {Type, TupleType} from "./Type";
 import SourceLocation from "./SourceLocation"
 import TypeCheckError from "./TypeCheckError";
 
 interface GenericTypeParam {
   type: Type;
-  variance: TypeVariance;
   variadic: boolean;
   name: String;
   location: SourceLocation;

@@ -27,7 +27,6 @@
         "./src/compiler/Type.ts",
         "./src/compiler/TypeCheckError.ts",
         "./src/compiler/TypeEvaluator.ts",
-        "./src/compiler/TypeVariance.ts",
         "./src/compiler/defaultEnvironment.ts",
         "./src/compiler/nativeTypes.ts",
         "./src/test/compilerTest.ts",
