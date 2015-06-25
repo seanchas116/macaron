@@ -39,5 +39,3 @@ for let i : [1,2,3] {
 
 }
 ```
-
-TODO: for-in as in JavaScript
