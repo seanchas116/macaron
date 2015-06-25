@@ -2,20 +2,25 @@
 
 ```
 // unnamed function
-foo = (x number, y number) {
+let foo = (x number, y number) => {
   // implicit return
   x + y
 }
 
-// receive arguments as Array
-foo = (...xs number[]) {
+// explicit return type
+let foo = (x number, y number) => number {
   x + y
 }
 
-// receive arguments as tuple
-foo = (...xy [number, number]) {
+// infer types from lvalue type
+type Func = (x number, y number) => number
+let foo Func = (x, y) => {
   x + y
 }
+
+// shorter form
+xs.map(x => x + 1)
+xs.reduce((x, y) => x + y)
 
 // named function
 func foo(x number, y number) {
@@ -24,6 +29,16 @@ func foo(x number, y number) {
 
 // explicit return type
 func foo(x number, y number) number {
+  x + y
+}
+
+// receive arguments as Array
+func foo(...xs number[]) {
+  x + y
+}
+
+// receive arguments as tuple
+func foo(...xy [number, number]) {
   x + y
 }
 
@@ -36,10 +51,6 @@ func (this number) fooMethod(y number) {
 fooMethod = (this number)(y number) {
   this + y
 }
-
-// shorter form
-xs.map(x => x + 1)
-xs.reduce((x, y) => x + y)
 ```
 
 ## Trailing closure (block)
