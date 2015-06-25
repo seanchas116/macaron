@@ -68,10 +68,6 @@ class FunctionType extends Type {
       // OK: (Object[, Object])=>void to (Object)=>void
       // NG: (Object)=>void to (Object[, Object])=>void
 
-      if (!!this.selfType != !!superType.selfType) {
-        return false;
-      }
-
       if (superType.selfType && !superType.selfType.isCastableTo(this.selfType)) {
         return false;
       }
