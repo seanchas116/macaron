@@ -111,6 +111,7 @@ __ = (Whitespace / Separator)*
 ___ = _ Separator (_ Separator)* _
 
 ClassKeyword = "class"
+NewKeyword = "new"
 
 Expression
   = expr:AssignmentExpression _
@@ -139,9 +140,26 @@ UnaryExpression
 }
 
 FunctionCall
-  = func:Value _ argLists:ArgumentList*
+  = news:(NewKeyword _)* func:Value _ argLists:ArgumentList*
 {
-  return argLists.reduce((func, args) => new AST.FunctionCallAST(currentLocation(), func, args), func);
+  // Parse expressions like `new new new foo()()` or `new foo()()()`
+  const count = Math.max(news.length, argLists.length);
+  let ast = func;
+  for (let i = 0; i < count; ++i) {
+    let args;
+    if (i < argLists.length) {
+      args = argLists[i];
+    } else {
+      args = [];
+    }
+
+    if (i < news.length) {
+      ast = new AST.ConstructorCallAST(currentLocation(), func, args);
+    } else {
+      ast = new AST.FunctionCallAST(currentLocation(), func, args);
+    }
+  }
+  return ast;
 }
 
 Assignable
