@@ -27,22 +27,3 @@
   src: |
     11 << 2 + 22 >> 3 + 33 >> 4
   expected: 720896
-
-- title: in
-  src: |
-    let obj any = {
-      foo: 1
-      bar: 2
-    }
-    "foo" in obj
-  expected: true
-
-- title: delete
-  src: |
-    let obj any = {
-      foo: 1
-      bar: 2
-    }
-    delete obj["foo"]
-    "foo" in obj
-  expected: false
