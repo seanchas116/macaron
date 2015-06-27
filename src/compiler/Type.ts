@@ -113,3 +113,10 @@ class TupleType extends Type {
     return `[${this.types.join()}]`;
   }
 }
+
+export
+class ClassType extends Type {
+  constructor(public members: Map<string, Type>) {
+    super();
+  }
+}
