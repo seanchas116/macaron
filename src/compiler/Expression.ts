@@ -5,21 +5,21 @@ import SourceLocation from "./SourceLocation";
 
 export
 class Expression {
-  constructor(public type: Type) {
+  constructor(public location: SourceLocation, public type: Type) {
   }
 }
 
 export
 class IdentifierExpression extends Expression {
-  constructor(public name: string, public location: SourceLocation, type: Type) {
-    super(type);
+  constructor(public name: string, location: SourceLocation, type: Type) {
+    super(location, type);
   }
 }
 
 export
 class AssignmentExpression extends Expression {
-  constructor(public declarationType: DeclarationType, public ideitifier: IdentifierExpression, public value: Expression) {
-    super(ideitifier.type)
+  constructor(public declarationType: DeclarationType, public ideitifier: IdentifierExpression, public value: Expression, location: SourceLocation) {
+    super(location, ideitifier.type)
   }
 }
 
@@ -28,8 +28,8 @@ class FunctionCallExpression extends Expression {
   function: Expression;
   arguments: Expression[];
 
-  constructor(func: Expression, args: Expression[]) {
-    super((<FunctionType>func.type).returnType);
+  constructor(func: Expression, args: Expression[], location: SourceLocation) {
+    super(location, (<FunctionType>func.type).returnType);
     this.function = func;
     this.arguments = args;
   }
@@ -37,35 +37,35 @@ class FunctionCallExpression extends Expression {
 
 export
 class FunctionExpression extends Expression {
-  constructor(public parameters: IdentifierExpression[], public expressions: Expression[], type: Type) {
-    super(type);
+  constructor(public parameters: IdentifierExpression[], public expressions: Expression[], location: SourceLocation, type: Type) {
+    super(location, type);
   }
 }
 
 export
 class NumberExpression extends Expression {
-  constructor(public value: number, public location: SourceLocation) {
-    super(numberType);
+  constructor(public value: number, location: SourceLocation) {
+    super(location, numberType);
   }
 }
 
 export
 class StringExpression extends Expression {
-  constructor(public value: string, public location: SourceLocation) {
-    super(stringType);
+  constructor(public value: string, location: SourceLocation) {
+    super(location, stringType);
   }
 }
 
 export
 class BinaryExpression extends Expression {
-  constructor(public operator: string, public location: SourceLocation, public left: Expression, public right: Expression) {
-    super(left.type);
+  constructor(public operator: string, public left: Expression, public right: Expression, location: SourceLocation) {
+    super(location, left.type);
   }
 }
 
 export
 class ReturnExpression extends Expression {
-  constructor(public expression: Expression) {
-    super(expression.type);
+  constructor(public expression: Expression, location: SourceLocation) {
+    super(location, expression.type);
   }
 }

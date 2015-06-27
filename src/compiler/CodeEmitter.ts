@@ -20,7 +20,7 @@ function appendReturnType(expressions: Expression[]) {
   const init = expressions.slice(0, len - 1);
   const last = expressions[len - 1];
 
-  return init.concat([new ReturnExpression(last)]);
+  return init.concat([new ReturnExpression(last, last.location)]);
 }
 
 export default

@@ -105,7 +105,7 @@ class TypeEvaluator {
         ast.operator.location
       );
     }
-    return new BinaryExpression(ast.operator.name, ast.operator.location, left, right);
+    return new BinaryExpression(ast.operator.name, left, right, ast.location);
   }
 
   evaluateIdentifier(ast: IdentifierAST) {
@@ -139,7 +139,7 @@ class TypeEvaluator {
     const expressions = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
     const paramTypes = params.map(p => p.type);
     const type = new FunctionType(voidType, paramTypes, [], returnType(expressions));
-    return new FunctionExpression(params, expressions, type);
+    return new FunctionExpression(params, expressions, ast.location, type);
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
@@ -164,7 +164,7 @@ class TypeEvaluator {
         }
       });
 
-      return new FunctionCallExpression(func, args);
+      return new FunctionCallExpression(func, args, ast.location);
     }
     else {
       throw new TypeCheckError(

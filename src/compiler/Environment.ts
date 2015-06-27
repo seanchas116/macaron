@@ -36,7 +36,8 @@ class Environment {
       return new AssignmentExpression(
         type,
         new IdentifierExpression(name.name, name.location, variable.type),
-        value
+        value,
+        name.location
       );
     } else {
       this.addVariable(type, name, value.type);
@@ -44,7 +45,8 @@ class Environment {
       return new AssignmentExpression(
         type,
         new IdentifierExpression(name.name, name.location, value.type),
-        value
+        value,
+        name.location
       );
     }
   }
