@@ -5,6 +5,10 @@ class Type {
     return "[anonymous type]";
   }
 
+  get members() {
+    return new Map<string, Type>();
+  }
+
   isCastableTo(superType: Type) {
     return this === superType;
   }
