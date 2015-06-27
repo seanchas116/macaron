@@ -6,7 +6,9 @@ import {
   NumberAST,
   StringAST,
   FunctionAST,
-  FunctionCallAST
+  FunctionCallAST,
+  ClassAST,
+  ClassMethodAST
 } from "./AST";
 
 import {
@@ -17,7 +19,8 @@ import {
   FunctionExpression,
   IdentifierExpression,
   FunctionCallExpression,
-  ReturnExpression
+  ReturnExpression,
+  ClassExpression
 } from "./Expression";
 
 import Environment from "./Environment";
@@ -172,5 +175,9 @@ class TypeEvaluator {
         ast.location
       );
     }
+  }
+
+  evaluateClass(ast: ClassAST) {
+    // TODO
   }
 }
