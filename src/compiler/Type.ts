@@ -1,3 +1,4 @@
+import {Expression} from "./Expression";
 
 export
 class Type {
@@ -6,7 +7,7 @@ class Type {
   }
 
   get members() {
-    return new Map<string, Type>();
+    return new Map<string, Expression>();
   }
 
   isCastableTo(superType: Type) {
@@ -116,7 +117,7 @@ class TupleType extends Type {
 
 export
 class ClassType extends Type {
-  constructor(public members: Map<string, Type>) {
+  constructor(public members: Map<string, Expression>) {
     super();
   }
 }
