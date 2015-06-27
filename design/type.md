@@ -2,31 +2,38 @@
 
 ## Hierarchy
 
-Type hierarchy is a DAG (directed acyclic graph)
-
-* void
-  * any
-    * Object
-      * number
-      * string
-      * Array
-      * ...
-    * Object?
-      * number?
-      * string?
-      * Array?
+* `dynamic`
+  * `any` / `void`
+    * `nil` (`null`, `undefined`)
+    * `number`
+    * `string`
+    * `Object`
+      * `Array<T>`
+      * `Number`
+      * `String`
       * ...
 
-Casting to void, any or Object must be explicit
-
-TODO: how to handle primitive boxing
+`Object?` = `Object|nil`
 
 ## Subtyping
 
 * Everything is structural
-* `(a Object) => Array` is a subtype of `(a Array) => Object`
+* `(a Object) => Date` is a subtype of `(a Date) => Object`
   * Function argument types are contravariant
   * Function return types are covariant
 * Read-only properties are covariant
 * Write-only properties are contravariant
 * Read-write properties are nonvariant
+
+## Boxing
+
+* `number` -> `Number`
+* `string` -> `String`
+
+```
+1.toString() // OK, calling method of box class
+
+let obj = {}
+obj = 1 // error, 1 is not an object
+obj = new Number(1) // OK
+```
