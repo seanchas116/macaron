@@ -13,6 +13,36 @@ class Type {
   isCastableTo(superType: Type) {
     return this === superType;
   }
+
+  get boxType(): Type {
+    return null;
+  }
+
+  get hasBoxType() {
+    return !!this.boxType;
+  }
+}
+
+export
+class AnyType extends Type {
+  get name() {
+    return "any";
+  }
+}
+
+export
+class PrimitiveType extends Type {
+  constructor(private _name: string) {
+    super();
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  isCastableTo(superType: Type): boolean {
+    return this === superType || superType instanceof AnyType;
+  }
 }
 
 export

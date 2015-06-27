@@ -1,10 +1,17 @@
-import {Type} from "./Type";
+import {
+  Type,
+  AnyType,
+  PrimitiveType
+} from "./Type";
 
 export
-const voidType = new Type();
+const anyType = new AnyType();
 
 export
-const numberType = new Type();
+const voidType = anyType;
 
 export
-const stringType = new Type();
+const numberType = new PrimitiveType("number");
+
+export
+const stringType = new PrimitiveType("string");
