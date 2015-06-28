@@ -5,6 +5,7 @@ import {
   IdentifierAST,
   NumberAST,
   StringAST,
+  ParameterAST,
   FunctionAST,
   FunctionCallAST,
   ClassAST,
@@ -27,12 +28,15 @@ import Environment from "./Environment";
 import DeclarationType from "./DeclarationType";
 import TypeCheckError from "./TypeCheckError";
 import {
+  Type,
   FunctionType,
-  MetaType
+  MetaType,
+  ClassType
 } from "./Type";
 import {
   voidType
 } from "./nativeTypes";
+import SourceLocation from "./SourceLocation";
 
 function returnType(expressions: Expression[]) {
   return expressions[expressions.length - 1].type;
@@ -77,6 +81,9 @@ class TypeEvaluator {
     }
     else if (ast instanceof FunctionCallAST) {
       return this.evaluateFunctionCall(ast);
+    }
+    else if (ast instanceof ClassAST) {
+      return this.evaluateClass(ast);
     }
     else {
       throw new Error(`Not supported AST: ${ast.constructor.name}`);
@@ -124,25 +131,7 @@ class TypeEvaluator {
   }
 
   evaluateFunction(ast: FunctionAST) {
-    const subEnv = new Environment(this.environment);
-    const params: IdentifierExpression[] = [];
-    for (const {name, type} of ast.parameters) {
-      const metaType = this.evaluate(type).type;
-      if (metaType instanceof MetaType) {
-        subEnv.addVariable(DeclarationType.Constant, name, metaType.type);
-        params.push(new IdentifierExpression(name.name, name.location, metaType.type));
-      }
-      else {
-        throw new TypeCheckError(
-          `Provided expression is not a type`,
-          type.location
-        );
-      }
-    }
-    const expressions = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
-    const paramTypes = params.map(p => p.type);
-    const type = new FunctionType(voidType, paramTypes, [], returnType(expressions));
-    return new FunctionExpression(params, expressions, ast.location, type);
+    return this.evaluateFunctionLike(voidType, ast.parameters, ast.expressions, ast.location);
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
@@ -178,6 +167,37 @@ class TypeEvaluator {
   }
 
   evaluateClass(ast: ClassAST) {
-    // TODO
+    // TODO: superclass
+    const classType = new ClassType(voidType);
+    for (const member of ast.members) {
+      if (member instanceof ClassMethodAST) {
+        const func = this.evaluateFunctionLike(classType, member.parameters, member.expressions, member.location);
+        classType.addMember(member.name.name, func);
+      }
+    }
+    return new ClassExpression(classType, ast.location);
+  }
+
+  evaluateFunctionLike(selfType: Type, paramASTs: ParameterAST[], expressionASTs: ExpressionAST[], location: SourceLocation) {
+    const subEnv = new Environment(this.environment);
+    const params: IdentifierExpression[] = [];
+    for (const {name, type} of paramASTs) {
+      const metaType = this.evaluate(type).type;
+      if (metaType instanceof MetaType) {
+        subEnv.addVariable(DeclarationType.Constant, name, metaType.type);
+        params.push(new IdentifierExpression(name.name, name.location, metaType.type));
+      }
+      else {
+        throw new TypeCheckError(
+          `Provided expression is not a type`,
+          type.location
+        );
+      }
+    }
+    const expressions = new TypeEvaluator(subEnv).evaluateExpressions(expressionASTs);
+    const paramTypes = params.map(p => p.type);
+    const type = new FunctionType(selfType, paramTypes, [], returnType(expressions));
+    return new FunctionExpression(params, expressions, location, type);
+
   }
 }

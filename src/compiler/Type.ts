@@ -1,4 +1,5 @@
 import {Expression} from "./Expression";
+import TypeCheckError from "./TypeCheckError";
 
 export
 class Type {
@@ -6,7 +7,7 @@ class Type {
     return "[anonymous type]";
   }
 
-  get members() {
+  getMembers() {
     return new Map<string, Expression>();
   }
 
@@ -145,9 +146,36 @@ class TupleType extends Type {
   }
 }
 
+function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
+  const ret = new Map<TKey, TValue>();
+  for (const [k, v] of a) {
+    ret.set(k, v);
+  }
+  for (const [k, v] of b) {
+    ret.set(k, v);
+  }
+  return ret;
+}
+
 export
 class ClassType extends Type {
-  constructor(public members: Map<string, Expression>) {
+  selfMembers = new Map<string, Expression>();
+
+  constructor(public superClass: Type) {
     super();
+  }
+
+  getMembers(): Map<string, Expression> {
+    return mergeMap(this.selfMembers, this.superClass.getMembers());
+  }
+
+  addMember(name: string, member: Expression) {
+    const superMember = this.superClass.getMembers().get(name);
+    if (superMember && !member.type.isCastableTo(superMember.type)) {
+      throw new TypeCheckError(
+        `Member type is not compatible to super types`,
+        member.location
+      )
+    }
   }
 }
