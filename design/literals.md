@@ -2,11 +2,11 @@
 
 ## null
 
-* TODO: type
+* Same as JavaScript
 
 ## undefined
 
-* TODO: type
+* Same as JavaScript
 
 ## true / false
 
@@ -30,19 +30,63 @@
 
 ## Array
 
-* Same as JavaScript
+```
+let arr = [1, 2, 3]
+
+// "," == "\n"
+let arr2 = [
+  1
+  2
+  3
+]
+
+let arr3 = [1, 2, 3, ...arr]
+```
 
 ## Object
 
-* Same as JavaScript
+```
+let obj = {
+  foo: 1
+  bar: 2
+}
+
+let foo = 1
+let bar = 2
+let obj2 = {foo, bar} // {foo: foo, bar: bar}
+```
 
 ## Map
 
-TODO
+```
+let map = {
+  1 => "one"
+  2 => "two"
+  3 => "three"
+}
+
+let pairs = [
+  [2, "two"]
+  [3, "three"]
+]
+
+let map = {
+  1 => "one"
+  ...pairs
+}
+```
 
 ## Set
 
-TODO
+```
+let set = {{
+  "foo"
+  "bar"
+}}
+
+let arr = ["foo", "bar"]
+let set = {{ ...arr, "baz" }}
+```
 
 ## Tuple
 
