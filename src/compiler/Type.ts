@@ -1,4 +1,13 @@
 import {Expression} from "./Expression";
+import OperatorKind from "./OperatorKind";
+
+export
+class Operator {
+}
+
+export
+class NativeOperator extends Operator {
+}
 
 export
 class Type {
@@ -8,6 +17,10 @@ class Type {
 
   getMembers() {
     return new Map<string, Type>();
+  }
+
+  getOperators() {
+    return new Map<OperatorKind, Operator>();
   }
 
   isCastableTo(superType: Type) {
