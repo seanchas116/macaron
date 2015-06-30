@@ -5,7 +5,7 @@ export
 class Type {
   name = "[anonymous type]";
   boxType: Type = null;
-  constructorType: Type = null;
+  constructorType: FunctionType = null;
 
   getMembers() {
     return new Map<string, Type>();

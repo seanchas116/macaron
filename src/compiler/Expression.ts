@@ -36,6 +36,18 @@ class FunctionCallExpression extends Expression {
 }
 
 export
+class ConstructorCallExpression extends Expression {
+  function: Expression;
+  arguments: Expression[];
+
+  constructor(func: Expression, args: Expression[], location: SourceLocation) {
+    super(location, (<FunctionType>func.type).returnType);
+    this.function = func;
+    this.arguments = args;
+  }
+}
+
+export
 class FunctionExpression extends Expression {
   constructor(public parameters: IdentifierExpression[], public expressions: Expression[], location: SourceLocation, type: Type) {
     super(location, type);

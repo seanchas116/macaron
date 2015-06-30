@@ -20,6 +20,7 @@ import {
   FunctionExpression,
   IdentifierExpression,
   FunctionCallExpression,
+  ConstructorCallExpression,
   ReturnExpression,
   ClassMemberExpression,
   ClassMethodExpression,
@@ -137,35 +138,55 @@ class TypeEvaluator {
     return new FunctionExpression(params, expressions, location, type);
   }
 
-  evaluateFunctionCall(ast: FunctionCallAST) {
-    const func = this.evaluate(ast.function);
-    const funcType = func.type;
+  checkArgumentType(funcType: FunctionType, args: Expression[], location: SourceLocation) {
+    if (args.length < funcType.minParamCount || funcType.maxParamCount < args.length) {
+      throw new TypeCheckError(
+        `Cannot pass ${args.length} arguments for ${funcType.minParamCount}...${funcType.maxParamCount} parameter function`,
+        location
+      );
+    }
+    funcType.parameters.forEach((type, i) => {
+      if (!args[i].type.isCastableTo(type)) {
+        throw new TypeCheckError(
+          `Cannot pass '${args[i].type.name}' to '${type.name}'`,
+          args[i].location
+        );
+      }
+    });
+  }
 
+  evaluateFunctionCall(ast: FunctionCallAST) {
     const args = this.evaluateExpressions(ast.arguments);
 
-    if (funcType instanceof FunctionType) {
-      if (args.length < funcType.minParamCount || funcType.maxParamCount < args.length) {
+    if (ast.withNew) {
+      const classExpr = this.evaluate(ast.function);
+      const classMetaType = classExpr.type;
+      if (classMetaType instanceof MetaType) {
+        const classType = classMetaType.type;
+        if (classType instanceof ClassType) {
+          this.checkArgumentType(classType.constructorType, args, ast.location);
+          return new ConstructorCallExpression(classExpr, args, ast.location);
+        }
+      }
+      throw new TypeCheckError(
+        `${classMetaType.name} is not an class`,
+        ast.location
+      );
+    }
+    else {
+      const func = this.evaluate(ast.function);
+      const funcType = func.type;
+
+      if (funcType instanceof FunctionType) {
+        this.checkArgumentType(funcType, args, ast.location);
+        return new FunctionCallExpression(func, args, ast.location);
+      }
+      else {
         throw new TypeCheckError(
-          `Cannot pass ${args.length} arguments for ${funcType.minParamCount}...${funcType.maxParamCount} parameter function`,
+          `${funcType.name} is not an function`,
           ast.location
         );
       }
-      funcType.parameters.forEach((type, i) => {
-        if (!args[i].type.isCastableTo(type)) {
-          throw new TypeCheckError(
-            `Cannot pass '${args[i].type.name}' to '${type.name}'`,
-            ast.arguments[i].location
-          );
-        }
-      });
-
-      return new FunctionCallExpression(func, args, ast.location);
-    }
-    else {
-      throw new TypeCheckError(
-        `${funcType.name} is not an function`,
-        ast.location
-      );
     }
   }
 
