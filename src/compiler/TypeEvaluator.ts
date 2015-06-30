@@ -196,11 +196,12 @@ class TypeEvaluator {
         }
 
         classType.selfMembers.set(name, type);
-        memberExpressions.push(new ClassMethodExpression(params, expressions, location, type));
+        const nameExpr = new IdentifierExpression(name, member.location, type);
+        memberExpressions.push(new ClassMethodExpression(params, expressions, nameExpr, location));
       }
     }
-    const name = new IdentifierExpression(ast.name.name, ast.name.location, classType);
-    return new ClassExpression(name, memberExpressions, ast.location, classType);
+    const classNameExpr = new IdentifierExpression(ast.name.name, ast.name.location, classType);
+    return new ClassExpression(classNameExpr, memberExpressions, ast.location, classType);
   }
 
   evaluateFunctionLike(selfType: Type, paramASTs: ParameterAST[], expressionASTs: ExpressionAST[], location: SourceLocation) {

@@ -7,7 +7,10 @@ import {
   FunctionExpression,
   FunctionCallExpression,
   AssignmentExpression,
-  ReturnExpression
+  ReturnExpression,
+  ClassMemberExpression,
+  ClassMethodExpression,
+  ClassExpression
 } from "./Expression";
 
 import DeclarationType from "./DeclarationType";
@@ -98,6 +101,20 @@ class CodeEmitter {
     const body = bodyEmitter.emitExpressions(expr.expressions, true);
 
     return `(${params}) => {\n${body}\n}`;
+  }
+
+  emitClassMethod(expr: ClassMethodExpression) {
+    const params = expr.parameters
+      .map(p => p.name)
+      .join(", ");
+
+    const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
+    const body = bodyEmitter.emitExpressions(expr.expressions, true);
+
+    return `(expr.name)`
+  }
+
+  emitClass(expr: ClassExpression) {
   }
 
   emitFunctionCall(expr: FunctionCallExpression) {
