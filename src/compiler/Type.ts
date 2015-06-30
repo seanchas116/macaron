@@ -7,7 +7,7 @@ class Type {
   boxType: Type = null;
 
   getMembers() {
-    return new Map<string, Expression>();
+    return new Map<string, Type>();
   }
 
   isCastableTo(superType: Type) {
@@ -144,23 +144,13 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
 
 export
 class ClassType extends Type {
-  selfMembers = new Map<string, Expression>();
+  selfMembers = new Map<string, Type>();
 
   constructor(public name: string, public superClass: Type) {
     super();
   }
 
-  getMembers(): Map<string, Expression> {
+  getMembers(): Map<string, Type> {
     return mergeMap(this.selfMembers, this.superClass.getMembers());
-  }
-
-  addMember(name: string, member: Expression) {
-    const superMember = this.superClass.getMembers().get(name);
-    if (superMember && !member.type.isCastableTo(superMember.type)) {
-      throw new TypeCheckError(
-        `Member type is not compatible to super types`,
-        member.location
-      )
-    }
   }
 }

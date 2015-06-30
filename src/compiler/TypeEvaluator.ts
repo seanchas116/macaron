@@ -21,6 +21,8 @@ import {
   IdentifierExpression,
   FunctionCallExpression,
   ReturnExpression,
+  ClassMemberExpression,
+  ClassMethodExpression,
   ClassExpression
 } from "./Expression";
 
@@ -131,7 +133,8 @@ class TypeEvaluator {
   }
 
   evaluateFunction(ast: FunctionAST) {
-    return this.evaluateFunctionLike(voidType, ast.parameters, ast.expressions, ast.location);
+    const {params, expressions, location, type} = this.evaluateFunctionLike(voidType, ast.parameters, ast.expressions, ast.location);
+    return new FunctionExpression(params, expressions, location, type);
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
@@ -168,14 +171,36 @@ class TypeEvaluator {
 
   evaluateClass(ast: ClassAST) {
     // TODO: superclass
-    const classType = new ClassType(ast.name.name, voidType);
+    const superType = voidType;
+    const className = ast.name.name;
+    const classType = new ClassType(className, superType);
+    const memberExpressions: ClassMemberExpression[] = [];
     for (const member of ast.members) {
       if (member instanceof ClassMethodAST) {
-        const func = this.evaluateFunctionLike(classType, member.parameters, member.expressions, member.location);
-        classType.addMember(member.name.name, func);
+        const {params, expressions, location, type} = this.evaluateFunctionLike(classType, member.parameters, member.expressions, member.location);
+        const name = member.name.name;
+
+        if (classType.selfMembers.has(name)) {
+          throw new TypeCheckError(
+            `Class "${className}" already has member "${name}"`,
+            member.location
+          );
+        }
+
+        const superMember = superType.getMembers().get(name);
+        if (superMember && !type.isCastableTo(superMember)) {
+          throw new TypeCheckError(
+            `Type of "${name}" is not compatible to super types`,
+            member.location
+          );
+        }
+
+        classType.selfMembers.set(name, type);
+        memberExpressions.push(new ClassMethodExpression(params, expressions, location, type));
       }
     }
-    return new ClassExpression(classType, ast.location);
+    const name = new IdentifierExpression(ast.name.name, ast.name.location, classType);
+    return new ClassExpression(name, memberExpressions, ast.location, classType);
   }
 
   evaluateFunctionLike(selfType: Type, paramASTs: ParameterAST[], expressionASTs: ExpressionAST[], location: SourceLocation) {
@@ -197,7 +222,6 @@ class TypeEvaluator {
     const expressions = new TypeEvaluator(subEnv).evaluateExpressions(expressionASTs);
     const paramTypes = params.map(p => p.type);
     const type = new FunctionType(selfType, paramTypes, [], returnType(expressions));
-    return new FunctionExpression(params, expressions, location, type);
-
+    return {params, expressions, location, type};
   }
 }

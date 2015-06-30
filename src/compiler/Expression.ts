@@ -71,8 +71,19 @@ class ReturnExpression extends Expression {
 }
 
 export
+class ClassMemberExpression extends Expression {
+}
+
+export
+class ClassMethodExpression extends ClassMemberExpression {
+  constructor(public parameters: IdentifierExpression[], public expressions: Expression[], location: SourceLocation, type: Type) {
+    super(location, type);
+  }
+}
+
+export
 class ClassExpression extends Expression {
-  constructor(public classType: ClassType, location: SourceLocation) {
-    super(location, classType);
+  constructor(public name: IdentifierExpression, public members: ClassMemberExpression[], location: SourceLocation, type: Type) {
+    super(location, type);
   }
 }
