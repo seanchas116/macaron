@@ -26,9 +26,9 @@ class CompilerError implements Error {
     ]);
   }
 
-  static parseError(message: string, location: SourceLocation) {
+  static syntaxError(message: string, location: SourceLocation) {
     return new CompilerError([
-      new ErrorInfo(ErrorType.ParseError, message, location)
+      new ErrorInfo(ErrorType.SyntaxError, message, location)
     ])
   }
 }

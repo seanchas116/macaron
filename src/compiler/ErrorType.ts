@@ -1,7 +1,7 @@
 
 enum ErrorType {
   TypeError,
-  ParseError
+  SyntaxError
 }
 
 export default ErrorType;
