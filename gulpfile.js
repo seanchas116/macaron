@@ -34,4 +34,8 @@ gulp.task("test", ["build"], shell.task([
   `mocha --require ./babel-hook ${TESTS}`
 ]));
 
+gulp.task("test:debug", ["build"], shell.task([
+  `node-debug _mocha --require ./babel-hook ${TESTS}`
+]));
+
 gulp.task("default", ["watch"]);
