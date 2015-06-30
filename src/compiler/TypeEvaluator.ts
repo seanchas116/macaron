@@ -208,6 +208,7 @@ class TypeEvaluator {
     if (!classType.constructorType) {
       classType.constructorType = new FunctionType(voidType, [], [], voidType);
     }
+    this.environment.addVariable(DeclarationType.Constant, ast.name, new MetaType(classType));
     const classNameExpr = new IdentifierExpression(ast.name.name, ast.name.location, classType);
     return new ClassExpression(classNameExpr, memberExpressions, ast.location, classType);
   }
