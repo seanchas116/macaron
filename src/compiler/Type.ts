@@ -168,7 +168,7 @@ class ClassType extends Type {
   }
 
   getMembers(): Map<string, Type> {
-    return mergeMap(this.selfMembers, this.superClass.getMembers());
+    return mergeMap(this.superClass.getMembers(), this.selfMembers);
   }
 
   getOperators(): Map<OperatorKind, Operator> {
