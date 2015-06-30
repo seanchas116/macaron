@@ -30,7 +30,7 @@ macaron is a statically typed programming language that compiles to JavaScript
 * CommonJS/ES6 module support
 * Editor support
 
-Inspirations
+## Inspirations
 
 * TypeScript
 * Kotlin
