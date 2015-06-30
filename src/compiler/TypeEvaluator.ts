@@ -8,6 +8,7 @@ import {
   ParameterAST,
   FunctionAST,
   FunctionCallAST,
+  ConstructorCallAST,
   ClassAST,
   ClassMethodAST
 } from "./AST";
@@ -85,6 +86,9 @@ class TypeEvaluator {
     else if (ast instanceof FunctionCallAST) {
       return this.evaluateFunctionCall(ast);
     }
+    else if (ast instanceof ConstructorCallAST) {
+      return this.evaluateConstructorCall(ast);
+    }
     else if (ast instanceof ClassAST) {
       return this.evaluateClass(ast);
     }
@@ -158,36 +162,37 @@ class TypeEvaluator {
   evaluateFunctionCall(ast: FunctionCallAST) {
     const args = this.evaluateExpressions(ast.arguments);
 
-    if (ast.withNew) {
-      const classExpr = this.evaluate(ast.function);
-      const classMetaType = classExpr.type;
-      if (classMetaType instanceof MetaType) {
-        const classType = classMetaType.type;
-        if (classType instanceof ClassType) {
-          this.checkArgumentType(classType.constructorType, args, ast.location);
-          return new ConstructorCallExpression(classExpr, args, ast.location);
-        }
-      }
+    const func = this.evaluate(ast.function);
+    const funcType = func.type;
+
+    if (funcType instanceof FunctionType) {
+      this.checkArgumentType(funcType, args, ast.location);
+      return new FunctionCallExpression(func, args, ast.location);
+    }
+    else {
       throw new TypeCheckError(
-        `${classMetaType.name} is not an class`,
+        `${funcType.name} is not an function`,
         ast.location
       );
     }
-    else {
-      const func = this.evaluate(ast.function);
-      const funcType = func.type;
+  }
 
-      if (funcType instanceof FunctionType) {
-        this.checkArgumentType(funcType, args, ast.location);
-        return new FunctionCallExpression(func, args, ast.location);
-      }
-      else {
-        throw new TypeCheckError(
-          `${funcType.name} is not an function`,
-          ast.location
-        );
+  evaluateConstructorCall(ast: ConstructorCallAST) {
+    const args = this.evaluateExpressions(ast.arguments);
+
+    const classExpr = this.evaluate(ast.function);
+    const classMetaType = classExpr.type;
+    if (classMetaType instanceof MetaType) {
+      const classType = classMetaType.type;
+      if (classType instanceof ClassType) {
+        this.checkArgumentType(classType.constructorType, args, ast.location);
+        return new ConstructorCallExpression(classExpr, args, ast.location);
       }
     }
+    throw new TypeCheckError(
+      `${classMetaType.name} is not an class`,
+      ast.location
+    );
   }
 
   evaluateClass(ast: ClassAST) {

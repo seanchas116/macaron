@@ -37,7 +37,19 @@ class FunctionCallAST extends ExpressionAST {
   function: ExpressionAST;
   arguments: ExpressionAST[];
 
-  constructor(location: SourceLocation, func: ExpressionAST, args: ExpressionAST[], public withNew: boolean) {
+  constructor(location: SourceLocation, func: ExpressionAST, args: ExpressionAST[]) {
+    super(location);
+    this.function = func;
+    this.arguments = args;
+  }
+}
+
+export
+class ConstructorCallAST extends ExpressionAST {
+  function: ExpressionAST;
+  arguments: ExpressionAST[];
+
+  constructor(location: SourceLocation, func: ExpressionAST, args: ExpressionAST[]) {
     super(location);
     this.function = func;
     this.arguments = args;
