@@ -1,3 +1,11 @@
+- title: named function call
+  src: |
+    func f(a number, b number) {
+      a + b
+    }
+    1 + 2 * 1 * f(1, 2)
+  expected: 7
+
 - title: unnamed function call
   src: |
     let f = (a number, b number) => {
