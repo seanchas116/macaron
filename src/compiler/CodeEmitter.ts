@@ -6,6 +6,7 @@ import {
   StringExpression,
   FunctionExpression,
   FunctionCallExpression,
+  ConstructorCallExpression,
   AssignmentExpression,
   ReturnExpression,
   ClassMemberExpression,
@@ -61,6 +62,9 @@ class CodeEmitter {
     }
     else if (expr instanceof FunctionCallExpression) {
       return this.emitFunctionCall(expr);
+    }
+    else if (expr instanceof ConstructorCallExpression) {
+      return this.emitConstructorCall(expr);
     }
     else if (expr instanceof AssignmentExpression) {
       return this.emitAssignment(expr);
@@ -139,6 +143,12 @@ class CodeEmitter {
     const func = this.emitExpression(expr.function);
     const args = expr.arguments.map(expr => this.emitExpression(expr)).join(", ");
     return `${func}(${args})`;
+  }
+
+  emitConstructorCall(expr: ConstructorCallExpression) {
+    const func = this.emitExpression(expr.function);
+    const args = expr.arguments.map(expr => this.emitExpression(expr)).join(", ");
+    return `new ${func}(${args})`;
   }
 
   emitAssignment(expr: AssignmentExpression) {
