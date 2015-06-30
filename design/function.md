@@ -51,6 +51,8 @@ func (this number) fooMethod(y number) {
 fooMethod = (this number)(y number) {
   this + y
 }
+
+fooMethod.call(1, 1) //=> 2
 ```
 
 ## Trailing closure (block)
