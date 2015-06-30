@@ -1,6 +1,6 @@
 import {Type, TupleType} from "./Type";
 import SourceLocation from "./SourceLocation"
-import TypeCheckError from "./TypeCheckError";
+import CompilerError from "./CompilerError";
 
 interface GenericTypeParam {
   type: Type;
@@ -14,7 +14,7 @@ class GenericType {
   constructor(public name: string, public typeParams: GenericTypeParam[]) {
     const variadicParams = typeParams.filter(p => p.variadic);
     if (variadicParams.length >= 2) {
-      throw new TypeCheckError(
+      throw CompilerError.typeError(
         `Cannot contain 2 or more variadic generic parameters`,
         variadicParams[1].location
       );
@@ -25,7 +25,7 @@ class GenericType {
     const variadicParam = this.typeParams.find(p => p.variadic);
     if (variadicParam) {
       if (types.length < this.typeParams.length - 1) {
-        throw new TypeCheckError(
+        throw CompilerError.typeError(
           `Wrong type argument count for generic type (${types.length} for ${this.typeParams.length - 1}...)`,
           location
         );
@@ -43,7 +43,7 @@ class GenericType {
     }
     else {
       if (types.length != this.typeParams.length) {
-        throw new TypeCheckError(
+        throw CompilerError.typeError(
           `Wrong type argument count for generic type (${types.length} for ${this.typeParams.length})`,
           location
         );

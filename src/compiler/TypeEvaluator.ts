@@ -32,7 +32,7 @@ import {
 
 import Environment from "./Environment";
 import DeclarationType from "./DeclarationType";
-import TypeCheckError from "./TypeCheckError";
+import CompilerError from "./CompilerError";
 import {
   Type,
   FunctionType,
@@ -122,7 +122,7 @@ class TypeEvaluator {
     const left = this.evaluate(ast.left);
     const right = this.evaluate(ast.right);
     if (left.type !== right.type) {
-      throw new TypeCheckError(
+      throw CompilerError.typeError(
         `Cannot perform "${ast.operator.name}" operation between "${left.type}" and "right.type"`,
         ast.operator.location
       );
@@ -149,7 +149,7 @@ class TypeEvaluator {
     const memberType = objType.getMembers().get(memberName);
     const memberLoc = ast.member.location;
     if (!memberType) {
-      throw new TypeCheckError(
+      throw CompilerError.typeError(
         `Type "${objType.name}" has no member "${memberName}"`,
         memberLoc
       );
@@ -165,14 +165,14 @@ class TypeEvaluator {
 
   checkArgumentType(funcType: FunctionType, args: Expression[], location: SourceLocation) {
     if (args.length < funcType.minParamCount || funcType.maxParamCount < args.length) {
-      throw new TypeCheckError(
+      throw CompilerError.typeError(
         `Cannot pass ${args.length} arguments for ${funcType.minParamCount}...${funcType.maxParamCount} parameter function`,
         location
       );
     }
     funcType.parameters.forEach((type, i) => {
       if (!args[i].type.isCastableTo(type)) {
-        throw new TypeCheckError(
+        throw CompilerError.typeError(
           `Cannot pass '${args[i].type.name}' to '${type.name}'`,
           args[i].location
         );
@@ -191,7 +191,7 @@ class TypeEvaluator {
       return new FunctionCallExpression(func, args, ast.location, funcType.returnType);
     }
     else {
-      throw new TypeCheckError(
+      throw CompilerError.typeError(
         `${funcType.name} is not an function`,
         ast.location
       );
@@ -210,7 +210,7 @@ class TypeEvaluator {
         return new ConstructorCallExpression(classExpr, args, ast.location, classType);
       }
     }
-    throw new TypeCheckError(
+    throw CompilerError.typeError(
       `${classMetaType.name} is not an class`,
       ast.location
     );
@@ -229,7 +229,7 @@ class TypeEvaluator {
         const name = member.name.name;
 
         if (classType.selfMembers.has(name)) {
-          throw new TypeCheckError(
+          throw CompilerError.typeError(
             `Class "${className}" already has member "${name}"`,
             member.location
           );
@@ -237,7 +237,7 @@ class TypeEvaluator {
 
         const superMember = superType.getMembers().get(name);
         if (superMember && !type.isCastableTo(superMember)) {
-          throw new TypeCheckError(
+          throw CompilerError.typeError(
             `Type of "${name}" is not compatible to super types`,
             member.location
           );
@@ -270,7 +270,7 @@ class TypeEvaluator {
         params.push(new IdentifierExpression(name.name, name.location, metaType.type));
       }
       else {
-        throw new TypeCheckError(
+        throw CompilerError.typeError(
           `Provided expression is not a type`,
           type.location
         );

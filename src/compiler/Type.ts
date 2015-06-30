@@ -1,5 +1,4 @@
 import {Expression} from "./Expression";
-import TypeCheckError from "./TypeCheckError";
 
 export
 class Type {
