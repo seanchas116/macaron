@@ -3,7 +3,9 @@
 
 macaron is a statically typed programming language that compiles to JavaScript
 
-What to do
+* [Design](https://github.com/seanchas116/macaron/tree/master/design)
+
+## What to do
 
 * Easy, simple and expressive syntax
 * Interoperable with JavaScript and TypeScript
@@ -12,12 +14,11 @@ What to do
 * ES6/ES7 friendly
 * Make use of static type system
 
-What to implement
+## What to implement
 
 * Optional value
 * Compile-time property/method extension
 * Compile-time operator overload
-* Compile-time function overload
 * Mixins
 * Covariant/contravariant generics
 * Algebraic data type
