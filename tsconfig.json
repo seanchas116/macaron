@@ -26,6 +26,7 @@
         "./src/compiler/ErrorType.ts",
         "./src/compiler/Expression.ts",
         "./src/compiler/GenericType.ts",
+        "./src/compiler/OperatorKind.ts",
         "./src/compiler/SourceLocation.ts",
         "./src/compiler/Type.ts",
         "./src/compiler/TypeEvaluator.ts",
