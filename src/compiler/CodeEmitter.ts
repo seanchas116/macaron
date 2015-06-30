@@ -68,6 +68,9 @@ class CodeEmitter {
     else if (expr instanceof ReturnExpression) {
       return this.emitReturn(expr);
     }
+    else if (expr instanceof ClassExpression) {
+      return this.emitClass(expr);
+    }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
     }
@@ -103,18 +106,33 @@ class CodeEmitter {
     return `(${params}) => {\n${body}\n}`;
   }
 
+  emitClassMember(expr: ClassMemberExpression) {
+    if (expr instanceof ClassMethodExpression) {
+      return this.emitClassMethod(expr);
+    }
+    else {
+      throw new Error(`Not supported expression: ${expr.constructor.name}`);
+    }
+  }
+
   emitClassMethod(expr: ClassMethodExpression) {
     const params = expr.parameters
       .map(p => p.name)
       .join(", ");
 
-    const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
+    const bodyEmitter = this.indented();
     const body = bodyEmitter.emitExpressions(expr.expressions, true);
 
-    return `(expr.name)`
+    return `${expr.name.name}(${params}) {\n${body}\n}`;
   }
 
   emitClass(expr: ClassExpression) {
+    const emitter = this.indented();
+    const body = expr.members
+      .map(member => emitter.emitClassMember(member))
+      .join("\n");
+
+    return `class ${expr.name} {\n${body}\n}`;
   }
 
   emitFunctionCall(expr: FunctionCallExpression) {
@@ -141,5 +159,9 @@ class CodeEmitter {
 
   emitReturn(expr: ReturnExpression) {
     return `return ${this.emitExpression(expr.expression)}`;
+  }
+
+  indented() {
+    return new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
   }
 }
