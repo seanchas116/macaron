@@ -37,5 +37,6 @@
         "./typings/node/node.d.ts",
         "./typings/power-assert-formatter/power-assert-formatter.d.ts",
         "./typings/power-assert/power-assert.d.ts"
-    ]
+    ],
+    "compileOnSave": false
 }
