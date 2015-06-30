@@ -161,6 +161,7 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
 export
 class ClassType extends Type {
   selfMembers = new Map<string, Type>();
+  selfOperators = new Map<OperatorKind, Operator>();
 
   constructor(public name: string, public superClass: Type) {
     super();
@@ -168,5 +169,9 @@ class ClassType extends Type {
 
   getMembers(): Map<string, Type> {
     return mergeMap(this.selfMembers, this.superClass.getMembers());
+  }
+
+  getOperators(): Map<OperatorKind, Operator> {
+    return mergeMap(this.superClass.getOperators(), this.selfOperators);
   }
 }
