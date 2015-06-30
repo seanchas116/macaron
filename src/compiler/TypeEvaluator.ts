@@ -10,7 +10,8 @@ import {
   FunctionCallAST,
   ConstructorCallAST,
   ClassAST,
-  ClassMethodAST
+  ClassMethodAST,
+  MemberAccessAST
 } from "./AST";
 
 import {
@@ -25,7 +26,8 @@ import {
   ReturnExpression,
   ClassMemberExpression,
   ClassMethodExpression,
-  ClassExpression
+  ClassExpression,
+  MemberAccessExpression
 } from "./Expression";
 
 import Environment from "./Environment";
@@ -92,6 +94,9 @@ class TypeEvaluator {
     else if (ast instanceof ClassAST) {
       return this.evaluateClass(ast);
     }
+    else if (ast instanceof MemberAccessAST) {
+      return this.evaluateMemberAccess(ast);
+    }
     else {
       throw new Error(`Not supported AST: ${ast.constructor.name}`);
     }
@@ -137,6 +142,22 @@ class TypeEvaluator {
     return new StringExpression(ast.value, ast.location);
   }
 
+  evaluateMemberAccess(ast: MemberAccessAST) {
+    const obj = this.evaluate(ast.object);
+    const objType = obj.type;
+    const memberName = ast.member.name;
+    const memberType = objType.getMembers().get(memberName);
+    const memberLoc = ast.member.location;
+    if (!memberType) {
+      throw new TypeCheckError(
+        `Type "${objType.name}" has no member "${memberName}"`,
+        memberLoc
+      );
+    }
+    const memberExpr = new IdentifierExpression(memberName, memberLoc, memberType);
+    return new MemberAccessExpression(obj, memberExpr);
+  }
+
   evaluateFunction(ast: FunctionAST) {
     const {params, expressions, location, type} = this.evaluateFunctionLike(voidType, ast.parameters, ast.expressions, ast.location);
     return new FunctionExpression(params, expressions, location, type);
@@ -167,7 +188,7 @@ class TypeEvaluator {
 
     if (funcType instanceof FunctionType) {
       this.checkArgumentType(funcType, args, ast.location);
-      return new FunctionCallExpression(func, args, ast.location);
+      return new FunctionCallExpression(func, args, ast.location, funcType.returnType);
     }
     else {
       throw new TypeCheckError(
@@ -186,7 +207,7 @@ class TypeEvaluator {
       const classType = classMetaType.type;
       if (classType instanceof ClassType) {
         this.checkArgumentType(classType.constructorType, args, ast.location);
-        return new ConstructorCallExpression(classExpr, args, ast.location);
+        return new ConstructorCallExpression(classExpr, args, ast.location, classType);
       }
     }
     throw new TypeCheckError(

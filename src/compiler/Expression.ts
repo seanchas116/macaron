@@ -28,8 +28,8 @@ class FunctionCallExpression extends Expression {
   function: Expression;
   arguments: Expression[];
 
-  constructor(func: Expression, args: Expression[], location: SourceLocation) {
-    super(location, (<FunctionType>func.type).returnType);
+  constructor(func: Expression, args: Expression[], location: SourceLocation, type: Type) {
+    super(location, type);
     this.function = func;
     this.arguments = args;
   }
@@ -40,8 +40,8 @@ class ConstructorCallExpression extends Expression {
   function: Expression;
   arguments: Expression[];
 
-  constructor(func: Expression, args: Expression[], location: SourceLocation) {
-    super(location, (<FunctionType>func.type).returnType);
+  constructor(func: Expression, args: Expression[], location: SourceLocation, type: Type) {
+    super(location, type);
     this.function = func;
     this.arguments = args;
   }
@@ -100,5 +100,12 @@ export
 class ClassExpression extends Expression {
   constructor(public name: IdentifierExpression, public members: ClassMemberExpression[], location: SourceLocation, type: Type) {
     super(location, type);
+  }
+}
+
+export
+class MemberAccessExpression extends Expression {
+  constructor(public object: Expression , public member: IdentifierExpression) {
+    super(object.location, member.type);
   }
 }
