@@ -12,12 +12,15 @@ class Foo : Bar {
     x + y
   }
 
-  // you can assign new instance properties only in constructor
+  // you can introduce new instance properties only in constructor
   constructor(@x number) {
-    // properties are immutable by default
-    @y = @x + 1
-    // mutable property
+    // @x is immutable by default
+
+    let @y = @x + 1
     var @z = @x + 2
+
+    // private property
+    private let @w = 1
   }
 
   // directly assign properties like in CoffeeScript
@@ -36,6 +39,11 @@ class Foo : Bar {
   // getter / setter is like in JavaScript
   get sum() {
     @x + @y + @z
+  }
+
+  // private method (using Symbols)
+  private hoge() {
+
   }
 }
 ```
