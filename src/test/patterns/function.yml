@@ -21,3 +21,14 @@
     }
     f(1, 2)
   error: Cannot pass 2 arguments
+
+- title: function forward reference
+  src: |
+    func f(a number, b number) {
+      g(a, b)
+    }
+    func g(a number, b number) {
+      a + b
+    }
+    f(1, 2)
+  expected: 3
