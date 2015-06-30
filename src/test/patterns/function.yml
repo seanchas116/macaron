@@ -1,4 +1,4 @@
-- title: function call
+- title: unnamed function call
   src: |
     let f = (a number, b number) => {
       a + b
@@ -6,7 +6,7 @@
     1 + 2 * 1 * f(1, 2)
   expected: 7
 
-- title: function call with wrong arguments
+- title: unnamed function call with wrong arguments
   src: |
     let f = (a number) => {
       a
