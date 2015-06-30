@@ -14,8 +14,8 @@ class CompilerError implements Error {
     return this.error["stack"];
   }
 
-  constructor(public errorInfos: ErrorInfo[]) {
-    const message = errorInfos.map(info => info.message).join("\n`");
+  constructor(public infos: ErrorInfo[]) {
+    const message = infos.map(info => info.message).join("\n`");
     this.error = new Error(message);
     this.message = this.error.message;
   }

@@ -43,6 +43,7 @@ import {
   voidType
 } from "./nativeTypes";
 import SourceLocation from "./SourceLocation";
+import ErrorInfo from "./ErrorInfo";
 
 function returnType(expressions: Expression[]) {
   return expressions[expressions.length - 1].type;
@@ -57,10 +58,26 @@ class TypeEvaluator {
 
   evaluateExpressions(asts: ExpressionAST[]) {
     const expressions: Expression[] = [];
+    const errors: ErrorInfo[] = [];
 
     for (const ast of asts) {
-      // TODO: catch and collect errors
-      expressions.push(this.evaluate(ast));
+      try {
+        expressions.push(this.evaluate(ast));
+      }
+      catch (error) {
+        if (error instanceof CompilerError) {
+          console.log("pushing errors");
+          errors.push(...error.infos);
+        }
+        else {
+          throw error;
+        }
+      }
+    }
+
+    if (errors.length > 0) {
+      console.log("throwing errors");
+      throw new CompilerError(errors);
     }
 
     return expressions;
