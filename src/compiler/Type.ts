@@ -4,6 +4,7 @@ import TypeCheckError from "./TypeCheckError";
 export
 class Type {
   name = "[anonymous type]";
+  boxType: Type = null;
 
   getMembers() {
     return new Map<string, Expression>();
@@ -11,10 +12,6 @@ class Type {
 
   isCastableTo(superType: Type) {
     return this === superType;
-  }
-
-  get boxType(): Type {
-    return null;
   }
 
   get hasBoxType() {
