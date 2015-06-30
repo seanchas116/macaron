@@ -37,3 +37,22 @@ let obj = {}
 obj = 1 // error, 1 is not an object
 obj = new Number(1) // OK
 ```
+
+## Union type
+
+```
+var x Foo|Bar = new Foo()
+x = new Bar()
+```
+
+## Tuple
+
+```
+let x [number, string] = [1, "foo"]
+```
+
+## Array shorthand
+
+```
+let xs number[] = []
+```
