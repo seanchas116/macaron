@@ -66,7 +66,6 @@ class TypeEvaluator {
       }
       catch (error) {
         if (error instanceof CompilerError) {
-          console.log("pushing errors");
           errors.push(...error.infos);
         }
         else {
@@ -76,7 +75,6 @@ class TypeEvaluator {
     }
 
     if (errors.length > 0) {
-      console.log("throwing errors");
       throw new CompilerError(errors);
     }
 
