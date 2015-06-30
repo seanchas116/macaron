@@ -3,9 +3,7 @@ import TypeCheckError from "./TypeCheckError";
 
 export
 class Type {
-  get name() {
-    return "[anonymous type]";
-  }
+  name = "[anonymous type]";
 
   getMembers() {
     return new Map<string, Expression>();
@@ -26,19 +24,13 @@ class Type {
 
 export
 class AnyType extends Type {
-  get name() {
-    return "any";
-  }
+  name = "any";
 }
 
 export
 class PrimitiveType extends Type {
-  constructor(private _name: string) {
+  constructor(public name: string) {
     super();
-  }
-
-  get name() {
-    return this._name;
   }
 
   isCastableTo(superType: Type): boolean {
@@ -50,10 +42,7 @@ export
 class MetaType extends Type {
   constructor(public type: Type) {
     super();
-  }
-
-  get name() {
-    return `type:${this.type.name}`;
+    this.name = `type:${this.type.name}`;
   }
 }
 
@@ -61,9 +50,11 @@ export
 class FunctionType extends Type {
   constructor(public selfType: Type, public requiredParams: Type[], public optionalParams: Type[], public returnType: Type) {
     super();
+
+    this.name = this.buildName();
   }
 
-  get name() {
+  buildName() {
     const requiredNames = this.requiredParams.map(t => t.name);
     const optionalNames = this.optionalParams.map(t => t.name);
     const returnName = this.returnType.name;
@@ -139,10 +130,7 @@ export
 class TupleType extends Type {
   constructor(public types: Type[]) {
     super();
-  }
-
-  get name() {
-    return `[${this.types.join()}]`;
+    this.name = `[${this.types.join()}]`;
   }
 }
 
@@ -161,7 +149,7 @@ export
 class ClassType extends Type {
   selfMembers = new Map<string, Expression>();
 
-  constructor(public superClass: Type) {
+  constructor(public name: string, public superClass: Type) {
     super();
   }
 

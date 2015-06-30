@@ -168,7 +168,7 @@ class TypeEvaluator {
 
   evaluateClass(ast: ClassAST) {
     // TODO: superclass
-    const classType = new ClassType(voidType);
+    const classType = new ClassType(ast.name.name, voidType);
     for (const member of ast.members) {
       if (member instanceof ClassMethodAST) {
         const func = this.evaluateFunctionLike(classType, member.parameters, member.expressions, member.location);
