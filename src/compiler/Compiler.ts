@@ -2,6 +2,9 @@ import defaultEnviromnent from "./defaultEnvironment";
 import TypeEvaluator from "./TypeEvaluator";
 import CodeEmitter from "./CodeEmitter";
 import {ExpressionAST} from "./AST";
+import CompilerError from "./CompilerError";
+import SourceLocation from "./SourceLocation";
+
 const parser = require("./parser");
 
 interface CompileOption {
@@ -12,7 +15,18 @@ export default
 class Compiler {
 
   compile(source: string, options: CompileOption = {}) {
-    const parsed: ExpressionAST[] = parser.parse(source);
+    let parsed: ExpressionAST[] = [];
+    try {
+      parsed = parser.parse(source);
+    }
+    catch (error) {
+      if (error.name == "SyntaxError") {
+        throw CompilerError.syntaxError(
+          error.message,
+          new SourceLocation(error.line, error.column, error.offset)
+        );
+      }
+    }
 
     const evaluator = new TypeEvaluator(defaultEnviromnent());
     const expressions = evaluator.evaluateExpressions(parsed);
