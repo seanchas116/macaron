@@ -11,7 +11,8 @@ import {
   ReturnExpression,
   ClassMemberExpression,
   ClassMethodExpression,
-  ClassExpression
+  ClassExpression,
+  MemberAccessExpression
 } from "./Expression";
 
 import DeclarationType from "./DeclarationType";
@@ -75,6 +76,9 @@ class CodeEmitter {
     else if (expr instanceof ClassExpression) {
       return this.emitClass(expr);
     }
+    else if (expr instanceof MemberAccessExpression) {
+      return this.emitMemberAccess(expr);
+    }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
     }
@@ -136,7 +140,7 @@ class CodeEmitter {
       .map(member => emitter.emitClassMember(member))
       .join("\n");
 
-    return `class ${expr.name} {\n${body}\n}`;
+    return `class ${expr.name.name} {\n${body}\n}`;
   }
 
   emitFunctionCall(expr: FunctionCallExpression) {
@@ -169,6 +173,11 @@ class CodeEmitter {
 
   emitReturn(expr: ReturnExpression) {
     return `return ${this.emitExpression(expr.expression)}`;
+  }
+
+  emitMemberAccess(expr: MemberAccessExpression) {
+    const obj = this.emitExpression(expr.object);
+    return `${obj}.${expr.member.name}`;
   }
 
   indented() {
