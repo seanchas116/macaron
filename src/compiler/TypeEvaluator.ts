@@ -175,6 +175,7 @@ class TypeEvaluator {
     const className = ast.name.name;
     const classType = new ClassType(className, superType);
     const memberExpressions: ClassMemberExpression[] = [];
+
     for (const member of ast.members) {
       if (member instanceof ClassMethodAST) {
         const {params, expressions, location, type} = this.evaluateFunctionLike(classType, member.parameters, member.expressions, member.location);
@@ -198,7 +199,14 @@ class TypeEvaluator {
         classType.selfMembers.set(name, type);
         const nameExpr = new IdentifierExpression(name, member.location, type);
         memberExpressions.push(new ClassMethodExpression(params, expressions, nameExpr, location));
+
+        if (name === "constructor") {
+          classType.constructorType = new FunctionType(voidType, type.requiredParams, type.optionalParams, type.returnType);
+        }
       }
+    }
+    if (!classType.constructorType) {
+      classType.constructorType = new FunctionType(voidType, [], [], voidType);
     }
     const classNameExpr = new IdentifierExpression(ast.name.name, ast.name.location, classType);
     return new ClassExpression(classNameExpr, memberExpressions, ast.location, classType);

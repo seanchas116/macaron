@@ -5,6 +5,7 @@ export
 class Type {
   name = "[anonymous type]";
   boxType: Type = null;
+  constructorType: Type = null;
 
   getMembers() {
     return new Map<string, Type>();
@@ -16,6 +17,9 @@ class Type {
 
   get hasBoxType() {
     return !!this.boxType;
+  }
+  get hasConstructor() {
+    return !!this.constructorType;
   }
 }
 
