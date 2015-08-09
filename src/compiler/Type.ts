@@ -1,5 +1,5 @@
 import {Expression} from "./Expression";
-import OperatorKind from "./OperatorKind";
+import {BinaryOperatorKind, UnaryOperatorKind} from "./OperatorKind";
 
 export
 class Operator {
@@ -7,6 +7,9 @@ class Operator {
 
 export
 class NativeOperator extends Operator {
+  constructor(public nativeOperatorName: string) {
+    super();
+  }
 }
 
 export
@@ -19,8 +22,12 @@ class Type {
     return new Map<string, Type>();
   }
 
-  getOperators() {
-    return new Map<OperatorKind, Operator>();
+  getBinaryOperators() {
+    return new Map<BinaryOperatorKind, Operator>();
+  }
+
+  getUnaryOperators() {
+    return new Map<UnaryOperatorKind, Operator>();
   }
 
   isCastableTo(superType: Type) {
@@ -42,8 +49,19 @@ class AnyType extends Type {
 
 export
 class PrimitiveType extends Type {
+  binaryOperators = new Map<BinaryOperatorKind, Operator>();
+  unaryOperators = new Map<UnaryOperatorKind, Operator>();
+
   constructor(public name: string) {
     super();
+  }
+
+  getBinaryOperators() {
+    return this.binaryOperators;
+  }
+
+  getUnaryOperators() {
+    return this.unaryOperators;
   }
 
   isCastableTo(superType: Type): boolean {
@@ -161,7 +179,8 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
 export
 class ClassType extends Type {
   selfMembers = new Map<string, Type>();
-  selfOperators = new Map<OperatorKind, Operator>();
+  selfBinaryOperators = new Map<BinaryOperatorKind, Operator>();
+  selfUnaryOperators = new Map<UnaryOperatorKind, Operator>();
 
   constructor(public name: string, public superClass: Type) {
     super();
@@ -171,7 +190,11 @@ class ClassType extends Type {
     return mergeMap(this.superClass.getMembers(), this.selfMembers);
   }
 
-  getOperators(): Map<OperatorKind, Operator> {
-    return mergeMap(this.superClass.getOperators(), this.selfOperators);
+  getBinaryOperators(): Map<BinaryOperatorKind, Operator> {
+    return mergeMap(this.superClass.getBinaryOperators(), this.selfBinaryOperators);
+  }
+
+  getUnaryOperators(): Map<UnaryOperatorKind, Operator> {
+    return mergeMap(this.superClass.getUnaryOperators(), this.selfUnaryOperators);
   }
 }
