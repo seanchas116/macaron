@@ -27,6 +27,7 @@
         "./src/compiler/typing/Environment.ts",
         "./src/compiler/typing/Expression.ts",
         "./src/compiler/typing/GenericType.ts",
+        "./src/compiler/typing/Identifier.ts",
         "./src/compiler/typing/OperatorKind.ts",
         "./src/compiler/typing/Type.ts",
         "./src/compiler/typing/TypeEvaluator.ts",

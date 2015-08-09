@@ -1,4 +1,4 @@
-import {IdentifierAST} from "../parser/AST";
+import Identifier from "./Identifier";
 import {Expression, AssignmentExpression, IdentifierExpression} from "./Expression";
 import DeclarationType from "./DeclarationType";
 import CompilationError from "../common/CompilationError";
@@ -16,14 +16,14 @@ class Environment {
   constructor(public parent: Environment = null) {
   }
 
-  addVariable(declarationType: DeclarationType, name: IdentifierAST, type: Type) {
+  addVariable(declarationType: DeclarationType, name: Identifier, type: Type) {
     if (this.variables.has(name.name)) {
       throw CompilationError.typeError(`Variable "${name.name}" is already defined`, name.location);
     }
     this.variables.set(name.name, new Variable(type, declarationType == DeclarationType.Constant));
   }
 
-  addVariableExpression(type: DeclarationType, name: IdentifierAST, value: Expression) {
+  addVariableExpression(type: DeclarationType, name: Identifier, value: Expression) {
     if (type == DeclarationType.Assignment) {
       const variable = this.get(name);
       if (variable.isConstant) {
@@ -51,12 +51,12 @@ class Environment {
     }
   }
 
-  getVariableExpression(name: IdentifierAST) {
+  getVariableExpression(name: Identifier) {
     const variable = this.get(name);
     return new IdentifierExpression(name.name, name.location, variable.type);
   }
 
-  get(name: IdentifierAST) {
+  get(name: Identifier) {
     const variable = this.getOrNull(name.name);
     if (!variable) {
       throw CompilationError.typeError(`No variable "${name.name}"`, name.location);
