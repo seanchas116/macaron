@@ -1,169 +1,6 @@
-import {Expression} from "./Expression";
 import {BinaryOperatorKind, UnaryOperatorKind} from "./OperatorKind";
-
-export
-class Operator {
-}
-
-export
-class NativeOperator extends Operator {
-  constructor(public nativeOperatorName: string) {
-    super();
-  }
-}
-
-export
-class Type {
-  name = "[anonymous type]";
-  boxType: Type = null;
-  constructorType: FunctionType = null;
-
-  getMembers() {
-    return new Map<string, Type>();
-  }
-
-  getBinaryOperators() {
-    return new Map<BinaryOperatorKind, Operator>();
-  }
-
-  getUnaryOperators() {
-    return new Map<UnaryOperatorKind, Operator>();
-  }
-
-  isCastableTo(superType: Type) {
-    return this === superType;
-  }
-
-  get hasBoxType() {
-    return !!this.boxType;
-  }
-  get hasConstructor() {
-    return !!this.constructorType;
-  }
-}
-
-export
-class AnyType extends Type {
-  name = "any";
-}
-
-export
-class PrimitiveType extends Type {
-  binaryOperators = new Map<BinaryOperatorKind, Operator>();
-  unaryOperators = new Map<UnaryOperatorKind, Operator>();
-
-  constructor(public name: string) {
-    super();
-  }
-
-  getBinaryOperators() {
-    return this.binaryOperators;
-  }
-
-  getUnaryOperators() {
-    return this.unaryOperators;
-  }
-
-  isCastableTo(superType: Type): boolean {
-    return this === superType || superType instanceof AnyType;
-  }
-}
-
-export
-class MetaType extends Type {
-  constructor(public type: Type) {
-    super();
-    this.name = `type:${this.type.name}`;
-  }
-}
-
-export
-class FunctionType extends Type {
-  constructor(public selfType: Type, public requiredParams: Type[], public optionalParams: Type[], public returnType: Type) {
-    super();
-
-    this.name = this.buildName();
-  }
-
-  buildName() {
-    const requiredNames = this.requiredParams.map(t => t.name);
-    const optionalNames = this.optionalParams.map(t => t.name);
-    const returnName = this.returnType.name;
-
-    const funcName = (() => {
-      if (optionalNames.length > 0) {
-        return `(${requiredNames.join()}[, ${optionalNames.join()}])=>${returnName}`;
-      }
-      else {
-        return `(${requiredNames.join()})=>${returnName}`
-      }
-    })();
-
-    if (this.selfType) {
-      return `(${this.selfType.name})${funcName}`;
-    }
-    else {
-      return funcName;
-    }
-  }
-
-  get parameters() {
-    return this.requiredParams.concat(this.optionalParams);
-  }
-
-  get minParamCount() {
-    return this.requiredParams.length;
-  }
-
-  get maxParamCount() {
-    return this.requiredParams.length + this.optionalParams.length;
-  }
-
-  isCastableTo(superType: Type) {
-    if (superType instanceof FunctionType) {
-      // OK: (Object)=>HTMLElement to (HTMLElement)=>Object
-      // NG: (HTMLElement)=>Object to (Object)=>HTMLElement
-      // OK: (Object[, Object])=>void to (Object)=>void
-      // NG: (Object)=>void to (Object[, Object])=>void
-
-      if (superType.selfType && !superType.selfType.isCastableTo(this.selfType)) {
-        return false;
-      }
-
-      if (!this.returnType.isCastableTo(superType.returnType)) {
-        return false;
-      }
-      if (superType.requiredParams.length !== this.requiredParams.length) {
-        return false;
-      }
-      if (this.optionalParams.length < superType.optionalParams.length) {
-        return false;
-      }
-
-      for (let i = 0; i < superType.requiredParams.length; ++i) {
-        if (!superType.requiredParams[i].isCastableTo(this.requiredParams[i])) {
-          return false;
-        }
-      }
-      for (let i = 0; i < superType.optionalParams.length; ++i) {
-        if (!superType.optionalParams[i].isCastableTo(this.optionalParams[i])) {
-          return false;
-        }
-      }
-    }
-    else {
-      return false;
-    }
-  }
-}
-
-export
-class TupleType extends Type {
-  constructor(public types: Type[]) {
-    super();
-    this.name = `[${this.types.join()}]`;
-  }
-}
+import CallSignature from "./CallSignature";
+import Expression from "./expression/Expression";
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   const ret = new Map<TKey, TValue>();
@@ -176,25 +13,48 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   return ret;
 }
 
-export
-class ClassType extends Type {
+function isCastableSignatures(fromSigs: CallSignature[], toSigs: CallSignature[]) {
+  return toSigs.every(toSig => {
+    return fromSigs.some(fromSig => fromSig.isCastableTo(toSig));
+  });
+}
+
+export default
+class Type {
   selfMembers = new Map<string, Type>();
-  selfBinaryOperators = new Map<BinaryOperatorKind, Operator>();
-  selfUnaryOperators = new Map<UnaryOperatorKind, Operator>();
+  selfBinaryOperators = new Map<string, Type>();
+  selfUnaryOperators = new Map<string, Type>();
+  callSignatures: CallSignature[] = [];
+  newSignatures: CallSignature[] = [];
 
-  constructor(public name: string, public superClass: Type) {
-    super();
+  constructor(public name: string, public superType: Type, public expression: Expression = null) {
   }
 
-  getMembers(): Map<string, Type> {
-    return mergeMap(this.superClass.getMembers(), this.selfMembers);
+  get members(): Map<string, Type> {
+    return mergeMap(this.superType.members, this.selfMembers);
   }
 
-  getBinaryOperators(): Map<BinaryOperatorKind, Operator> {
-    return mergeMap(this.superClass.getBinaryOperators(), this.selfBinaryOperators);
+  get binaryOperators(): Map<string, Type> {
+    return mergeMap(this.superType.binaryOperators, this.selfBinaryOperators);
   }
 
-  getUnaryOperators(): Map<UnaryOperatorKind, Operator> {
-    return mergeMap(this.superClass.getUnaryOperators(), this.selfUnaryOperators);
+  get unaryOperators(): Map<string , Type> {
+    return mergeMap(this.superType.unaryOperators, this.selfUnaryOperators);
+  }
+
+  isCastableTo(other: Type) {
+    for (const [name, member] of other.members) {
+      const thisMember = this.members.get(name);
+      if (!thisMember || !thisMember.isCastableTo(member)) {
+        return false;
+      }
+    }
+    if (!isCastableSignatures(this.callSignatures, other.callSignatures)) {
+      return false;
+    }
+    if (!isCastableSignatures(this.newSignatures, other.newSignatures)) {
+      return false;
+    }
+    return true;
   }
 }

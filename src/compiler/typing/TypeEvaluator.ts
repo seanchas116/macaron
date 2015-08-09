@@ -14,40 +14,24 @@ import {
   MemberAccessAST
 } from "../parser/AST";
 
-import {
-  Expression,
-  BinaryExpression,
-  NumberExpression,
-  StringExpression,
-  FunctionExpression,
+import Expression, {
+  LiteralExpression,
   IdentifierExpression,
   FunctionCallExpression,
-  ConstructorCallExpression,
   ReturnExpression,
-  ClassMemberExpression,
-  ClassMethodExpression,
-  ClassExpression,
   MemberAccessExpression
-} from "./Expression";
+} from "./expression/Expression";
+import FunctionExpression from "./expression/FunctionExpression";
+import ClassExpression from "./expression/ClassExpression";
 
+import Identifier from "./Identifier";
 import Environment from "./Environment";
 import DeclarationType from "./DeclarationType";
 import CompilationError from "../common/CompilationError";
-import {
-  Type,
-  FunctionType,
-  MetaType,
-  ClassType
-} from "./Type";
-import {
-  voidType
-} from "./nativeTypes";
+import Type from "./Type";
+import {voidType} from "./nativeTypes";
 import SourceLocation from "../common/SourceLocation";
 import ErrorInfo from "../common/ErrorInfo";
-
-function returnType(expressions: Expression[]) {
-  return expressions[expressions.length - 1].type;
-}
 
 export default
 class TypeEvaluator {
@@ -136,164 +120,73 @@ class TypeEvaluator {
   evaluateBinary(ast: BinaryAST) {
     const left = this.evaluate(ast.left);
     const right = this.evaluate(ast.right);
-    if (left.type !== right.type) {
+
+    const operator = left.type.binaryOperators.get(ast.operator.name);
+    if (!operator) {
       throw CompilationError.typeError(
-        `Cannot perform "${ast.operator.name}" operation between "${left.type}" and "right.type"`,
+        `No operator '${ast.operator.name}' for type 'left.type'`,
         ast.operator.location
       );
     }
-    return new BinaryExpression(ast.operator.name, left, right, ast.location);
+    return new BinaryExpression(ast.location, operator, left, right);
   }
 
   evaluateIdentifier(ast: IdentifierAST) {
-    return this.environment.getVariableExpression(ast);
+    const type = this.environment.getType(ast.name);
+    if (!type) {
+      throw CompilationError.typeError(
+        `Variable '${ast.name}' not in scope`,
+        ast.location
+      );
+    }
+    return new IdentifierExpression(ast, type);
   }
 
   evalauteNumber(ast: NumberAST) {
-    return new NumberExpression(ast.value, ast.location);
+    return new LiteralExpression(ast.location, ast.value);
   }
 
   evaluateString(ast: StringAST) {
-    return new StringExpression(ast.value, ast.location);
+    return new LiteralExpression(ast.location, ast.value);
   }
 
   evaluateMemberAccess(ast: MemberAccessAST) {
     const obj = this.evaluate(ast.object);
-    const objType = obj.type;
-    const memberName = ast.member.name;
-    const memberType = objType.getMembers().get(memberName);
-    const memberLoc = ast.member.location;
-    if (!memberType) {
-      throw CompilationError.typeError(
-        `Type "${objType.name}" has no member "${memberName}"`,
-        memberLoc
-      );
-    }
-    const memberExpr = new IdentifierExpression(memberName, memberLoc, memberType);
-    return new MemberAccessExpression(obj, memberExpr);
+    const member = new Identifier(ast.member.location, ast.member.name);
+    return new MemberAccessExpression(ast.location, obj, member)
   }
 
   evaluateFunction(ast: FunctionAST) {
-    const {params, expressions, location, type} = this.evaluateFunctionLike(voidType, ast.parameters, ast.expressions, ast.location);
-    return new FunctionExpression(params, expressions, location, type);
-  }
-
-  checkArgumentType(funcType: FunctionType, args: Expression[], location: SourceLocation) {
-    if (args.length < funcType.minParamCount || funcType.maxParamCount < args.length) {
-      throw CompilationError.typeError(
-        `Cannot pass ${args.length} arguments for ${funcType.minParamCount}...${funcType.maxParamCount} parameter function`,
-        location
-      );
-    }
-    funcType.parameters.forEach((type, i) => {
-      if (!args[i].type.isCastableTo(type)) {
+    const subEnv = new Environment(this.environment);
+    const params: [Identifier, Type][] = [];
+    for (const {name, type: typeName} of ast.parameters) {
+      const type = subEnv.getType(typeName.name);
+      if (!type) {
         throw CompilationError.typeError(
-          `Cannot pass '${args[i].type.name}' to '${type.name}'`,
-          args[i].location
+          `Type '${typeName}' not in scope`,
+          typeName.location
         );
       }
-    });
+      params.push([name, type]);
+    }
+    const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
+    return new FunctionExpression(ast.location, ast.name, params, body);
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
-    const args = this.evaluateExpressions(ast.arguments);
-
     const func = this.evaluate(ast.function);
-    const funcType = func.type;
-
-    if (funcType instanceof FunctionType) {
-      this.checkArgumentType(funcType, args, ast.location);
-      return new FunctionCallExpression(func, args, ast.location, funcType.returnType);
-    }
-    else {
-      throw CompilationError.typeError(
-        `${funcType.name} is not an function`,
-        ast.location
-      );
-    }
+    const args = this.evaluateExpressions(ast.arguments);
+    return new FunctionCallExpression(ast.location, func, args, false);
   }
 
   evaluateConstructorCall(ast: ConstructorCallAST) {
+    const func = this.evaluate(ast.function);
     const args = this.evaluateExpressions(ast.arguments);
-
-    const classExpr = this.evaluate(ast.function);
-    const classMetaType = classExpr.type;
-    if (classMetaType instanceof MetaType) {
-      const classType = classMetaType.type;
-      if (classType instanceof ClassType) {
-        this.checkArgumentType(classType.constructorType, args, ast.location);
-        return new ConstructorCallExpression(classExpr, args, ast.location, classType);
-      }
-    }
-    throw CompilationError.typeError(
-      `${classMetaType.name} is not an class`,
-      ast.location
-    );
+    return new FunctionCallExpression(ast.location, func, args, true);
   }
 
   evaluateClass(ast: ClassAST) {
-    // TODO: superclass
-    const superType = voidType;
-    const className = ast.name.name;
-    const classType = new ClassType(className, superType);
-    const memberExpressions: ClassMemberExpression[] = [];
-
-    for (const member of ast.members) {
-      if (member instanceof ClassMethodAST) {
-        const {params, expressions, location, type} = this.evaluateFunctionLike(classType, member.parameters, member.expressions, member.location);
-        const name = member.name.name;
-
-        if (classType.selfMembers.has(name)) {
-          throw CompilationError.typeError(
-            `Class "${className}" already has member "${name}"`,
-            member.location
-          );
-        }
-
-        const superMember = superType.getMembers().get(name);
-        if (superMember && !type.isCastableTo(superMember)) {
-          throw CompilationError.typeError(
-            `Type of "${name}" is not compatible to super types`,
-            member.location
-          );
-        }
-
-        classType.selfMembers.set(name, type);
-        const nameExpr = new IdentifierExpression(name, member.location, type);
-        memberExpressions.push(new ClassMethodExpression(params, expressions, nameExpr, location));
-
-        if (name === "constructor") {
-          classType.constructorType = new FunctionType(voidType, type.requiredParams, type.optionalParams, type.returnType);
-        }
-      }
-    }
-    if (!classType.constructorType) {
-      classType.constructorType = new FunctionType(voidType, [], [], voidType);
-    }
-    this.environment.addVariable(DeclarationType.Constant, ast.name, new MetaType(classType));
-    const classNameExpr = new IdentifierExpression(ast.name.name, ast.name.location, classType);
-    return new ClassExpression(classNameExpr, memberExpressions, ast.location, classType);
-  }
-
-  evaluateFunctionLike(selfType: Type, paramASTs: ParameterAST[], expressionASTs: ExpressionAST[], location: SourceLocation) {
-    const subEnv = new Environment(this.environment);
-    const params: IdentifierExpression[] = [];
-    for (const {name, type} of paramASTs) {
-      const metaType = this.evaluate(type).type;
-      if (metaType instanceof MetaType) {
-        subEnv.addVariable(DeclarationType.Constant, name, metaType.type);
-        params.push(new IdentifierExpression(name.name, name.location, metaType.type));
-      }
-      else {
-        throw CompilationError.typeError(
-          `Provided expression is not a type`,
-          type.location
-        );
-      }
-    }
-    const expressions = new TypeEvaluator(subEnv).evaluateExpressions(expressionASTs);
-    const paramTypes = params.map(p => p.type);
-    const type = new FunctionType(selfType, paramTypes, [], returnType(expressions));
-    return {params, expressions, location, type};
+    const members = this.evaluateExpressions(ast.members);
+    return new ClassExpression(ast.location, ast.name, members);
   }
 }
