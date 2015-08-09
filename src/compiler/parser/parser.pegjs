@@ -1,6 +1,6 @@
 {
   const AST = require("./AST");
-  const SourceLocation = require("./SourceLocation");
+  const SourceLocation = require("../common/SourceLocation");
 
   const binaryOperators = [
     ["*", "/"],

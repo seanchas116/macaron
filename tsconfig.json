@@ -16,13 +16,13 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./src/compiler/common/CompilationError.ts",
+        "./src/compiler/common/ErrorInfo.ts",
+        "./src/compiler/common/ErrorType.ts",
+        "./src/compiler/common/SourceLocation.ts",
         "./src/compiler/compiler/Compiler.ts",
-        "./src/compiler/compiler/CompilerError.ts",
-        "./src/compiler/compiler/ErrorInfo.ts",
-        "./src/compiler/compiler/ErrorType.ts",
         "./src/compiler/emitter/CodeEmitter.ts",
         "./src/compiler/parser/AST.ts",
-        "./src/compiler/parser/SourceLocation.ts",
         "./src/compiler/typing/DeclarationType.ts",
         "./src/compiler/typing/Environment.ts",
         "./src/compiler/typing/Expression.ts",

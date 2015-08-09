@@ -1,4 +1,4 @@
-import SourceLocation from "../parser/SourceLocation";
+import SourceLocation from "./SourceLocation";
 import ErrorType from "./ErrorType";
 
 export default

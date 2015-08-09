@@ -10,7 +10,7 @@ import {
   MetaType
 } from "./Type";
 import {IdentifierAST} from "../parser/AST";
-import SourceLocation from "../parser/SourceLocation";
+import SourceLocation from "../common/SourceLocation";
 
 export default
 function defaultEnvironment() {

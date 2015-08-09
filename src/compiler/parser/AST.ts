@@ -1,4 +1,4 @@
-import SourceLocation from "./SourceLocation";
+import SourceLocation from "../common/SourceLocation";
 
 export
 class AST {

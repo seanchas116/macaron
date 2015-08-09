@@ -2,8 +2,8 @@ import defaultEnviromnent from "../typing/defaultEnvironment";
 import TypeEvaluator from "../typing/TypeEvaluator";
 import CodeEmitter from "../emitter/CodeEmitter";
 import {ExpressionAST} from "../parser/AST";
-import CompilerError from "./CompilerError";
-import SourceLocation from "../parser/SourceLocation";
+import CompilationError from "../common/CompilationError";
+import SourceLocation from "../common/SourceLocation";
 
 const parser = require("../parser/parser");
 
@@ -21,7 +21,7 @@ class Compiler {
     }
     catch (error) {
       if (error.name == "SyntaxError") {
-        throw CompilerError.syntaxError(
+        throw CompilationError.syntaxError(
           error.message,
           new SourceLocation(error.line, error.column, error.offset)
         );

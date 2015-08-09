@@ -1,7 +1,7 @@
 import {IdentifierAST} from "../parser/AST";
 import {Expression, AssignmentExpression, IdentifierExpression} from "./Expression";
 import DeclarationType from "./DeclarationType";
-import CompilerError from "../compiler/CompilerError";
+import CompilationError from "../common/CompilationError";
 import {Type} from "./Type";
 
 class Variable {
@@ -18,7 +18,7 @@ class Environment {
 
   addVariable(declarationType: DeclarationType, name: IdentifierAST, type: Type) {
     if (this.variables.has(name.name)) {
-      throw CompilerError.typeError(`Variable "${name.name}" is already defined`, name.location);
+      throw CompilationError.typeError(`Variable "${name.name}" is already defined`, name.location);
     }
     this.variables.set(name.name, new Variable(type, declarationType == DeclarationType.Constant));
   }
@@ -27,10 +27,10 @@ class Environment {
     if (type == DeclarationType.Assignment) {
       const variable = this.get(name);
       if (variable.isConstant) {
-        throw CompilerError.typeError(`Cannot assign to constant`, name.location);
+        throw CompilationError.typeError(`Cannot assign to constant`, name.location);
       }
       if (variable.type !== value.type) {
-        throw CompilerError.typeError(`Cannot assign "${value.type.name}" to "${variable.type.name}"`, name.location);
+        throw CompilationError.typeError(`Cannot assign "${value.type.name}" to "${variable.type.name}"`, name.location);
       }
 
       return new AssignmentExpression(
@@ -59,7 +59,7 @@ class Environment {
   get(name: IdentifierAST) {
     const variable = this.getOrNull(name.name);
     if (!variable) {
-      throw CompilerError.typeError(`No variable "${name.name}"`, name.location);
+      throw CompilationError.typeError(`No variable "${name.name}"`, name.location);
     }
     return variable;
   }

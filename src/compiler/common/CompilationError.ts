@@ -1,11 +1,11 @@
-import SourceLocation from "../parser/SourceLocation";
+import SourceLocation from "./SourceLocation";
 import ErrorInfo from "./ErrorInfo";
 import ErrorType from "./ErrorType";
 import * as util from "util";
 
 // TODO: extends Error
 export default
-class CompilerError implements Error {
+class CompilationError implements Error {
   name = "TypeCheckError";
   message: string;
   error: Error;
@@ -21,16 +21,16 @@ class CompilerError implements Error {
   }
 
   static typeError(message: string, location: SourceLocation) {
-    return new CompilerError([
+    return new CompilationError([
       new ErrorInfo(ErrorType.TypeError, message, location)
     ]);
   }
 
   static syntaxError(message: string, location: SourceLocation) {
-    return new CompilerError([
+    return new CompilationError([
       new ErrorInfo(ErrorType.SyntaxError, message, location)
     ])
   }
 }
 
-util.inherits(CompilerError, Error);
+util.inherits(CompilationError, Error);

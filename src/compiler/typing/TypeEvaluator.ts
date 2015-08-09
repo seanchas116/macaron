@@ -32,7 +32,7 @@ import {
 
 import Environment from "./Environment";
 import DeclarationType from "./DeclarationType";
-import CompilerError from "../compiler/CompilerError";
+import CompilationError from "../common/CompilationError";
 import {
   Type,
   FunctionType,
@@ -42,8 +42,8 @@ import {
 import {
   voidType
 } from "./nativeTypes";
-import SourceLocation from "../parser/SourceLocation";
-import ErrorInfo from "../compiler/ErrorInfo";
+import SourceLocation from "../common/SourceLocation";
+import ErrorInfo from "../common/ErrorInfo";
 
 function returnType(expressions: Expression[]) {
   return expressions[expressions.length - 1].type;
@@ -65,7 +65,7 @@ class TypeEvaluator {
         expressions.push(this.evaluate(ast));
       }
       catch (error) {
-        if (error instanceof CompilerError) {
+        if (error instanceof CompilationError) {
           errors.push(...error.infos);
         }
         else {
@@ -75,7 +75,7 @@ class TypeEvaluator {
     }
 
     if (errors.length > 0) {
-      throw new CompilerError(errors);
+      throw new CompilationError(errors);
     }
 
     return expressions;
@@ -137,7 +137,7 @@ class TypeEvaluator {
     const left = this.evaluate(ast.left);
     const right = this.evaluate(ast.right);
     if (left.type !== right.type) {
-      throw CompilerError.typeError(
+      throw CompilationError.typeError(
         `Cannot perform "${ast.operator.name}" operation between "${left.type}" and "right.type"`,
         ast.operator.location
       );
@@ -164,7 +164,7 @@ class TypeEvaluator {
     const memberType = objType.getMembers().get(memberName);
     const memberLoc = ast.member.location;
     if (!memberType) {
-      throw CompilerError.typeError(
+      throw CompilationError.typeError(
         `Type "${objType.name}" has no member "${memberName}"`,
         memberLoc
       );
@@ -180,14 +180,14 @@ class TypeEvaluator {
 
   checkArgumentType(funcType: FunctionType, args: Expression[], location: SourceLocation) {
     if (args.length < funcType.minParamCount || funcType.maxParamCount < args.length) {
-      throw CompilerError.typeError(
+      throw CompilationError.typeError(
         `Cannot pass ${args.length} arguments for ${funcType.minParamCount}...${funcType.maxParamCount} parameter function`,
         location
       );
     }
     funcType.parameters.forEach((type, i) => {
       if (!args[i].type.isCastableTo(type)) {
-        throw CompilerError.typeError(
+        throw CompilationError.typeError(
           `Cannot pass '${args[i].type.name}' to '${type.name}'`,
           args[i].location
         );
@@ -206,7 +206,7 @@ class TypeEvaluator {
       return new FunctionCallExpression(func, args, ast.location, funcType.returnType);
     }
     else {
-      throw CompilerError.typeError(
+      throw CompilationError.typeError(
         `${funcType.name} is not an function`,
         ast.location
       );
@@ -225,7 +225,7 @@ class TypeEvaluator {
         return new ConstructorCallExpression(classExpr, args, ast.location, classType);
       }
     }
-    throw CompilerError.typeError(
+    throw CompilationError.typeError(
       `${classMetaType.name} is not an class`,
       ast.location
     );
@@ -244,7 +244,7 @@ class TypeEvaluator {
         const name = member.name.name;
 
         if (classType.selfMembers.has(name)) {
-          throw CompilerError.typeError(
+          throw CompilationError.typeError(
             `Class "${className}" already has member "${name}"`,
             member.location
           );
@@ -252,7 +252,7 @@ class TypeEvaluator {
 
         const superMember = superType.getMembers().get(name);
         if (superMember && !type.isCastableTo(superMember)) {
-          throw CompilerError.typeError(
+          throw CompilationError.typeError(
             `Type of "${name}" is not compatible to super types`,
             member.location
           );
@@ -285,7 +285,7 @@ class TypeEvaluator {
         params.push(new IdentifierExpression(name.name, name.location, metaType.type));
       }
       else {
-        throw CompilerError.typeError(
+        throw CompilationError.typeError(
           `Provided expression is not a type`,
           type.location
         );
