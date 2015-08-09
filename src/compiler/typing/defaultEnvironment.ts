@@ -9,8 +9,8 @@ import {
   Type,
   MetaType
 } from "./Type";
-import {IdentifierAST} from "./AST";
-import SourceLocation from "./SourceLocation";
+import {IdentifierAST} from "../parser/AST";
+import SourceLocation from "../parser/SourceLocation";
 
 export default
 function defaultEnvironment() {

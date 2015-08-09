@@ -1,6 +1,6 @@
 import {Type, TupleType} from "./Type";
-import SourceLocation from "./SourceLocation"
-import CompilerError from "./CompilerError";
+import SourceLocation from "../parser/SourceLocation"
+import CompilerError from "../compiler/CompilerError";
 
 interface GenericTypeParam {
   type: Type;

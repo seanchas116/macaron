@@ -1,5 +1,4 @@
 import SourceLocation from "./SourceLocation";
-import Environment from "./Environment";
 
 export
 class AST {

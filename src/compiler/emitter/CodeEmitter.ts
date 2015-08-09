@@ -13,9 +13,9 @@ import {
   ClassMethodExpression,
   ClassExpression,
   MemberAccessExpression
-} from "./Expression";
+} from "../typing/Expression";
 
-import DeclarationType from "./DeclarationType";
+import DeclarationType from "../typing/DeclarationType";
 
 function appendReturnType(expressions: Expression[]) {
   const len = expressions.length;

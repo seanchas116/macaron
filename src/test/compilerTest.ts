@@ -1,7 +1,7 @@
 "use strict";
 
 import assert from "power-assert";
-import Compiler from "../compiler/Compiler";
+import Compiler from "../compiler/compiler/Compiler";
 import * as vm from "vm";
 import loadPatterns from "./support/loadPattern";
 const babel = require("babel");

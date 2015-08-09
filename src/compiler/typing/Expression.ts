@@ -1,7 +1,7 @@
 import DeclarationType from "./DeclarationType";
 import {numberType, stringType} from "./nativeTypes";
 import {Type, FunctionType, ClassType} from "./Type";
-import SourceLocation from "./SourceLocation";
+import SourceLocation from "../parser/SourceLocation";
 
 export
 class Expression {

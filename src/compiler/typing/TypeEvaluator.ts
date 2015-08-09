@@ -12,7 +12,7 @@ import {
   ClassAST,
   ClassMethodAST,
   MemberAccessAST
-} from "./AST";
+} from "../parser/AST";
 
 import {
   Expression,
@@ -32,7 +32,7 @@ import {
 
 import Environment from "./Environment";
 import DeclarationType from "./DeclarationType";
-import CompilerError from "./CompilerError";
+import CompilerError from "../compiler/CompilerError";
 import {
   Type,
   FunctionType,
@@ -42,8 +42,8 @@ import {
 import {
   voidType
 } from "./nativeTypes";
-import SourceLocation from "./SourceLocation";
-import ErrorInfo from "./ErrorInfo";
+import SourceLocation from "../parser/SourceLocation";
+import ErrorInfo from "../compiler/ErrorInfo";
 
 function returnType(expressions: Expression[]) {
   return expressions[expressions.length - 1].type;

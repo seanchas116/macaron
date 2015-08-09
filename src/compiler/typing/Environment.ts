@@ -1,7 +1,7 @@
-import {IdentifierAST} from "./AST";
+import {IdentifierAST} from "../parser/AST";
 import {Expression, AssignmentExpression, IdentifierExpression} from "./Expression";
 import DeclarationType from "./DeclarationType";
-import CompilerError from "./CompilerError";
+import CompilerError from "../compiler/CompilerError";
 import {Type} from "./Type";
 
 class Variable {

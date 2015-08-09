@@ -1,4 +1,4 @@
-import SourceLocation from "./SourceLocation";
+import SourceLocation from "../parser/SourceLocation";
 import ErrorInfo from "./ErrorInfo";
 import ErrorType from "./ErrorType";
 import * as util from "util";

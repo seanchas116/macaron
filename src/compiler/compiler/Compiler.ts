@@ -1,11 +1,11 @@
-import defaultEnviromnent from "./defaultEnvironment";
-import TypeEvaluator from "./TypeEvaluator";
-import CodeEmitter from "./CodeEmitter";
-import {ExpressionAST} from "./AST";
+import defaultEnviromnent from "../typing/defaultEnvironment";
+import TypeEvaluator from "../typing/TypeEvaluator";
+import CodeEmitter from "../emitter/CodeEmitter";
+import {ExpressionAST} from "../parser/AST";
 import CompilerError from "./CompilerError";
-import SourceLocation from "./SourceLocation";
+import SourceLocation from "../parser/SourceLocation";
 
-const parser = require("./parser");
+const parser = require("../parser/parser");
 
 interface CompileOption {
   implicitReturn? : boolean;
