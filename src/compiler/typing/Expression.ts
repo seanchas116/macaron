@@ -41,9 +41,17 @@ class FunctionCallExpression extends Expression {
     this.function = func;
     this.arguments = args;
 
-    const sigs = isNewCall ? func.type.callSignatures : func.type.newSignatures;
+    let selfType = voidType;
+    if (func instanceof MemberAccessExpression) {
+      selfType = func.object.type;
+    }
+    if (func instanceof OperatorAccessExpression) {
+      selfType = func.object.type;
+    }
+
+    const sigs = isNewCall ? func.type.newSignatures : func.type.callSignatures;
     const argTypes = args.map(a => a.type);
-    const sig = sigs.find(sig => sig.isCallable(voidType, argTypes));
+    const sig = sigs.find(sig => sig.isCallable(selfType, argTypes));
     if (!sig) {
       throw CompilationError.typeError(
         `Type '${func.type}' cannot be called with '${argTypes.join(",")}'`,
