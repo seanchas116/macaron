@@ -3,8 +3,8 @@ var shell = require("gulp-shell");
 
 var COMPILER_SRC = "./src/compiler";
 var COMPILER_DEST = "./dest/compiler";
-var PEGJS_SRC = `${COMPILER_SRC}/parser/parser.pegjs`;
-var PEGJS_DEST = `${COMPILER_DEST}/parser/parser.js`;
+var PEGJS_SRC = `${COMPILER_SRC}/parser/parserImpl.pegjs`;
+var PEGJS_DEST = `${COMPILER_DEST}/parser/parserImpl.js`;
 var SRC = "./**/*.ts";
 var OTHER_SRC = `./src/**/!(*.ts|*.pegjs)`;
 var TESTS = "./dest/test/**/*Test.js";
