@@ -1,6 +1,7 @@
 import {BinaryOperatorKind, UnaryOperatorKind} from "./OperatorKind";
 import CallSignature from "./CallSignature";
 import Expression from "./expression/Expression";
+import Operator from "./Operator";
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   const ret = new Map<TKey, TValue>();
@@ -22,8 +23,8 @@ function isCastableSignatures(fromSigs: CallSignature[], toSigs: CallSignature[]
 export default
 class Type {
   selfMembers = new Map<string, Type>();
-  selfBinaryOperators = new Map<string, Type>();
-  selfUnaryOperators = new Map<string, Type>();
+  selfBinaryOperators = new Map<string, Operator>();
+  selfUnaryOperators = new Map<string, Operator>();
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
 
@@ -34,11 +35,11 @@ class Type {
     return mergeMap(this.superType.members, this.selfMembers);
   }
 
-  get binaryOperators(): Map<string, Type> {
+  get binaryOperators(): Map<string, Operator> {
     return mergeMap(this.superType.binaryOperators, this.selfBinaryOperators);
   }
 
-  get unaryOperators(): Map<string , Type> {
+  get unaryOperators(): Map<string , Operator> {
     return mergeMap(this.superType.unaryOperators, this.selfUnaryOperators);
   }
 

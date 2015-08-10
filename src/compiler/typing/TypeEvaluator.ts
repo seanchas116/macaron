@@ -11,7 +11,7 @@ import {
   ConstructorCallAST,
   ClassAST,
   ClassMethodAST,
-  MemberAccessAST
+  MemberAccessAST,
 } from "../parser/AST";
 
 import Expression, {
@@ -19,7 +19,8 @@ import Expression, {
   IdentifierExpression,
   FunctionCallExpression,
   ReturnExpression,
-  MemberAccessExpression
+  MemberAccessExpression,
+  OperatorAccessExpression,
 } from "./expression/Expression";
 import FunctionExpression from "./expression/FunctionExpression";
 import ClassExpression from "./expression/ClassExpression";
@@ -121,14 +122,8 @@ class TypeEvaluator {
     const left = this.evaluate(ast.left);
     const right = this.evaluate(ast.right);
 
-    const operator = left.type.binaryOperators.get(ast.operator.name);
-    if (!operator) {
-      throw CompilationError.typeError(
-        `No operator '${ast.operator.name}' for type 'left.type'`,
-        ast.operator.location
-      );
-    }
-    return new BinaryExpression(ast.location, operator, left, right);
+    const operatorAccess = new OperatorAccessExpression(ast.location, left, ast.operator, 2);
+    return new FunctionCallExpression(ast.location, operatorAccess, [right]);
   }
 
   evaluateIdentifier(ast: IdentifierAST) {

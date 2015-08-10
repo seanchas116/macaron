@@ -4,6 +4,7 @@ import Type from "../Type";
 import SourceLocation from "../../common/SourceLocation";
 import Identifier from "../Identifier";
 import CompilationError from "../../common/CompilationError";
+import Operator from "../Operator";
 
 export default
 class Expression {
@@ -36,7 +37,7 @@ class FunctionCallExpression extends Expression {
   arguments: Expression[];
   isNewCall: boolean;
 
-  constructor(location: SourceLocation, func: Expression, args: Expression[], isNewCall: boolean) {
+  constructor(location: SourceLocation, func: Expression, args: Expression[], isNewCall = false) {
     super(location);
     this.isNewCall = isNewCall;
     this.function = func;
@@ -88,5 +89,28 @@ class MemberAccessExpression extends Expression {
       );
     }
     this.type = members.get(member.name);
+  }
+}
+
+export
+class OperatorAccessExpression extends Expression {
+  operator: Operator;
+
+  constructor(location: SourceLocation, public object: Expression, operatorName: Identifier, arity: number) {
+    super(location);
+    if (arity === 1) {
+      this.operator = object.type.unaryOperators.get(operatorName.name);
+    } else if (arity === 2) {
+      this.operator = object.type.binaryOperators.get(operatorName.name);
+    } else {
+      throw new Error("unsupported arity");
+    }
+    if (!this.operator) {
+      throw CompilationError.typeError(
+        `No operator '${operatorName.name}' for type '${object.type}'`,
+        operatorName.location
+      );
+    }
+    this.type = this.operator.type;
   }
 }
