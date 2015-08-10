@@ -149,14 +149,14 @@ class TypeEvaluator {
   }
 
   evaluateIdentifier(ast: IdentifierAST) {
-    const type = this.environment.getType(ast.name);
-    if (!type) {
+    const variable = this.environment.getVariable(ast.name);
+    if (!variable) {
       throw CompilationError.typeError(
         `Variable '${ast.name}' not in scope`,
         ast.location
       );
     }
-    return new IdentifierExpression(ast, type);
+    return new IdentifierExpression(ast, variable.type);
   }
 
   evalauteNumber(ast: NumberAST) {
