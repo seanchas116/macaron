@@ -42,11 +42,13 @@ class FunctionCallExpression extends Expression {
     this.arguments = args;
 
     let selfType = voidType;
-    if (func instanceof MemberAccessExpression) {
-      selfType = func.object.type;
-    }
-    if (func instanceof OperatorAccessExpression) {
-      selfType = func.object.type;
+    if (!isNewCall) {
+      if (func instanceof MemberAccessExpression) {
+        selfType = func.object.type;
+      }
+      if (func instanceof OperatorAccessExpression) {
+        selfType = func.object.type;
+      }
     }
 
     const sigs = isNewCall ? func.type.newSignatures : func.type.callSignatures;
