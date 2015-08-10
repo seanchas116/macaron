@@ -10,7 +10,6 @@ import {
   FunctionCallAST,
   ConstructorCallAST,
   ClassAST,
-  ClassMethodAST,
   MemberAccessAST,
 } from "../parser/AST";
 
