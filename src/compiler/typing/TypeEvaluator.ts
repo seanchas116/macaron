@@ -66,6 +66,16 @@ class TypeEvaluator {
     }
   }
 
+  addType(name: Identifier, type: Type) {
+    if (this.environment.getOwnType(name.name)) {
+      throw CompilationError.typeError(
+        `Type '${name.name}' already defined`,
+        name.location
+      );
+    }
+    this.environment.addType(name.name, type);
+  }
+
   evaluateExpressions(asts: ExpressionAST[]) {
     const expressions: Expression[] = [];
     const errors: ErrorInfo[] = [];
@@ -211,6 +221,7 @@ class TypeEvaluator {
     const members = this.evaluateExpressions(ast.members);
     const expr = new ClassExpression(ast.location, ast.name, members);
     this.addVariable(DeclarationType.Constant, ast.name, expr.type);
+    this.addType(ast.name, expr.type);
     return expr;
   }
 }
