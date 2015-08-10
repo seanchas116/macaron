@@ -40,6 +40,32 @@ class TypeEvaluator {
   constructor(public environment: Environment) {
   }
 
+  addVariable(type: DeclarationType, name: Identifier, valueType: Type) {
+    const variable = this.environment.getVariable(name.name);
+    if (type === DeclarationType.Assignment) {
+      if (!variable) {
+        throw CompilationError.typeError(
+          `Variable '${name.name}' not in scope`,
+          name.location
+        );
+      }
+      if (!valueType.isCastableTo(variable.type)) {
+        throw CompilationError.typeError(
+          `Cannot assign '${valueType}' to type '${variable.type}'`,
+          name.location
+        );
+      }
+    } else {
+      if (this.environment.getOwnVariable(name.name)) {
+        throw CompilationError.typeError(
+          `Variable '${name.name}' already defined`,
+          name.location
+        );
+      }
+      this.environment.addVariable(name.name, valueType, type);
+    }
+  }
+
   evaluateExpressions(asts: ExpressionAST[]) {
     const expressions: Expression[] = [];
     const errors: ErrorInfo[] = [];
@@ -114,29 +140,7 @@ class TypeEvaluator {
         return DeclarationType.Assignment;
       }
     })();
-    const variable = this.environment.getVariable(varName);
-    if (type === DeclarationType.Assignment) {
-      if (!variable) {
-        throw CompilationError.typeError(
-          `Variable '${varName}' not in scope`,
-          ast.left.location
-        );
-      }
-      if (!right.type.isCastableTo(variable.type)) {
-        throw CompilationError.typeError(
-          `Cannot assign '${right.type}' to type '${variable.type}'`,
-          ast.left.location
-        );
-      }
-    } else {
-      if (this.environment.getOwnVariable(varName)) {
-        throw CompilationError.typeError(
-          `Variable '${varName}' already defined`,
-          ast.left.location
-        );
-      }
-      this.environment.addVariable(varName, right.type, type);
-    }
+    this.addVariable(type, ast.left, right.type);
     return new AssignmentExpression(ast.location, type, ast.left, right);
   }
 
