@@ -184,6 +184,7 @@ class TypeEvaluator {
           typeName.location
         );
       }
+      subEnv.addVariable(name.name, type, DeclarationType.Constant);
       params.push([name, type]);
     }
     const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
