@@ -5,8 +5,10 @@ import Compiler from "../compiler/compiler/Compiler";
 import * as vm from "vm";
 import loadPatterns from "./support/loadPattern";
 const babel = require("babel");
+const lineNumbers = require("line-numbers");
 
 function evalIsolated(code: string) {
+  console.log(lineNumbers(code));
   const es5: string = babel.transform(code).code;
   const sandbox = {};
   const context = vm.createContext(sandbox);
