@@ -1,13 +1,10 @@
 import CallSignature from "./CallSignature";
 import Type from "./Type";
+import {voidType} from "./nativeTypes";
 
 export default
 class Operator {
-  constructor() {
-  }
-  get type(): Type {
-    throw new Error("not implemented");
-  }
+  type = voidType;
 }
 
 export

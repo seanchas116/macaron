@@ -41,14 +41,14 @@ class Type {
 
   get binaryOperators(): Map<string, Operator> {
     if (!this.superType) {
-      return this.binaryOperators;
+      return this.selfBinaryOperators;
     }
     return mergeMap(this.superType.binaryOperators, this.selfBinaryOperators);
   }
 
   get unaryOperators(): Map<string , Operator> {
     if (!this.superType) {
-      return this.unaryOperators;
+      return this.selfUnaryOperators;
     }
     return mergeMap(this.superType.unaryOperators, this.selfUnaryOperators);
   }

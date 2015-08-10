@@ -8,11 +8,9 @@ import Operator from "./Operator";
 
 export default
 class Expression {
-  constructor(public location: SourceLocation) {
-  }
+  type = voidType;
 
-  get type(): Type {
-    return voidType;
+  constructor(public location: SourceLocation) {
   }
 }
 
