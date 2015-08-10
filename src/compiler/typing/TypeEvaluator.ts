@@ -49,6 +49,12 @@ class TypeEvaluator {
           name.location
         );
       }
+      if (variable.isConstant) {
+        throw CompilationError.typeError(
+          `Variable '${name.name}' is constant`,
+          name.location
+        );
+      }
       if (!valueType.isCastableTo(variable.type)) {
         throw CompilationError.typeError(
           `Cannot assign '${valueType}' to type '${variable.type}'`,
