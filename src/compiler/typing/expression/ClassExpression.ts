@@ -1,4 +1,4 @@
-import Expression from "./Expression";
+import Expression from "../Expression";
 import Identifier from "../Identifier";
 import Type from "../Type";
 import {voidType} from "../nativeTypes";
@@ -20,7 +20,7 @@ class ClassExpression extends Expression {
     for (const member of members) {
       type.selfMembers.set(member.name.name, member.type);
 
-      const superMember = superType.getMembers().get(name);
+      const superMember = superType.members.get(name.name);
       if (superMember && !type.isCastableTo(superMember)) {
         throw CompilationError.typeError(
           `Type of "${name}" is not compatible to super types`,

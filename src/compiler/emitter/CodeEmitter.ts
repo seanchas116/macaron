@@ -1,19 +1,17 @@
-import {
-  Expression,
+import Expression, {
   IdentifierExpression,
-  BinaryExpression,
-  NumberExpression,
-  StringExpression,
-  FunctionExpression,
+  LiteralExpression,
   FunctionCallExpression,
-  ConstructorCallExpression,
   AssignmentExpression,
   ReturnExpression,
-  ClassMemberExpression,
-  ClassMethodExpression,
-  ClassExpression,
-  MemberAccessExpression
+  MemberAccessExpression,
+  OperatorAccessExpression
 } from "../typing/Expression";
+
+import {NativeOperator, MethodOperator} from "../typing/Operator";
+
+import FunctionExpression from "../typing/expression/FunctionExpression";
+import ClassExpression from "../typing/expression/ClassExpression";
 
 import DeclarationType from "../typing/DeclarationType";
 
@@ -25,7 +23,7 @@ function appendReturnType(expressions: Expression[]) {
   const init = expressions.slice(0, len - 1);
   const last = expressions[len - 1];
 
-  return init.concat([new ReturnExpression(last, last.location)]);
+  return init.concat([new ReturnExpression(last.location, last)]);
 }
 
 export default
@@ -49,23 +47,14 @@ class CodeEmitter {
     if (expr instanceof IdentifierExpression) {
       return this.emitIdentifier(expr);
     }
-    else if (expr instanceof BinaryExpression) {
-      return this.emitBinary(expr);
-    }
-    else if (expr instanceof NumberExpression) {
-      return this.emitNumber(expr);
-    }
-    else if (expr instanceof StringExpression) {
-      return this.emitString(expr);
+    else if (expr instanceof LiteralExpression) {
+      return this.emitLiteral(expr);
     }
     else if (expr instanceof FunctionExpression) {
       return this.emitFunction(expr);
     }
     else if (expr instanceof FunctionCallExpression) {
       return this.emitFunctionCall(expr);
-    }
-    else if (expr instanceof ConstructorCallExpression) {
-      return this.emitConstructorCall(expr);
     }
     else if (expr instanceof AssignmentExpression) {
       return this.emitAssignment(expr);
@@ -85,51 +74,35 @@ class CodeEmitter {
   }
 
   emitIdentifier(expr: IdentifierExpression) {
-    return expr.name;
+    return expr.name.name;
   }
 
-  emitBinary(expr: BinaryExpression) {
-    const left = this.emitExpression(expr.left);
-    const right = this.emitExpression(expr.right);
-
-    return `(${left} ${expr.operator} ${right})`;
-  }
-
-  emitNumber(expr: NumberExpression) {
-    return expr.value.toString();
-  }
-
-  emitString(expr: StringExpression) {
-    return JSON.stringify(expr.value);
+  emitLiteral(expr: LiteralExpression) {
+    if (typeof expr.value === "number") {
+      return String(expr.value);
+    } else {
+      return JSON.stringify(expr.value);
+    }
   }
 
   emitFunction(expr: FunctionExpression) {
     const params = expr.parameters
-      .map(p => p.name)
+      .map(p => p[0].name)
       .join(", ");
 
     const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
-    const body = bodyEmitter.emitExpressions(expr.expressions, true);
+    const body = bodyEmitter.emitExpressions(expr.body, true);
 
     return `(${params}) => {\n${body}\n}`;
   }
 
-  emitClassMember(expr: ClassMemberExpression) {
-    if (expr instanceof ClassMethodExpression) {
-      return this.emitClassMethod(expr);
-    }
-    else {
-      throw new Error(`Not supported expression: ${expr.constructor.name}`);
-    }
-  }
-
-  emitClassMethod(expr: ClassMethodExpression) {
+  emitClassMethod(expr: FunctionExpression) {
     const params = expr.parameters
-      .map(p => p.name)
+      .map(p => p[0].name)
       .join(", ");
 
     const bodyEmitter = this.indented();
-    const body = bodyEmitter.emitExpressions(expr.expressions, true);
+    const body = bodyEmitter.emitExpressions(expr.body, true);
 
     return `${expr.name.name}(${params}) {\n${body}\n}`;
   }
@@ -137,29 +110,28 @@ class CodeEmitter {
   emitClass(expr: ClassExpression) {
     const emitter = this.indented();
     const body = expr.members
-      .map(member => emitter.emitClassMember(member))
+      .map(member => emitter.emitClassMethod(member))
       .join("\n");
 
     return `class ${expr.name.name} {\n${body}\n}`;
   }
 
   emitFunctionCall(expr: FunctionCallExpression) {
-    const func = this.emitExpression(expr.function);
     const args = expr.arguments.map(expr => this.emitExpression(expr)).join(", ");
-    return `${func}(${args})`;
-  }
+    const func = this.emitExpression(expr.function);
 
-  emitConstructorCall(expr: ConstructorCallExpression) {
-    const func = this.emitExpression(expr.function);
-    const args = expr.arguments.map(expr => this.emitExpression(expr)).join(", ");
-    return `new ${func}(${args})`;
+    if (expr.isNewCall) {
+      return `new ${func}(${args})`;
+    } else {
+      return `${func}(${args})`;
+    }
   }
 
   emitAssignment(expr: AssignmentExpression) {
     // TODO: AssignmentExpression must be top-level
 
     const value = this.emitExpression(expr.value);
-    const name = expr.ideitifier.name;
+    const name = expr.assignable.name;
 
     switch (expr.declarationType) {
     case DeclarationType.Variable:

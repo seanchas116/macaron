@@ -1,4 +1,4 @@
-import Expression from "./Expression";
+import Expression from "../Expression";
 import Identifier from "../Identifier";
 import Type from "../Type";
 import {voidType} from "../nativeTypes";
@@ -14,10 +14,10 @@ export default
 class FunctionExpression extends Expression {
   _type: Type;
 
-  constructor(location: SourceLocation, public name: Identifier, params: [Identifier, Type][], public body: Expression[]) {
+  constructor(location: SourceLocation, public name: Identifier, public parameters: [Identifier, Type][], public body: Expression[]) {
     super(location);
     const type = this._type = new Type("function", voidType, this);
-    const callSig = new CallSignature(voidType, params.map(pair => pair[1]), returnType(body));
+    const callSig = new CallSignature(voidType, parameters.map(pair => pair[1]), returnType(body));
     type.callSignatures.push(callSig);
   }
 
