@@ -25,6 +25,8 @@ class Compiler {
           error.message,
           new SourceLocation(error.line, error.column, error.offset)
         );
+      } else {
+        throw error;
       }
     }
 
