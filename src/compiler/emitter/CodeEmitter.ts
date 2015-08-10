@@ -118,12 +118,31 @@ class CodeEmitter {
 
   emitFunctionCall(expr: FunctionCallExpression) {
     const args = expr.arguments.map(expr => this.emitExpression(expr)).join(", ");
-    const func = this.emitExpression(expr.function);
+    const funcExpr = expr.function;
 
-    if (expr.isNewCall) {
-      return `new ${func}(${args})`;
+    if (funcExpr instanceof OperatorAccessExpression) {
+      if (expr.isNewCall) {
+        throw new Error("operator cannot be called as constructor");
+      }
+
+      const operator = funcExpr.operator;
+      const obj = this.emitExpression(funcExpr.object);
+
+      if (operator instanceof MethodOperator) {
+        return `${obj}.${operator.methodName}(${args})`;
+      } else if (operator instanceof NativeOperator) {
+        return `${obj} ${operator.nativeOperatorName} ${args}`;
+      } else {
+        throw new Error(`Unknown Operator class: ${operator.constructor.name}`);
+      }
     } else {
-      return `${func}(${args})`;
+      const func = this.emitExpression(funcExpr);
+
+      if (expr.isNewCall) {
+        return `new ${func}(${args})`;
+      } else {
+        return `${func}(${args})`;
+      }
     }
   }
 
