@@ -2,6 +2,7 @@ import Expression from "../Expression";
 import Identifier from "../Identifier";
 import Type from "../Type";
 import {voidType} from "../nativeTypes";
+import CallSignature from "../CallSignature";
 import CompilationError from "../../common/CompilationError";
 import FunctionExpression from "./FunctionExpression";
 import SourceLocation from "../../common/SourceLocation";
@@ -17,6 +18,7 @@ class ClassExpression extends Expression {
     const superType = voidType;
 
     const type = this.type = new Type(name.name, superType, this);
+    type.newSignatures = [new CallSignature(voidType, [], type)];
     for (const member of members) {
       if (member instanceof FunctionExpression) {
         type.selfMembers.set(member.name.name, member.type);
@@ -30,7 +32,9 @@ class ClassExpression extends Expression {
         }
 
         if (member.name.name === "constructor") {
-          type.newSignatures.push(...member.type.callSignatures);
+          type.newSignatures = member.type.callSignatures.map(sig => {
+            return new CallSignature(voidType, sig.params, type);
+          });
         }
       } else {
         throw new Error(`Not supported expression as class member: ${member.constructor.name}`);
