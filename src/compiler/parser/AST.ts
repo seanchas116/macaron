@@ -92,7 +92,8 @@ class OperatorAST extends AST {
 
 export
 class ParameterAST extends AST {
-  constructor(location: SourceLocation, public name: IdentifierAST, public type: ExpressionAST) {
+  // FIXME: support type more than Identifier
+  constructor(location: SourceLocation, public name: IdentifierAST, public type: IdentifierAST) {
     super(location);
   }
 }

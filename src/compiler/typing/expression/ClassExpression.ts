@@ -10,7 +10,7 @@ export default
 class ClassExpression extends Expression {
   _type: Type;
 
-  constructor(location: SourceLocation, public name: Identifier, public members: FunctionExpression[]) {
+  constructor(location: SourceLocation, public name: Identifier, public members: Expression[]) {
     super(location);
 
     // TODO: superclass
@@ -18,18 +18,22 @@ class ClassExpression extends Expression {
 
     const type = this._type = new Type(name.name, superType, this);
     for (const member of members) {
-      type.selfMembers.set(member.name.name, member.type);
+      if (member instanceof FunctionExpression) {
+        type.selfMembers.set(member.name.name, member.type);
 
-      const superMember = superType.members.get(name.name);
-      if (superMember && !type.isCastableTo(superMember)) {
-        throw CompilationError.typeError(
-          `Type of "${name}" is not compatible to super types`,
-          member.name.location
-        );
-      }
+        const superMember = superType.members.get(name.name);
+        if (superMember && !type.isCastableTo(superMember)) {
+          throw CompilationError.typeError(
+            `Type of "${name}" is not compatible to super types`,
+            member.name.location
+          );
+        }
 
-      if (member.name.name === "constructor") {
-        type.newSignatures.push(...member.type.callSignatures);
+        if (member.name.name === "constructor") {
+          type.newSignatures.push(...member.type.callSignatures);
+        }
+      } else {
+        throw new Error(`Not supported expression as class member: ${member.constructor.name}`);
       }
     }
   }

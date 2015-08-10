@@ -224,7 +224,7 @@ Block
 }
 
 Parameter
-  = name:Identifier type:Expression
+  = name:Identifier type:Identifier
 {
   return new AST.ParameterAST(currentLocation(), name, type);
 }
