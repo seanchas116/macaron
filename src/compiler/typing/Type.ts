@@ -32,6 +32,10 @@ class Type {
   constructor(public name: string, public superType: Type = null, public expression: Expression = null) {
   }
 
+  toString() {
+    return this.name;
+  }
+
   get members(): Map<string, Type> {
     if (!this.superType) {
       return this.selfMembers;
