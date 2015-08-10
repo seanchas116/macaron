@@ -21,7 +21,7 @@ import Expression, {
   ReturnExpression,
   MemberAccessExpression,
   OperatorAccessExpression,
-} from "./expression/Expression";
+} from "./Expression";
 import FunctionExpression from "./expression/FunctionExpression";
 import ClassExpression from "./expression/ClassExpression";
 

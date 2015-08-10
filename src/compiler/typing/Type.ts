@@ -1,6 +1,6 @@
 import {BinaryOperatorKind, UnaryOperatorKind} from "./OperatorKind";
 import CallSignature from "./CallSignature";
-import Expression from "./expression/Expression";
+import Expression from "./Expression";
 import Operator from "./Operator";
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {

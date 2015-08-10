@@ -1,10 +1,10 @@
-import DeclarationType from "../DeclarationType";
-import {voidType, numberType, stringType} from "../nativeTypes";
-import Type from "../Type";
-import SourceLocation from "../../common/SourceLocation";
-import Identifier from "../Identifier";
-import CompilationError from "../../common/CompilationError";
-import Operator from "../Operator";
+import DeclarationType from "./DeclarationType";
+import {voidType, numberType, stringType} from "./nativeTypes";
+import Type from "./Type";
+import SourceLocation from "../common/SourceLocation";
+import Identifier from "./Identifier";
+import CompilationError from "../common/CompilationError";
+import Operator from "./Operator";
 
 export default
 class Expression {
