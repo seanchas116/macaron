@@ -255,7 +255,7 @@ Function
 NamedFunction
   = FuncKeyword name:Identifier parameters:ParameterList expressions:Block
 {
-  return new AST.FunctionAST(currentLocation(), name, parameters, expressions);
+  return new AST.FunctionAST(currentLocation(), name, parameters, expressions, true);
 }
 
 ArgumentList

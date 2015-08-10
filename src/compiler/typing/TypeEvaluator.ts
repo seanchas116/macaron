@@ -193,7 +193,7 @@ class TypeEvaluator {
     return new MemberAccessExpression(ast.location, obj, member)
   }
 
-  evaluateFunction(ast: FunctionAST) {
+  evaluateFunction(ast: FunctionAST): Expression {
     const subEnv = new Environment(this.environment);
     const params: [Identifier, Type][] = [];
     for (const {name, type: typeName} of ast.parameters) {
@@ -208,7 +208,13 @@ class TypeEvaluator {
       params.push([name, type]);
     }
     const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
-    return new FunctionExpression(ast.location, ast.name, params, body);
+    const expr = new FunctionExpression(ast.location, ast.name, params, body);
+    if (ast.addAsVariable) {
+      this.addVariable(DeclarationType.Constant, ast.name, expr.type);
+      return new AssignmentExpression(ast.location, DeclarationType.Constant, ast.name, expr);
+    } else {
+      return expr;
+    }
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
