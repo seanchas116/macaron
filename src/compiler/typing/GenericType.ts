@@ -1,4 +1,5 @@
-import Type, {TupleType} from "./Type";
+import Type from "./Type";
+import TupleType from "./type/TupleType";
 import SourceLocation from "../common/SourceLocation";
 import CompilationError from "../common/CompilationError";
 

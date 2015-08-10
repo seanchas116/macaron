@@ -38,6 +38,8 @@
         "./src/compiler/typing/expression/ClassExpression.ts",
         "./src/compiler/typing/expression/FunctionExpression.ts",
         "./src/compiler/typing/nativeTypes.ts",
+        "./src/compiler/typing/type/FunctionType.ts",
+        "./src/compiler/typing/type/TupleType.ts",
         "./src/test/compilerTest.ts",
         "./src/test/support/loadPattern.ts",
         "./typings/bundle.d.ts",

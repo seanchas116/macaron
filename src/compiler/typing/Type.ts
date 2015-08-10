@@ -73,13 +73,3 @@ class Type {
     return true;
   }
 }
-
-export
-class TupleType extends Type {
-  constructor(types: Type[]) {
-    super("", voidType);
-    types.forEach((type, i) => {
-      this.selfMembers.set(i.toString(), type);
-    });
-  }
-}
