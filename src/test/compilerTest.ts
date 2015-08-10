@@ -8,7 +8,6 @@ const babel = require("babel");
 const lineNumbers = require("line-numbers");
 
 function evalIsolated(code: string) {
-  console.log(lineNumbers(code));
   const es5: string = babel.transform(code).code;
   const sandbox = {};
   const context = vm.createContext(sandbox);
@@ -30,7 +29,14 @@ describe("Compiler", () => {
 
     if (expected != null) {
       it(`compiles ${title}`, () => {
+        console.log("== Source");
+        console.log(lineNumbers(src));
+
         const compiled = compile();
+
+        console.log("== Compiled");
+        console.log(lineNumbers(compiled));
+
         const func: any = evalIsolated(`
           (() => {
             ${compiled}
