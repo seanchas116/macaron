@@ -9,8 +9,9 @@ import SourceLocation from "../../common/SourceLocation";
 export default
 class ClassExpression extends Expression {
   _type: Type;
+  members: FunctionExpression[];
 
-  constructor(location: SourceLocation, public name: Identifier, public members: Expression[]) {
+  constructor(location: SourceLocation, public name: Identifier, members: Expression[]) {
     super(location);
 
     // TODO: superclass
@@ -36,6 +37,7 @@ class ClassExpression extends Expression {
         throw new Error(`Not supported expression as class member: ${member.constructor.name}`);
       }
     }
+    this.members = <FunctionExpression[]>members;
   }
 
   get type() {
