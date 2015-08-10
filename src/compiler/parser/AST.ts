@@ -26,7 +26,7 @@ class BinaryAST extends ExpressionAST {
 
 export
 class FunctionAST extends ExpressionAST {
-  constructor(location: SourceLocation, public parameters: ParameterAST[], public expressions: ExpressionAST[]) {
+  constructor(location: SourceLocation, public name: IdentifierAST, public parameters: ParameterAST[], public expressions: ExpressionAST[]) {
     super(location);
   }
 }
@@ -106,18 +106,7 @@ class UnaryAST extends ExpressionAST {
 
 export
 class ClassAST extends ExpressionAST {
-  constructor(location: SourceLocation, public name: IdentifierAST, public members: ClassMemberAST[]) {
-    super(location);
-  }
-}
-
-export
-class ClassMemberAST extends AST {
-}
-
-export
-class ClassMethodAST extends ClassMemberAST {
-  constructor(location: SourceLocation, public name: IdentifierAST, public parameters: ParameterAST[], public expressions: ExpressionAST[]) {
+  constructor(location: SourceLocation, public name: IdentifierAST, public members: FunctionAST[]) {
     super(location);
   }
 }

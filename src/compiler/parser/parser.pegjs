@@ -248,7 +248,7 @@ ParameterList
 Function
   = parameters:ParameterList "=>" _ expressions:Block _
 {
-  return new AST.FunctionAST(currentLocation(), parameters, expressions);
+  return new AST.FunctionAST(currentLocation(), new IdentifierAST("", currentLocation()), parameters, expressions);
 }
 
 ArgumentList
@@ -279,5 +279,5 @@ ClassMember
 ClassMethod
   = name:Identifier _ params:ParameterList _ exps:Block _
 {
-  return new AST.ClassMethodAST(currentLocation(), name, params, exps);
+  return new AST.FunctionAST(currentLocation(), name, params, exps);
 }
