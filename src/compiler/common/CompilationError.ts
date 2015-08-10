@@ -15,7 +15,9 @@ class CompilationError implements Error {
   }
 
   constructor(public infos: ErrorInfo[]) {
-    const message = infos.map(info => info.message).join("\n");
+    const message = "\n" + infos.map(info => {
+      return `${info.location}: ${info.message}`;
+    }).join("\n");
     this.error = new Error(message);
     this.message = this.error.message;
   }
