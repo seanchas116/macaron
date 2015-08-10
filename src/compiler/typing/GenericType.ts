@@ -1,4 +1,4 @@
-import {Type, TupleType} from "./Type";
+import Type, {TupleType} from "./Type";
 import SourceLocation from "../common/SourceLocation";
 import CompilationError from "../common/CompilationError";
 
@@ -56,10 +56,11 @@ class GenericType {
 export
 class InstantiatedType extends Type {
   constructor(public generic: GenericType, public typeArgs: Type[]) {
-    super();
+    super("");
+    this.name = this.createName();
   }
 
-  get name() {
+  private createName() {
     const base = this.generic.name;
     const types = this.typeArgs.map(t => t.name);
     return `${base}<${types.join()}>`;

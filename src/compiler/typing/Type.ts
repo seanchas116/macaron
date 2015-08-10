@@ -2,6 +2,7 @@ import {BinaryOperatorKind, UnaryOperatorKind} from "./OperatorKind";
 import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
+import {voidType} from "./nativeTypes";
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   const ret = new Map<TKey, TValue>();
@@ -66,5 +67,15 @@ class Type {
       return false;
     }
     return true;
+  }
+}
+
+export
+class TupleType extends Type {
+  constructor(types: Type[]) {
+    super("", voidType);
+    types.forEach((type, i) => {
+      this.selfMembers.set(i.toString(), type);
+    });
   }
 }
