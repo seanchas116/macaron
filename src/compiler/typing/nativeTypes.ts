@@ -6,13 +6,6 @@ import {
 
 import CallSignature from "./CallSignature";
 
-import {
-  UnaryOperatorKind,
-  BinaryOperatorKind,
-  unaryOperatorKinds,
-  binaryOperatorKinds,
-} from "./OperatorKind";
-
 export
 const anyType = new Type("any");
 
