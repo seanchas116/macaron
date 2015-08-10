@@ -110,8 +110,9 @@ __ = (Whitespace / Separator)*
 // whitespaces and >0 separator
 ___ = _ Separator (_ Separator)* _
 
-ClassKeyword = "class"
-NewKeyword = "new"
+ClassKeyword = "class" _
+NewKeyword = "new" _
+FuncKeyword = "func" _
 
 Expression
   = expr:AssignmentExpression _
@@ -140,7 +141,7 @@ UnaryExpression
 }
 
 FunctionCall
-  = news:(NewKeyword _)* func:MemberAccess _ argLists:ArgumentList*
+  = news:NewKeyword* func:MemberAccess _ argLists:ArgumentList*
 {
   // Parse expressions like `new new new foo()()` or `new foo()()()`
   const count = Math.max(news.length, argLists.length);
@@ -185,7 +186,7 @@ Parentheses
 }
 
 Literal
-  = NumberLiteral / StringLiteral / Function / Class
+  = NumberLiteral / StringLiteral / Function / NamedFunction / Class
 
 // TODO: parse other than integer
 NumberLiteral
@@ -246,9 +247,15 @@ ParameterList
 }
 
 Function
-  = parameters:ParameterList "=>" _ expressions:Block _
+  = parameters:ParameterList "=>" _ expressions:Block
 {
   return new AST.FunctionAST(currentLocation(), new AST.IdentifierAST("", currentLocation()), parameters, expressions);
+}
+
+NamedFunction
+  = FuncKeyword name:Identifier parameters:ParameterList expressions:Block
+{
+  return new AST.FunctionAST(currentLocation(), name, parameters, expressions);
 }
 
 ArgumentList
@@ -258,7 +265,7 @@ ArgumentList
 }
 
 Class
-  = ClassKeyword _ name:Identifier __ "{" __ members:ClassMembers "}" _
+  = ClassKeyword name:Identifier __ "{" __ members:ClassMembers "}" _
 {
   return new AST.ClassAST(currentLocation(), name, members);
 }
