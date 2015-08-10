@@ -8,7 +8,6 @@ import SourceLocation from "../../common/SourceLocation";
 
 export default
 class ClassExpression extends Expression {
-  _type: Type;
   members: FunctionExpression[];
 
   constructor(location: SourceLocation, public name: Identifier, members: Expression[]) {
@@ -17,7 +16,7 @@ class ClassExpression extends Expression {
     // TODO: superclass
     const superType = voidType;
 
-    const type = this._type = new Type(name.name, superType, this);
+    const type = this.type = new Type(name.name, superType, this);
     for (const member of members) {
       if (member instanceof FunctionExpression) {
         type.selfMembers.set(member.name.name, member.type);
@@ -38,9 +37,5 @@ class ClassExpression extends Expression {
       }
     }
     this.members = <FunctionExpression[]>members;
-  }
-
-  get type() {
-    return this._type;
   }
 }
