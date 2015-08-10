@@ -209,6 +209,8 @@ class TypeEvaluator {
 
   evaluateClass(ast: ClassAST) {
     const members = this.evaluateExpressions(ast.members);
-    return new ClassExpression(ast.location, ast.name, members);
+    const expr = new ClassExpression(ast.location, ast.name, members);
+    this.addVariable(DeclarationType.Constant, ast.name, expr.type);
+    return expr;
   }
 }
