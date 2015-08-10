@@ -248,7 +248,7 @@ ParameterList
 Function
   = parameters:ParameterList "=>" _ expressions:Block _
 {
-  return new AST.FunctionAST(currentLocation(), new IdentifierAST("", currentLocation()), parameters, expressions);
+  return new AST.FunctionAST(currentLocation(), new AST.IdentifierAST("", currentLocation()), parameters, expressions);
 }
 
 ArgumentList
