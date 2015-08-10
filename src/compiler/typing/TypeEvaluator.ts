@@ -124,14 +124,14 @@ class TypeEvaluator {
       }
       if (!right.type.isCastableTo(variable.type)) {
         throw CompilationError.typeError(
-          `Cannot assign '${right.type}' to ${variable.type}`,
+          `Cannot assign '${right.type}' to type '${variable.type}'`,
           ast.left.location
         );
       }
     } else {
       if (this.environment.getOwnVariable(varName)) {
         throw CompilationError.typeError(
-          `Variable ${varName} already defined`,
+          `Variable '${varName}' already defined`,
           ast.left.location
         );
       }
