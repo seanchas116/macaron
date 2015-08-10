@@ -17,6 +17,7 @@ import {
 import Expression, {
   LiteralExpression,
   IdentifierExpression,
+  AssignmentExpression,
   FunctionCallExpression,
   ReturnExpression,
   MemberAccessExpression,
@@ -102,6 +103,7 @@ class TypeEvaluator {
   }
 
   evaluateAssignment(ast: AssignmentAST) {
+    const varName = ast.left.name;
     const right = this.evaluate(ast.right);
     const type = (() => {
       switch (ast.declaration) {
@@ -113,8 +115,30 @@ class TypeEvaluator {
         return DeclarationType.Assignment;
       }
     })();
-
-    return this.environment.addVariableExpression(type, ast.left, right);
+    const variable = this.environment.getVariable(varName);
+    if (type === DeclarationType.Assignment) {
+      if (!variable) {
+        throw CompilationError.typeError(
+          `Variable '${varName}' not in scope`,
+          ast.left.location
+        );
+      }
+      if (!right.type.isCastableTo(variable.type)) {
+        throw CompilationError.typeError(
+          `Cannot assign '${right.type}' to ${variable.type}`,
+          ast.left.location
+        );
+      }
+    } else {
+      if (this.environment.getOwnVariable(varName)) {
+        throw CompilationError.typeError(
+          `Variable ${varName} already defined`,
+          ast.left.location
+        );
+      }
+      this.environment.addVariable(varName, right.type, type);
+    }
+    return new AssignmentExpression(ast.location, type, ast.left, right);
   }
 
   evaluateBinary(ast: BinaryAST) {

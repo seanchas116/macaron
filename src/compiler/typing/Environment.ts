@@ -26,6 +26,9 @@ class Environment {
         return parentVariable;
       }
     }
+    return this.getOwnVariable(name);
+  }
+  getOwnVariable(name: string) {
     return this.variables.get(name);
   }
 
@@ -40,6 +43,9 @@ class Environment {
         return parentType;
       }
     }
+    return this.getOwnType(name);
+  }
+  getOwnType(name: string) {
     return this.types.get(name);
   }
 }
