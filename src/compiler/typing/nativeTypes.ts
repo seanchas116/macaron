@@ -1,12 +1,8 @@
-import {
-  Type,
-  AnyType,
-  PrimitiveType
-} from "./Type";
+import Type from "./Type";
 
 import {
   NativeOperator
-} from "./Type";
+} from "./Operator";
 
 import {
   UnaryOperatorKind,
@@ -16,13 +12,13 @@ import {
 } from "./OperatorKind";
 
 export
-const anyType = new AnyType();
+const anyType = new Type("any");
 
 export
 const voidType = anyType;
 
 export
-const numberType = new PrimitiveType("number");
+const numberType = new Type("number");
 
 // all operators supported
 for (const [name, kind] of unaryOperatorKinds) {

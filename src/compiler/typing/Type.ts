@@ -28,18 +28,27 @@ class Type {
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
 
-  constructor(public name: string, public superType: Type, public expression: Expression = null) {
+  constructor(public name: string, public superType: Type = null, public expression: Expression = null) {
   }
 
   get members(): Map<string, Type> {
+    if (!this.superType) {
+      return this.selfMembers;
+    }
     return mergeMap(this.superType.members, this.selfMembers);
   }
 
   get binaryOperators(): Map<string, Operator> {
+    if (!this.superType) {
+      return this.binaryOperators;
+    }
     return mergeMap(this.superType.binaryOperators, this.selfBinaryOperators);
   }
 
   get unaryOperators(): Map<string , Operator> {
+    if (!this.superType) {
+      return this.unaryOperators;
+    }
     return mergeMap(this.superType.unaryOperators, this.selfUnaryOperators);
   }
 

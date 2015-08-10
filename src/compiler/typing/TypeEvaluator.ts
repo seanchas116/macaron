@@ -38,7 +38,6 @@ export default
 class TypeEvaluator {
 
   constructor(public environment: Environment) {
-
   }
 
   evaluateExpressions(asts: ExpressionAST[]) {
