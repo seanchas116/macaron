@@ -1,6 +1,7 @@
 import {
   ExpressionAST,
   AssignmentAST,
+  UnaryAST,
   BinaryAST,
   IdentifierAST,
   NumberAST,
@@ -111,6 +112,9 @@ class TypeEvaluator {
     if (ast instanceof AssignmentAST) {
       return this.evaluateAssignment(ast);
     }
+    else if (ast instanceof UnaryAST) {
+      return this.evaluateUnary(ast);
+    }
     else if (ast instanceof BinaryAST) {
       return this.evaluateBinary(ast);
     }
@@ -158,6 +162,13 @@ class TypeEvaluator {
     })();
     this.addVariable(type, ast.left, right.type);
     return new AssignmentExpression(ast.location, type, ast.left, right);
+  }
+
+  evaluateUnary(ast: UnaryAST) {
+    const operand = this.evaluate(ast.expression);
+
+    const operatorAccess = new OperatorAccessExpression(ast.location, operand, ast.operator, 1);
+    return new FunctionCallExpression(ast.location, operatorAccess, []);
   }
 
   evaluateBinary(ast: BinaryAST) {

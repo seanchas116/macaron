@@ -53,6 +53,7 @@ addNativeBinaryOp(numberType, "<<");
 addNativeBinaryOp(numberType, ">>");
 addNativeBinaryOp(numberType, ">>>");
 
+addNativeUnaryOp(numberType, "+");
 addNativeUnaryOp(numberType, "-");
 addNativeUnaryOp(numberType, "~");
 

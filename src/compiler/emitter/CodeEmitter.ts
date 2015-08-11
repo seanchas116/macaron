@@ -131,7 +131,11 @@ class CodeEmitter {
       if (operator instanceof MethodOperator) {
         return `${obj}.${operator.methodName}(${args})`;
       } else if (operator instanceof NativeOperator) {
-        return `${obj} ${operator.nativeOperatorName} ${args}`;
+        if (expr.arguments.length === 0) {
+          return `${operator.nativeOperatorName}${obj}`;
+        } else {
+          return `${obj} ${operator.nativeOperatorName} ${args}`;
+        }
       } else {
         throw new Error(`Unknown Operator class: ${operator.constructor.name}`);
       }
