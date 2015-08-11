@@ -56,7 +56,7 @@ class TypeEvaluator {
           name.location
         );
       }
-      if (!valueType.isCastableTo(variable.type)) {
+      if (!valueType.isCastableTo(variable.type.get())) {
         throw CompilationError.typeError(
           `Cannot assign '${valueType}' to type '${variable.type}'`,
           name.location
@@ -187,7 +187,7 @@ class TypeEvaluator {
         ast.location
       );
     }
-    return new IdentifierExpression(ast, variable.type);
+    return new IdentifierExpression(ast, variable.type.get());
   }
 
   evalauteNumber(ast: NumberAST) {
@@ -208,7 +208,7 @@ class TypeEvaluator {
     const subEnv = new Environment(this.environment);
     const params: [Identifier, Type][] = [];
     for (const {name, type: typeName} of ast.parameters) {
-      const type = subEnv.getType(typeName.name);
+      const type = subEnv.getType(typeName.name).get();
       if (!type) {
         throw CompilationError.typeError(
           `Type '${typeName}' not in scope`,
