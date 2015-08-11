@@ -164,23 +164,10 @@ class TypeEvaluator {
   }
 
   evaluateFunction(ast: FunctionAST, thisType = voidType): ExpressionThunk {
-    const subEnv = new Environment(this.environment);
-    const params: [Identifier, Type][] = [];
-    for (const {name, type: typeName} of ast.parameters) {
-      const type = subEnv.getType(typeName.name).get();
-      if (!type) {
-        throw CompilationError.typeError(
-          `Type '${typeName}' not in scope`,
-          typeName.location
-        );
-      }
-      subEnv.assignVariable(AssignType.Constant, name, type);
-      params.push([name, type]);
-    }
     const funcThunk = FunctionExpression.thunk(
-      ast.location, ast.name, thisType, params,
-      () => {
-        return new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions).map(e => e.get());
+      ast.location, this.environment, ast.name, thisType, ast.parameters,
+      (env) => {
+        return new TypeEvaluator(env).evaluateExpressions(ast.expressions).map(e => e.get());
       }
     );
 
