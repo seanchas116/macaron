@@ -3,8 +3,17 @@
   const SourceLocation = require("../common/SourceLocation");
 
   const binaryOperators = [
-    ["*", "/"],
-    ["+", "-"]
+    ["**"],
+    ["*", "/", "%"],
+    ["+", "-"],
+    ["<<", ">>", ">>>"],
+    ["<", "<=", ">", ">="],
+    ["=="], ["!="],
+    ["&"],
+    ["^"],
+    ["|"],
+    ["&&"],
+    ["||"],
   ];
 
   function currentLocation() {
@@ -73,13 +82,16 @@ String
   = String1 / String2
 
 BinaryOperator
-  = op:[+\-*/]
+  = op:(
+    "**" / "*" / "/" / "%" / "+" / "-" / "<<" / ">>>" / ">>" /
+    "<" / "<=" / ">" / ">=" / "==" / "!=" / "^" / "||" / "&&" / "|" / "&"
+    )
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
 
 UnaryOperator
-  = op:[+\-]
+  = op:("+" / "-" / "~" / "!")
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
