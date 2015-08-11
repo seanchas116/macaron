@@ -72,6 +72,9 @@ class Type {
   }
 
   isCastableTo(other: Type) {
+    if (this === other) {
+      return true;
+    }
     for (const [name, member] of other.getMembers()) {
       const thisMember = this.getMember(name).get();
       if (!thisMember || !thisMember.isCastableTo(member.get())) {
