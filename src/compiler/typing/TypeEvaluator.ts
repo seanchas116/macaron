@@ -213,7 +213,7 @@ class TypeEvaluator {
     return new MemberAccessExpression(ast.location, obj, member)
   }
 
-  evaluateFunction(ast: FunctionAST): ExpressionThunk {
+  evaluateFunction(ast: FunctionAST, thisType = voidType): ExpressionThunk {
     const subEnv = new Environment(this.environment);
     const params: [Identifier, Type][] = [];
     for (const {name, type: typeName} of ast.parameters) {
@@ -228,9 +228,7 @@ class TypeEvaluator {
       params.push([name, type]);
     }
     const funcThunk = FunctionExpression.thunk(
-      ast.location,
-      ast.name,
-      params,
+      ast.location, ast.name, thisType, params,
       () => {
         return new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions).map(e => e.get());
       }
@@ -257,7 +255,7 @@ class TypeEvaluator {
     const thunk = new ExpressionThunk(ast.location, () => {
       const expr = new ClassExpression(ast.location, ast.name);
       for (const memberAST of ast.members) {
-        const member = this.evaluateFunction(memberAST);
+        const member = this.evaluateFunction(memberAST, expr.type);
         expr.addMember(memberAST.name, member);
       }
       return expr;

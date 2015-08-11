@@ -17,13 +17,13 @@ class FunctionExpression extends Expression {
     super(location);
   }
 
-  static thunk(location: SourceLocation, name: Identifier, parameters: [Identifier, Type][], getBody: () => Expression[]) {
+  static thunk(location: SourceLocation, name: Identifier, thisType: Type, parameters: [Identifier, Type][], getBody: () => Expression[]) {
     const bodyThunk = new Thunk<Expression[]>(location, getBody);
     const type = new Type("function", voidType);
     const returnTypeThunk = new TypeThunk(location, () => {
       return returnType(bodyThunk.get());
     });
-    const callSig = new CallSignature(voidType, parameters.map(pair => pair[1]), returnTypeThunk);
+    const callSig = new CallSignature(thisType, parameters.map(pair => pair[1]), returnTypeThunk);
     type.callSignatures.push(callSig);
 
     return new ExpressionThunk(location, () => {
