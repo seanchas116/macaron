@@ -87,7 +87,7 @@ class CodeEmitter {
 
   emitFunction(expr: FunctionExpression) {
     const params = expr.parameters
-      .map(p => p[0].name)
+      .map(p => p.name)
       .join(", ");
 
     const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
@@ -106,7 +106,7 @@ class CodeEmitter {
 
   emitClassMethod(expr: FunctionExpression) {
     const params = expr.parameters
-      .map(p => p[0].name)
+      .map(p => p.name)
       .join(", ");
 
     const bodyEmitter = this.indented();

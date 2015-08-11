@@ -227,19 +227,23 @@ class TypeEvaluator {
       subEnv.addVariable(name.name, type, true);
       params.push([name, type]);
     }
-    const getExpr = () => {
-      const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions).map(e => e.get());
-      return new FunctionExpression(ast.location, ast.name, params, body);
-    }
+    const funcThunk = FunctionExpression.thunk(
+      ast.location,
+      ast.name,
+      params,
+      () => {
+        return new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions).map(e => e.get());
+      }
+    );
 
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(ast.location, () => {
-        return new AssignmentExpression(ast.location, DeclarationType.Constant, ast.name, getExpr());
+        return new AssignmentExpression(ast.location, DeclarationType.Constant, ast.name, funcThunk.get());
       });
       this.addVariable(DeclarationType.Constant, ast.name, thunk.type);
       return thunk;
     } else {
-      return new ExpressionThunk(ast.location, getExpr);
+      return funcThunk;
     }
   }
 
