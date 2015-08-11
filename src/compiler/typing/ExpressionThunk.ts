@@ -30,7 +30,12 @@ class ExpressionThunk {
     return new TypeThunk(() => this.get().type);
   }
 
-  static resolved(expr: Expression) {
-    return new ExpressionThunk(expr.location, () => expr);
+  static resolve(expr: Expression|ExpressionThunk) {
+    if (expr instanceof Expression) {
+      return new ExpressionThunk(expr.location, () => expr);
+    }
+    else if (expr instanceof ExpressionThunk) {
+      return expr;
+    }
   }
 }

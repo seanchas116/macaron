@@ -29,9 +29,15 @@ import ClassExpression from "./expression/ClassExpression";
 import Identifier from "./Identifier";
 import Environment from "./Environment";
 import DeclarationType from "./DeclarationType";
-import CompilationError from "../common/CompilationError";
+
 import Type from "./Type";
+
+import ExpressionThunk from "./ExpressionThunk";
+import TypeThunk from "./TypeThunk";
+
 import {voidType} from "./nativeTypes";
+
+import CompilationError from "../common/CompilationError";
 import SourceLocation from "../common/SourceLocation";
 import ErrorInfo from "../common/ErrorInfo";
 
@@ -84,7 +90,7 @@ class TypeEvaluator {
   }
 
   evaluateExpressions(asts: ExpressionAST[]) {
-    const expressions: Expression[] = [];
+    const expressions: ExpressionThunk[] = [];
     const errors: ErrorInfo[] = [];
 
     for (const ast of asts) {
@@ -108,48 +114,52 @@ class TypeEvaluator {
     return expressions;
   }
 
-  evaluate(ast: ExpressionAST): Expression {
-    if (ast instanceof AssignmentAST) {
-      return this.evaluateAssignment(ast);
-    }
-    else if (ast instanceof UnaryAST) {
-      return this.evaluateUnary(ast);
-    }
-    else if (ast instanceof BinaryAST) {
-      return this.evaluateBinary(ast);
-    }
-    else if (ast instanceof IdentifierAST) {
-      return this.evaluateIdentifier(ast);
-    }
-    else if (ast instanceof NumberAST) {
-      return this.evalauteNumber(ast);
-    }
-    else if (ast instanceof StringAST) {
-      return this.evaluateString(ast);
-    }
-    else if (ast instanceof FunctionAST) {
-      return this.evaluateFunction(ast);
-    }
-    else if (ast instanceof FunctionCallAST) {
-      return this.evaluateFunctionCall(ast);
-    }
-    else if (ast instanceof ConstructorCallAST) {
-      return this.evaluateConstructorCall(ast);
-    }
-    else if (ast instanceof ClassAST) {
-      return this.evaluateClass(ast);
-    }
-    else if (ast instanceof MemberAccessAST) {
-      return this.evaluateMemberAccess(ast);
-    }
-    else {
-      throw new Error(`Not supported AST: ${ast.constructor.name}`);
-    }
+  evaluate(ast: ExpressionAST): ExpressionThunk {
+    const expr: Expression|ExpressionThunk = (() => {
+      if (ast instanceof AssignmentAST) {
+        return this.evaluateAssignment(ast);
+      }
+      else if (ast instanceof UnaryAST) {
+        return this.evaluateUnary(ast);
+      }
+      else if (ast instanceof BinaryAST) {
+        return this.evaluateBinary(ast);
+      }
+      else if (ast instanceof IdentifierAST) {
+        return this.evaluateIdentifier(ast);
+      }
+      else if (ast instanceof NumberAST) {
+        return this.evalauteNumber(ast);
+      }
+      else if (ast instanceof StringAST) {
+        return this.evaluateString(ast);
+      }
+      else if (ast instanceof FunctionAST) {
+        return this.evaluateFunction(ast);
+      }
+      else if (ast instanceof FunctionCallAST) {
+        return this.evaluateFunctionCall(ast);
+      }
+      else if (ast instanceof ConstructorCallAST) {
+        return this.evaluateConstructorCall(ast);
+      }
+      else if (ast instanceof ClassAST) {
+        return this.evaluateClass(ast);
+      }
+      else if (ast instanceof MemberAccessAST) {
+        return this.evaluateMemberAccess(ast);
+      }
+      else {
+        throw new Error(`Not supported AST: ${ast.constructor.name}`);
+      }
+    })();
+
+    return ExpressionThunk.resolve(expr);
   }
 
   evaluateAssignment(ast: AssignmentAST) {
     const varName = ast.left.name;
-    const right = this.evaluate(ast.right);
+    const right = this.evaluate(ast.right).get();
     const type = (() => {
       switch (ast.declaration) {
       case "let":
@@ -165,15 +175,15 @@ class TypeEvaluator {
   }
 
   evaluateUnary(ast: UnaryAST) {
-    const operand = this.evaluate(ast.expression);
+    const operand = this.evaluate(ast.expression).get();
 
     const operatorAccess = new OperatorAccessExpression(ast.location, operand, ast.operator, 1);
     return new FunctionCallExpression(ast.location, operatorAccess, []);
   }
 
   evaluateBinary(ast: BinaryAST) {
-    const left = this.evaluate(ast.left);
-    const right = this.evaluate(ast.right);
+    const left = this.evaluate(ast.left).get();
+    const right = this.evaluate(ast.right).get();
 
     const operatorAccess = new OperatorAccessExpression(ast.location, left, ast.operator, 2);
     return new FunctionCallExpression(ast.location, operatorAccess, [right]);
@@ -199,7 +209,7 @@ class TypeEvaluator {
   }
 
   evaluateMemberAccess(ast: MemberAccessAST) {
-    const obj = this.evaluate(ast.object);
+    const obj = this.evaluate(ast.object).get();
     const member = new Identifier(ast.member.location, ast.member.name);
     return new MemberAccessExpression(ast.location, obj, member)
   }
@@ -218,7 +228,7 @@ class TypeEvaluator {
       subEnv.addVariable(name.name, type, DeclarationType.Constant);
       params.push([name, type]);
     }
-    const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions);
+    const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions).map(e => e.get());
     const expr = new FunctionExpression(ast.location, ast.name, params, body);
     if (ast.addAsVariable) {
       this.addVariable(DeclarationType.Constant, ast.name, expr.type);
@@ -229,19 +239,19 @@ class TypeEvaluator {
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
-    const func = this.evaluate(ast.function);
-    const args = this.evaluateExpressions(ast.arguments);
+    const func = this.evaluate(ast.function).get();
+    const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
     return new FunctionCallExpression(ast.location, func, args, false);
   }
 
   evaluateConstructorCall(ast: ConstructorCallAST) {
-    const func = this.evaluate(ast.function);
-    const args = this.evaluateExpressions(ast.arguments);
+    const func = this.evaluate(ast.function).get();
+    const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
     return new FunctionCallExpression(ast.location, func, args, true);
   }
 
   evaluateClass(ast: ClassAST) {
-    const members = this.evaluateExpressions(ast.members);
+    const members = this.evaluateExpressions(ast.members).map(e => e.get());
     const expr = new ClassExpression(ast.location, ast.name, members);
     this.addVariable(DeclarationType.Constant, ast.name, expr.type);
     this.addType(ast.name, expr.type);
