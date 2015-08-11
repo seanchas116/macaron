@@ -14,22 +14,22 @@ export
 const voidType = anyType;
 
 export
-const numberType = new Type("number");
+const numberType = new Type("number", anyType);
 
 export
-const booleanType = new Type("boolean");
+const booleanType = new Type("boolean", anyType);
 
 export
-const stringType = new Type("string");
+const stringType = new Type("string", anyType);
 
 let initialized = false;
 
 export
 const initNativeTypes: () => void = once(() => {
-  function addNativeBinaryOp(type: Type, name: string, ret: Type = type) {
+  function addNativeBinaryOp(type: Type, name: string, ret: Type = type, nativeName = name) {
     const opType = new Type(`${type} operator ${name}`);
     opType.callSignatures.push(new CallSignature(type, [type], ret));
-    type.selfBinaryOperators.set(name, new NativeOperator(name, opType));
+    type.selfBinaryOperators.set(name, new NativeOperator(nativeName, opType));
   }
 
   function addNativeUnaryOp(type: Type, name: string, ret: Type = type) {
@@ -38,7 +38,9 @@ const initNativeTypes: () => void = once(() => {
     type.selfUnaryOperators.set(name, new NativeOperator(name, opType));
   }
 
-  addNativeBinaryOp(numberType, "==", booleanType);
+  addNativeBinaryOp(anyType, "==", booleanType, "===");
+
+  addNativeBinaryOp(numberType, "==", booleanType, "===");
   addNativeBinaryOp(numberType, "<", booleanType);
   addNativeBinaryOp(numberType, "<=", booleanType);
   addNativeBinaryOp(numberType, ">", booleanType);
@@ -61,6 +63,10 @@ const initNativeTypes: () => void = once(() => {
   addNativeUnaryOp(numberType, "+");
   addNativeUnaryOp(numberType, "-");
   addNativeUnaryOp(numberType, "~");
+
+  addNativeBinaryOp(booleanType, "&&");
+  addNativeBinaryOp(booleanType, "||");
+  addNativeUnaryOp(booleanType, "!");
 
   addNativeBinaryOp(stringType, "+");
 });
