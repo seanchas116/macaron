@@ -25,3 +25,17 @@
     let foo = new Foo()
     foo.foo(1, 2)
   expected: 3
+
+- title: method forward reference
+  src: |
+    class Foo {
+      foo(x number, y number) {
+        @bar(x, y)
+      }
+      bar(x number, y number) {
+        x + y
+      }
+    }
+    let foo = new Foo()
+    foo.foo(1, 2)
+  expected: 3
