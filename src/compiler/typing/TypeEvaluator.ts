@@ -234,7 +234,7 @@ class TypeEvaluator {
       const thunk = new ExpressionThunk(ast.location, () => {
         return new AssignmentExpression(ast.location, DeclarationType.Constant, ast.name, getExpr());
       });
-      this.addVariable(DeclarationType.Constant, ast.name, thunk.getType());
+      this.addVariable(DeclarationType.Constant, ast.name, thunk.type);
       return thunk;
     } else {
       return getExpr();
