@@ -154,11 +154,8 @@ FunctionCall
       args = [];
     }
 
-    if (i < news.length) {
-      ast = new AST.ConstructorCallAST(currentLocation(), ast, args);
-    } else {
-      ast = new AST.FunctionCallAST(currentLocation(), ast, args);
-    }
+    const isNewCall = i < news.length;
+    ast = new AST.FunctionCallAST(currentLocation(), ast, args, isNewCall);
   }
   return ast;
 }

@@ -9,7 +9,6 @@ import {
   ParameterAST,
   FunctionAST,
   FunctionCallAST,
-  ConstructorCallAST,
   ClassAST,
   MemberAccessAST,
 } from "../parser/AST";
@@ -140,9 +139,6 @@ class TypeEvaluator {
       else if (ast instanceof FunctionCallAST) {
         return this.evaluateFunctionCall(ast);
       }
-      else if (ast instanceof ConstructorCallAST) {
-        return this.evaluateConstructorCall(ast);
-      }
       else if (ast instanceof ClassAST) {
         return this.evaluateClass(ast);
       }
@@ -241,13 +237,7 @@ class TypeEvaluator {
   evaluateFunctionCall(ast: FunctionCallAST) {
     const func = this.evaluate(ast.function).get();
     const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
-    return new FunctionCallExpression(ast.location, func, args, false);
-  }
-
-  evaluateConstructorCall(ast: ConstructorCallAST) {
-    const func = this.evaluate(ast.function).get();
-    const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
-    return new FunctionCallExpression(ast.location, func, args, true);
+    return new FunctionCallExpression(ast.location, func, args, ast.isNewCall);
   }
 
   evaluateClass(ast: ClassAST) {
