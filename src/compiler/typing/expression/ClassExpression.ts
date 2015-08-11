@@ -21,10 +21,10 @@ class ClassExpression extends Expression {
     type.newSignatures = [new CallSignature(voidType, [], type)];
     for (const member of members) {
       if (member instanceof FunctionExpression) {
-        type.selfMembers.set(member.name.name, member.type);
+        type.addMember(member.name.name, member.type);
 
-        const superMember = superType.members.get(name.name);
-        if (superMember && !type.isCastableTo(superMember)) {
+        const superMember = superType.getMember(name.name);
+        if (superMember && !type.isCastableTo(superMember.get())) {
           throw CompilationError.typeError(
             `Type of "${name}" is not compatible to super types`,
             member.name.location

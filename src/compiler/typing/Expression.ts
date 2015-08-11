@@ -89,14 +89,13 @@ class MemberAccessExpression extends Expression {
   constructor(location: SourceLocation, public object: Expression , public member: Identifier) {
     super(location);
 
-    const members = object.type.members;
-    if (!members.has(member.name)) {
+    if (!object.type.getMember(member.name)) {
       throw CompilationError.typeError(
         `Type '${object.type}' don't have member '${member.name}'`,
         location
       );
     }
-    this.type = members.get(member.name);
+    this.type = object.type.getMember(member.name).get();
   }
 }
 
@@ -107,9 +106,9 @@ class OperatorAccessExpression extends Expression {
   constructor(location: SourceLocation, public object: Expression, operatorName: Identifier, arity: number) {
     super(location);
     if (arity === 1) {
-      this.operator = object.type.unaryOperators.get(operatorName.name);
+      this.operator = object.type.getUnaryOperators().get(operatorName.name);
     } else if (arity === 2) {
-      this.operator = object.type.binaryOperators.get(operatorName.name);
+      this.operator = object.type.getBinaryOperators().get(operatorName.name);
     } else {
       throw new Error("unsupported arity");
     }

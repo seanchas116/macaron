@@ -1,6 +1,7 @@
 import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
+import TypeThunk from "./TypeThunk";
 import {voidType} from "./nativeTypes";
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
@@ -22,7 +23,7 @@ function isCastableSignatures(fromSigs: CallSignature[], toSigs: CallSignature[]
 
 export default
 class Type {
-  selfMembers = new Map<string, Type>();
+  selfMembers = new Map<string, TypeThunk>();
   selfBinaryOperators = new Map<string, Operator>();
   selfUnaryOperators = new Map<string, Operator>();
   callSignatures: CallSignature[] = [];
@@ -35,31 +36,45 @@ class Type {
     return this.name;
   }
 
-  get members(): Map<string, Type> {
+  addMember(name: string, type: Type|TypeThunk) {
+    this.selfMembers.set(name, TypeThunk.resolve(type));
+  }
+
+  getMember(name: string): TypeThunk {
+    if (this.superType) {
+      const member = this.superType.getMember(name);
+      if (member) {
+        return member;
+      }
+    }
+    return this.selfMembers.get(name);
+  }
+
+  getMembers(): Map<string, TypeThunk> {
     if (!this.superType) {
       return this.selfMembers;
     }
-    return mergeMap(this.superType.members, this.selfMembers);
+    return mergeMap(this.superType.getMembers(), this.selfMembers);
   }
 
-  get binaryOperators(): Map<string, Operator> {
+  getBinaryOperators(): Map<string, Operator> {
     if (!this.superType) {
       return this.selfBinaryOperators;
     }
-    return mergeMap(this.superType.binaryOperators, this.selfBinaryOperators);
+    return mergeMap(this.superType.getBinaryOperators(), this.selfBinaryOperators);
   }
 
-  get unaryOperators(): Map<string , Operator> {
+  getUnaryOperators(): Map<string , Operator> {
     if (!this.superType) {
       return this.selfUnaryOperators;
     }
-    return mergeMap(this.superType.unaryOperators, this.selfUnaryOperators);
+    return mergeMap(this.superType.getUnaryOperators(), this.selfUnaryOperators);
   }
 
   isCastableTo(other: Type) {
-    for (const [name, member] of other.members) {
-      const thisMember = this.members.get(name);
-      if (!thisMember || !thisMember.isCastableTo(member)) {
+    for (const [name, member] of other.getMembers()) {
+      const thisMember = this.getMember(name).get();
+      if (!thisMember || !thisMember.isCastableTo(member.get())) {
         return false;
       }
     }

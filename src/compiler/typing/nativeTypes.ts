@@ -24,13 +24,13 @@ const stringType = new Type("string");
 function addNativeBinaryOp(type: Type, name: string, ret: Type = type) {
   const opType = new Type(`${type} operator ${name}`);
   opType.callSignatures.push(new CallSignature(type, [type], ret));
-  type.binaryOperators.set(name, new NativeOperator(name, opType));
+  type.selfBinaryOperators.set(name, new NativeOperator(name, opType));
 }
 
 function addNativeUnaryOp(type: Type, name: string, ret: Type = type) {
   const opType = new Type(`${type} operator ${name}`);
   opType.callSignatures.push(new CallSignature(type, [], ret));
-  type.unaryOperators.set(name, new NativeOperator(name, opType));
+  type.selfUnaryOperators.set(name, new NativeOperator(name, opType));
 }
 
 addNativeBinaryOp(numberType, "==", booleanType);

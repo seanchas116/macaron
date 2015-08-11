@@ -18,7 +18,7 @@ export
 class MethodOperator extends Operator {
   constructor(public type: Type, public methodName: string) {
     super();
-    this.type = type.members.get(methodName);
+    this.type = type.getMember(methodName).get();
     if (!this.type) {
       throw new Error("no method found");
     }
