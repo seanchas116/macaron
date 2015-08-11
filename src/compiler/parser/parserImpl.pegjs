@@ -209,14 +209,14 @@ Literal
 NumberLiteral
   = str:[0-9]+
 {
-  return new AST.NumberAST(currentLocation(), Number.parseFloat(str));
+  return new AST.LiteralAST(currentLocation(), Number.parseFloat(str));
 }
 
 // TODO: parse escapes correctly
 StringLiteral
   = str:String
 {
-  return new AST.StringAST(currentLocation(), str);
+  return new AST.LiteralAST(currentLocation(), str);
 }
 
 Identifier

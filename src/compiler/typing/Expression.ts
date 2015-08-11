@@ -1,4 +1,4 @@
-import {voidType, numberType, stringType} from "./nativeTypes";
+import {voidType, numberType, booleanType, stringType} from "./nativeTypes";
 import Type from "./Type";
 import AssignType from "./AssignType";
 import SourceLocation from "../common/SourceLocation";
@@ -66,12 +66,21 @@ class FunctionCallExpression extends Expression {
 
 export
 class LiteralExpression extends Expression {
-  constructor(location: SourceLocation, public value: number|string) {
+  constructor(location: SourceLocation, public value: any) {
     super(location);
-    if (typeof value === "number") {
-      this.type = numberType;
-    } else {
-      this.type = stringType;
+    switch (typeof value) {
+      case "number":
+        this.type = numberType;
+        break;
+      case "string":
+        this.type = stringType;
+        break;
+      case "boolean":
+        this.type = booleanType;
+        break;
+      default:
+        this.type = voidType;
+        break;
     }
   }
 }

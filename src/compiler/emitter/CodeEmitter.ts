@@ -68,10 +68,11 @@ class CodeEmitter {
   }
 
   emitLiteral(expr: LiteralExpression) {
-    if (typeof expr.value === "number") {
-      return String(expr.value);
-    } else {
+    if (typeof expr.value === "string") {
       return JSON.stringify(expr.value);
+    }
+    else {
+      return String(expr.value);
     }
   }
 

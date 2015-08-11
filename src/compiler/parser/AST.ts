@@ -51,15 +51,8 @@ class IdentifierAST extends ExpressionAST {
 }
 
 export
-class NumberAST extends ExpressionAST {
-  constructor(location: SourceLocation, public value: number) {
-    super(location);
-  }
-}
-
-export
-class StringAST extends ExpressionAST {
-  constructor(location: SourceLocation, public value: string) {
+class LiteralAST extends ExpressionAST {
+  constructor(location: SourceLocation, public value: any) {
     super(location);
   }
 }

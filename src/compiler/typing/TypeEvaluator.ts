@@ -4,8 +4,7 @@ import {
   UnaryAST,
   BinaryAST,
   IdentifierAST,
-  NumberAST,
-  StringAST,
+  LiteralAST,
   ParameterAST,
   FunctionAST,
   FunctionCallAST,
@@ -80,11 +79,8 @@ class TypeEvaluator {
     else if (ast instanceof IdentifierAST) {
       return this.evaluateIdentifier(ast);
     }
-    else if (ast instanceof NumberAST) {
-      return this.evalauteNumber(ast);
-    }
-    else if (ast instanceof StringAST) {
-      return this.evaluateString(ast);
+    else if (ast instanceof LiteralAST) {
+      return this.evalauteLiteral(ast);
     }
     else if (ast instanceof FunctionAST) {
       return this.evaluateFunction(ast);
@@ -150,11 +146,7 @@ class TypeEvaluator {
     return new IdentifierExpression(ast, variable.type.get());
   }
 
-  evalauteNumber(ast: NumberAST) {
-    return new LiteralExpression(ast.location, ast.value);
-  }
-
-  evaluateString(ast: StringAST) {
+  evalauteLiteral(ast: LiteralAST) {
     return new LiteralExpression(ast.location, ast.value);
   }
 
