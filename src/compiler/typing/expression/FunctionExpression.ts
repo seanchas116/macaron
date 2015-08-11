@@ -40,6 +40,8 @@ class FunctionExpression extends Expression {
       paramTypes.push(type);
     }
 
+    subEnv.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
+
     const bodyThunk = new Thunk<Expression[]>(location, () => getBody(subEnv));
     const type = new Type("function", voidType);
     const returnTypeThunk = new TypeThunk(location, () => {
