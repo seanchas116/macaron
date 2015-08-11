@@ -6,7 +6,7 @@ import CompilationError from "../common/CompilationError";
 
 interface Variable {
   type: TypeThunk;
-  isConstant: boolean;
+  assignType: AssignType;
 }
 
 export default
@@ -25,9 +25,15 @@ class Environment {
         name.location
       );
     }
-    if (variable.isConstant) {
+    if (variable.assignType === AssignType.Constant) {
       throw CompilationError.typeError(
-        `Variable '${name.name}' is constant`,
+        `Variable '${name.name}' is constant and cannot be reassigned`,
+        name.location
+      );
+    }
+    if (variable.assignType === AssignType.Builtin) {
+      throw CompilationError.typeError(
+        `Variable '${name.name}' is builtin and cannot be reassigned`,
         name.location
       );
     }
@@ -46,6 +52,12 @@ class Environment {
     }
     else {
       const variable = this.getVariable(name.name);
+      if (variable && variable.assignType === AssignType.Builtin) {
+        throw CompilationError.typeError(
+          `Variable '${name.name}' is builtin and cannot be redefined`,
+          name.location
+        );
+      }
       if (this.getOwnVariable(name.name)) {
         throw CompilationError.typeError(
           `Variable '${name.name}' already defined`,
@@ -54,7 +66,7 @@ class Environment {
       }
       this.variables.set(name.name, {
         type: TypeThunk.resolve(type),
-        isConstant: assignType === AssignType.Constant
+        assignType
       });
     }
   }

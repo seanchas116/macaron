@@ -191,7 +191,7 @@ Assignable
   = Identifier
 
 Value
-  = ast:(Parentheses / Literal / ThisValue / Identifier) _
+  = ast:(Parentheses / Literal / Identifier) _
 {
   return ast;
 }
@@ -203,8 +203,7 @@ Parentheses
 }
 
 Literal
-  = NumberLiteral / StringLiteral / TrueLiteral / FalseLiteral / NullLiteral / UndefinedLiteral
-  / Function / NamedFunction / Class
+  = NumberLiteral / StringLiteral / Function / NamedFunction / Class
 
 // TODO: parse other than integer
 NumberLiteral
@@ -218,36 +217,6 @@ StringLiteral
   = str:String _
 {
   return new AST.LiteralAST(currentLocation(), str);
-}
-
-TrueLiteral
-  = "true" _
-{
-  return new AST.LiteralAST(currentLocation(), true);
-}
-
-FalseLiteral
-  = "false" _
-{
-  return new AST.LiteralAST(currentLocation(), true);
-}
-
-NullLiteral
-  = "null" _
-{
-  return new AST.LiteralAST(currentLocation(), null);
-}
-
-UndefinedLiteral
-  = "undefined" _
-{
-  return new AST.LiteralAST(currentLocation(), undefined);
-}
-
-ThisValue
-  = "this" _
-{
-  return new AST.IdentifierAST(currentLocation(), "this");
 }
 
 Identifier

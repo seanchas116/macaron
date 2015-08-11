@@ -21,5 +21,10 @@ function defaultEnvironment() {
   env.addType(new Identifier("void"), voidType);
   env.addType(new Identifier("any"), voidType);
 
+  env.assignVariable(AssignType.Builtin, new Identifier("true"), booleanType);
+  env.assignVariable(AssignType.Builtin, new Identifier("false"), booleanType);
+  env.assignVariable(AssignType.Builtin, new Identifier("null"), voidType);
+  env.assignVariable(AssignType.Builtin, new Identifier("undefined"), voidType);
+
   return env;
 }
