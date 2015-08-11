@@ -36,6 +36,7 @@
         "./src/compiler/typing/TypeEvaluator.ts",
         "./src/compiler/typing/defaultEnvironment.ts",
         "./src/compiler/typing/expression/ClassExpression.ts",
+        "./src/compiler/typing/expression/FunctionBodyExpression.ts",
         "./src/compiler/typing/expression/FunctionExpression.ts",
         "./src/compiler/typing/nativeTypes.ts",
         "./src/compiler/typing/type/FunctionType.ts",

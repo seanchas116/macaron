@@ -2,6 +2,7 @@ import Parser from "../parser/Parser";
 import defaultEnviromnent from "../typing/defaultEnvironment";
 import TypeEvaluator from "../typing/TypeEvaluator";
 import CodeEmitter from "../emitter/CodeEmitter";
+import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression";
 
 interface CompileOption {
   implicitReturn? : boolean;
@@ -13,10 +14,13 @@ class Compiler {
   compile(source: string, options: CompileOption = {}) {
     const parsed = new Parser(source).parse();
     const evaluator = new TypeEvaluator(defaultEnviromnent());
-    const expressions = evaluator.evaluateExpressions(parsed).map(e => e.get());
+    let expressions = evaluator.evaluateExpressions(parsed).map(e => e.get());
+    if (options.implicitReturn) {
+      expressions = [new FunctionBodyExpression(expressions[0].location, expressions)];
+    }
 
     const emitter = new CodeEmitter();
-    const code = emitter.emitExpressions(expressions, options.implicitReturn);
+    const code = emitter.emitExpressions(expressions);
 
     return code;
   }

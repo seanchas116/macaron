@@ -5,13 +5,10 @@ import Thunk, {ExpressionThunk, TypeThunk} from "../Thunk";
 import {voidType} from "../nativeTypes";
 import Environment from "../Environment";
 import AssignType from "../AssignType";
+import FunctionBodyExpression from "./FunctionBodyExpression";
 import CompilationError from "../../common/CompilationError";
 import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
-
-function returnType(expressions: Expression[]) {
-  return expressions[expressions.length - 1].type;
-}
 
 interface NameType {
   name: Identifier;
@@ -20,7 +17,7 @@ interface NameType {
 
 export default
 class FunctionExpression extends Expression {
-  constructor(location: SourceLocation, public name: Identifier, public type: Type, public parameters: Identifier[], public body: Expression[]) {
+  constructor(location: SourceLocation, public name: Identifier, public type: Type, public parameters: Identifier[], public body: FunctionBodyExpression) {
     super(location);
   }
 
@@ -42,16 +39,15 @@ class FunctionExpression extends Expression {
 
     subEnv.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
 
-    const bodyThunk = new Thunk<Expression[]>(location, () => getBody(subEnv));
-    const type = new Type("function", voidType);
-    const returnTypeThunk = new TypeThunk(location, () => {
-      return returnType(bodyThunk.get());
+    const bodyThunk = new ExpressionThunk(location, () => {
+      return new FunctionBodyExpression(location, getBody(subEnv));
     });
-    const callSig = new CallSignature(thisType, paramTypes, returnTypeThunk);
+    const type = new Type("function", voidType);
+    const callSig = new CallSignature(thisType, paramTypes, bodyThunk.type);
     type.callSignatures.push(callSig);
 
     return new ExpressionThunk(location, () => {
-      return new FunctionExpression(location, name, type, parameters.map(p => p.name), bodyThunk.get());
+      return new FunctionExpression(location, name, type, parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
     });
   }
 }

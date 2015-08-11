@@ -11,20 +11,10 @@ import Expression, {
 import {NativeOperator, MethodOperator} from "../typing/Operator";
 
 import FunctionExpression from "../typing/expression/FunctionExpression";
+import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression";
 import ClassExpression from "../typing/expression/ClassExpression";
 
 import AssignType from "../typing/AssignType";
-
-function appendReturnType(expressions: Expression[]) {
-  const len = expressions.length;
-  if (len === 0) {
-    return [];
-  }
-  const init = expressions.slice(0, len - 1);
-  const last = expressions[len - 1];
-
-  return init.concat([new ReturnExpression(last.location, last)]);
-}
 
 export default
 class CodeEmitter {
@@ -32,11 +22,8 @@ class CodeEmitter {
   constructor(public indentationWidth = 2, public indentationLevel = 0) {
   }
 
-  emitExpressions(expressions: Expression[], implicitReturn = false) {
+  emitExpressions(expressions: Expression[]) {
     const indentation = " ".repeat(this.indentationWidth * this.indentationLevel);
-    if (implicitReturn) {
-      expressions = appendReturnType(expressions);
-    }
     return expressions
       .map(e => this.emitExpression(e))
       .map(line => `${indentation}${line};\n`)
@@ -68,6 +55,9 @@ class CodeEmitter {
     else if (expr instanceof MemberAccessExpression) {
       return this.emitMemberAccess(expr);
     }
+    else if (expr instanceof FunctionBodyExpression) {
+      return this.emitFunctionBody(expr);
+    }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
     }
@@ -90,8 +80,7 @@ class CodeEmitter {
       .map(p => p.name)
       .join(", ");
 
-    const bodyEmitter = new CodeEmitter(this.indentationWidth, this.indentationLevel + 1);
-    const body = bodyEmitter.emitExpressions(expr.body, true);
+    const body = this.emitFunctionBody(expr.body);
 
     return `(${params}) => {\n${body}\n}`;
   }
@@ -109,8 +98,7 @@ class CodeEmitter {
       .map(p => p.name)
       .join(", ");
 
-    const bodyEmitter = this.indented();
-    const body = bodyEmitter.emitExpressions(expr.body, true);
+    const body = this.emitFunctionBody(expr.body);
 
     return `${expr.name.name}(${params}) {\n${body}\n}`;
   }
@@ -182,6 +170,12 @@ class CodeEmitter {
   emitMemberAccess(expr: MemberAccessExpression) {
     const obj = this.emitExpression(expr.object);
     return `${obj}.${expr.member.name}`;
+  }
+
+  emitFunctionBody(expr: FunctionBodyExpression) {
+    const emitter = this.indented();
+    const body = emitter.emitExpressions(expr.expressions);
+    return `{\n${body}\n}`;
   }
 
   indented() {
