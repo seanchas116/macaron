@@ -209,7 +209,7 @@ Literal
 NumberLiteral
   = str:[0-9]+ _
 {
-  return new AST.LiteralAST(currentLocation(), Number.parseFloat(str));
+  return new AST.LiteralAST(currentLocation(), Number.parseFloat(str.join("")));
 }
 
 // TODO: parse escapes correctly
