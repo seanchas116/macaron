@@ -1,4 +1,20 @@
 - title: integer
   src: |
     12345
-  result: 12345
+  expected: 12345
+- title: float
+  src: |
+    3.1416
+  expected: 3.1416
+- title: exponential float
+  src: |
+    6.67e-11
+  expected: 6.67e-11
+- title: octal integer
+  src: |
+    0123
+  expected: 0123
+- title: hex integer
+  src: |
+    0x12FA
+  expected: 0x12FA
