@@ -31,8 +31,10 @@ import DeclarationType from "./DeclarationType";
 
 import Type from "./Type";
 
-import ExpressionThunk from "./ExpressionThunk";
-import TypeThunk from "./TypeThunk";
+import {
+  ExpressionThunk,
+  TypeThunk
+} from "./Thunk";
 
 import {voidType} from "./nativeTypes";
 

@@ -1,4 +1,5 @@
 import Type from "./Type";
+const once = require("once");
 
 import {
   NativeOperator
@@ -21,40 +22,45 @@ const booleanType = new Type("boolean");
 export
 const stringType = new Type("string");
 
-function addNativeBinaryOp(type: Type, name: string, ret: Type = type) {
-  const opType = new Type(`${type} operator ${name}`);
-  opType.callSignatures.push(new CallSignature(type, [type], ret));
-  type.selfBinaryOperators.set(name, new NativeOperator(name, opType));
-}
+let initialized = false;
 
-function addNativeUnaryOp(type: Type, name: string, ret: Type = type) {
-  const opType = new Type(`${type} operator ${name}`);
-  opType.callSignatures.push(new CallSignature(type, [], ret));
-  type.selfUnaryOperators.set(name, new NativeOperator(name, opType));
-}
+export
+const initNativeTypes: () => void = once(() => {
+  function addNativeBinaryOp(type: Type, name: string, ret: Type = type) {
+    const opType = new Type(`${type} operator ${name}`);
+    opType.callSignatures.push(new CallSignature(type, [type], ret));
+    type.selfBinaryOperators.set(name, new NativeOperator(name, opType));
+  }
 
-addNativeBinaryOp(numberType, "==", booleanType);
-addNativeBinaryOp(numberType, "<", booleanType);
-addNativeBinaryOp(numberType, "<=", booleanType);
-addNativeBinaryOp(numberType, ">", booleanType);
-addNativeBinaryOp(numberType, ">=", booleanType);
+  function addNativeUnaryOp(type: Type, name: string, ret: Type = type) {
+    const opType = new Type(`${type} operator ${name}`);
+    opType.callSignatures.push(new CallSignature(type, [], ret));
+    type.selfUnaryOperators.set(name, new NativeOperator(name, opType));
+  }
 
-addNativeBinaryOp(numberType, "+");
-addNativeBinaryOp(numberType, "-");
-addNativeBinaryOp(numberType, "*");
-addNativeBinaryOp(numberType, "/");
-addNativeBinaryOp(numberType, "%");
-addNativeBinaryOp(numberType, "**");
+  addNativeBinaryOp(numberType, "==", booleanType);
+  addNativeBinaryOp(numberType, "<", booleanType);
+  addNativeBinaryOp(numberType, "<=", booleanType);
+  addNativeBinaryOp(numberType, ">", booleanType);
+  addNativeBinaryOp(numberType, ">=", booleanType);
 
-addNativeBinaryOp(numberType, "&");
-addNativeBinaryOp(numberType, "^");
-addNativeBinaryOp(numberType, "|");
-addNativeBinaryOp(numberType, "<<");
-addNativeBinaryOp(numberType, ">>");
-addNativeBinaryOp(numberType, ">>>");
+  addNativeBinaryOp(numberType, "+");
+  addNativeBinaryOp(numberType, "-");
+  addNativeBinaryOp(numberType, "*");
+  addNativeBinaryOp(numberType, "/");
+  addNativeBinaryOp(numberType, "%");
+  addNativeBinaryOp(numberType, "**");
 
-addNativeUnaryOp(numberType, "+");
-addNativeUnaryOp(numberType, "-");
-addNativeUnaryOp(numberType, "~");
+  addNativeBinaryOp(numberType, "&");
+  addNativeBinaryOp(numberType, "^");
+  addNativeBinaryOp(numberType, "|");
+  addNativeBinaryOp(numberType, "<<");
+  addNativeBinaryOp(numberType, ">>");
+  addNativeBinaryOp(numberType, ">>>");
 
-addNativeBinaryOp(stringType, "+");
+  addNativeUnaryOp(numberType, "+");
+  addNativeUnaryOp(numberType, "-");
+  addNativeUnaryOp(numberType, "~");
+
+  addNativeBinaryOp(stringType, "+");
+});

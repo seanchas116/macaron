@@ -1,5 +1,5 @@
 import Type from "./Type";
-import TypeThunk from "./TypeThunk";
+import {TypeThunk} from "./Thunk";
 
 export default
 class CallSignature {

@@ -3,11 +3,14 @@ import {
   numberType,
   booleanType,
   stringType,
-  voidType
+  voidType,
+  initNativeTypes
 } from "./nativeTypes";
 
 export default
 function defaultEnvironment() {
+  initNativeTypes();
+
   const env = new Environment();
 
   env.addType("number", numberType);

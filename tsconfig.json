@@ -28,13 +28,12 @@
         "./src/compiler/typing/DeclarationType.ts",
         "./src/compiler/typing/Environment.ts",
         "./src/compiler/typing/Expression.ts",
-        "./src/compiler/typing/ExpressionThunk.ts",
         "./src/compiler/typing/GenericType.ts",
         "./src/compiler/typing/Identifier.ts",
         "./src/compiler/typing/Operator.ts",
+        "./src/compiler/typing/Thunk.ts",
         "./src/compiler/typing/Type.ts",
         "./src/compiler/typing/TypeEvaluator.ts",
-        "./src/compiler/typing/TypeThunk.ts",
         "./src/compiler/typing/defaultEnvironment.ts",
         "./src/compiler/typing/expression/ClassExpression.ts",
         "./src/compiler/typing/expression/FunctionExpression.ts",
@@ -50,5 +49,5 @@
         "./typings/power-assert-formatter/power-assert-formatter.d.ts",
         "./typings/power-assert/power-assert.d.ts"
     ],
-    "compileOnSave": false
+    "compileOnSave": true
 }

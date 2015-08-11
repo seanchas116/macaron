@@ -21,5 +21,8 @@
     "pegjs": "^0.8.0",
     "power-assert": "^0.11.0",
     "typescript": "git://github.com/Microsoft/TypeScript.git#92f152cb8e9f132234727da9882763f08e13ec34"
+  },
+  "dependencies": {
+    "once": "^1.3.2"
   }
 }

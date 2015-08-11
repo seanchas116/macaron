@@ -1,6 +1,6 @@
 import DeclarationType from "./DeclarationType";
 import Type from "./Type";
-import TypeThunk from "./TypeThunk";
+import {TypeThunk} from "./Thunk";
 
 interface Variable {
   type: TypeThunk;

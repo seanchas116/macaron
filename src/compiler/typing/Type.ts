@@ -1,7 +1,7 @@
 import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
-import TypeThunk from "./TypeThunk";
+import {TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
