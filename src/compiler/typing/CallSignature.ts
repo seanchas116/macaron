@@ -1,8 +1,12 @@
 import Type from "./Type";
+import TypeThunk from "./TypeThunk";
 
 export default
 class CallSignature {
-  constructor(public selfType: Type, public params: Type[], public returnType: Type) {
+  returnType: TypeThunk;
+
+  constructor(public selfType: Type, public params: Type[], returnType: Type|TypeThunk) {
+    this.returnType = TypeThunk.resolve(returnType);
   }
 
   isCallable(selfType: Type, args: Type[]) {
@@ -26,7 +30,7 @@ class CallSignature {
     if (!this.isCallable(other.selfType, other.params)) {
       return false;
     }
-    if (!this.returnType.isCastableTo(other.returnType)) {
+    if (!this.returnType.get().isCastableTo(other.returnType.get())) {
       return false;
     }
     return true;

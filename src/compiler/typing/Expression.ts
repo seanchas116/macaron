@@ -60,7 +60,7 @@ class FunctionCallExpression extends Expression {
         location
       );
     }
-    this.type = sig.returnType;
+    this.type = sig.returnType.get();
   }
 }
 
