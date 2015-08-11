@@ -1,4 +1,3 @@
-import DeclarationType from "./DeclarationType";
 import Type from "./Type";
 import {TypeThunk} from "./Thunk";
 
@@ -15,8 +14,7 @@ class Environment {
   constructor(public parent: Environment = null) {
   }
 
-  addVariable(name: string, type: TypeThunk|Type, declarationType: DeclarationType) {
-    const isConstant = declarationType === DeclarationType.Constant;
+  addVariable(name: string, type: TypeThunk|Type, isConstant: boolean) {
     this.variables.set(name, {
       type: TypeThunk.resolve(type),
       isConstant

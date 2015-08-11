@@ -77,7 +77,7 @@ class TypeEvaluator {
           name.location
         );
       }
-      this.environment.addVariable(name.name, valueTypeThunk, type);
+      this.environment.addVariable(name.name, valueTypeThunk, type === DeclarationType.Constant);
     }
   }
 
@@ -224,7 +224,7 @@ class TypeEvaluator {
           typeName.location
         );
       }
-      subEnv.addVariable(name.name, type, DeclarationType.Constant);
+      subEnv.addVariable(name.name, type, true);
       params.push([name, type]);
     }
     const getExpr = () => {
