@@ -191,7 +191,7 @@ Assignable
   = Identifier
 
 Value
-  = ast:(Parentheses / Literal / Identifier) _
+  = ast:(Parentheses / Literal / ThisValue / Identifier) _
 {
   return ast;
 }
@@ -242,6 +242,12 @@ UndefinedLiteral
   = "undefined" _
 {
   return new AST.LiteralAST(currentLocation(), undefined);
+}
+
+ThisValue
+  = "this" _
+{
+  return new AST.IdentifierAST(currentLocation(), "this");
 }
 
 Identifier
