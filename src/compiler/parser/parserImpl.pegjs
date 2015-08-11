@@ -203,20 +203,45 @@ Parentheses
 }
 
 Literal
-  = NumberLiteral / StringLiteral / Function / NamedFunction / Class
+  = NumberLiteral / StringLiteral / TrueLiteral / FalseLiteral / NullLiteral / UndefinedLiteral
+  / Function / NamedFunction / Class
 
 // TODO: parse other than integer
 NumberLiteral
-  = str:[0-9]+
+  = str:[0-9]+ _
 {
   return new AST.LiteralAST(currentLocation(), Number.parseFloat(str));
 }
 
 // TODO: parse escapes correctly
 StringLiteral
-  = str:String
+  = str:String _
 {
   return new AST.LiteralAST(currentLocation(), str);
+}
+
+TrueLiteral
+  = "true" _
+{
+  return new AST.LiteralAST(currentLocation(), true);
+}
+
+FalseLiteral
+  = "false" _
+{
+  return new AST.LiteralAST(currentLocation(), true);
+}
+
+NullLiteral
+  = "null" _
+{
+  return new AST.LiteralAST(currentLocation(), null);
+}
+
+UndefinedLiteral
+  = "undefined" _
+{
+  return new AST.LiteralAST(currentLocation(), undefined);
 }
 
 Identifier
