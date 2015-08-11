@@ -18,6 +18,7 @@ function defaultEnvironment() {
   env.addType("string", stringType);
   env.addType("void", voidType);
   env.addType("any", voidType);
+  env.addVariable("this", voidType, true);
 
   return env;
 }
