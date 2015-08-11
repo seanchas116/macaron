@@ -46,7 +46,8 @@ class TypeEvaluator {
   constructor(public environment: Environment) {
   }
 
-  addVariable(type: DeclarationType, name: Identifier, valueType: Type) {
+  addVariable(type: DeclarationType, name: Identifier, valueType: Type|TypeThunk) {
+    const valueTypeThunk = TypeThunk.resolve(valueType);
     const variable = this.environment.getVariable(name.name);
     if (type === DeclarationType.Assignment) {
       if (!variable) {
@@ -61,7 +62,7 @@ class TypeEvaluator {
           name.location
         );
       }
-      if (!valueType.isCastableTo(variable.type.get())) {
+      if (!valueTypeThunk.get().isCastableTo(variable.type.get())) {
         throw CompilationError.typeError(
           `Cannot assign '${valueType}' to type '${variable.type}'`,
           name.location
@@ -74,7 +75,7 @@ class TypeEvaluator {
           name.location
         );
       }
-      this.environment.addVariable(name.name, valueType, type);
+      this.environment.addVariable(name.name, valueTypeThunk, type);
     }
   }
 
@@ -210,7 +211,7 @@ class TypeEvaluator {
     return new MemberAccessExpression(ast.location, obj, member)
   }
 
-  evaluateFunction(ast: FunctionAST): Expression {
+  evaluateFunction(ast: FunctionAST): Expression|ExpressionThunk {
     const subEnv = new Environment(this.environment);
     const params: [Identifier, Type][] = [];
     for (const {name, type: typeName} of ast.parameters) {
@@ -224,13 +225,19 @@ class TypeEvaluator {
       subEnv.addVariable(name.name, type, DeclarationType.Constant);
       params.push([name, type]);
     }
-    const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions).map(e => e.get());
-    const expr = new FunctionExpression(ast.location, ast.name, params, body);
+    const getExpr = () => {
+      const body = new TypeEvaluator(subEnv).evaluateExpressions(ast.expressions).map(e => e.get());
+      return new FunctionExpression(ast.location, ast.name, params, body);
+    }
+
     if (ast.addAsVariable) {
-      this.addVariable(DeclarationType.Constant, ast.name, expr.type);
-      return new AssignmentExpression(ast.location, DeclarationType.Constant, ast.name, expr);
+      const thunk = new ExpressionThunk(ast.location, () => {
+        return new AssignmentExpression(ast.location, DeclarationType.Constant, ast.name, getExpr());
+      });
+      this.addVariable(DeclarationType.Constant, ast.name, thunk.getType());
+      return thunk;
     } else {
-      return expr;
+      return getExpr();
     }
   }
 
