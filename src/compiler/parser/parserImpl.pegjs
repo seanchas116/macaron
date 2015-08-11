@@ -161,7 +161,7 @@ FunctionCall
 }
 
 MemberAccess
-  = obj:Value "." _ member:Identifier?
+  = obj:Value "." _ member:Identifier
 {
   return new AST.MemberAccessAST(currentLocation(), obj, member);
 }
