@@ -2,6 +2,6 @@ import SourceLocation from "../common/SourceLocation";
 
 export default
 class Identifier {
-  constructor(public location: SourceLocation, public name: string) {
+  constructor(public name: string, public location = SourceLocation.empty()) {
   }
 }

@@ -1,6 +1,6 @@
-import DeclarationType from "./DeclarationType";
 import {voidType, numberType, stringType} from "./nativeTypes";
 import Type from "./Type";
+import AssignType from "./AssignType";
 import SourceLocation from "../common/SourceLocation";
 import Identifier from "./Identifier";
 import CompilationError from "../common/CompilationError";
@@ -23,7 +23,7 @@ class IdentifierExpression extends Expression {
 
 export
 class AssignmentExpression extends Expression {
-  constructor(location: SourceLocation, public declarationType: DeclarationType, public assignable: Identifier, public value: Expression) {
+  constructor(location: SourceLocation, public assignType: AssignType, public assignable: Identifier, public value: Expression) {
     super(location);
     this.type = value.type;
   }

@@ -25,17 +25,11 @@ import Expression, {
 import FunctionExpression from "./expression/FunctionExpression";
 import ClassExpression from "./expression/ClassExpression";
 
+import AssignType from "./AssignType";
 import Identifier from "./Identifier";
 import Environment from "./Environment";
-import DeclarationType from "./DeclarationType";
-
 import Type from "./Type";
-
-import {
-  ExpressionThunk,
-  TypeThunk
-} from "./Thunk";
-
+import {ExpressionThunk, TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
 
 import CompilationError from "../common/CompilationError";
@@ -46,49 +40,6 @@ export default
 class TypeEvaluator {
 
   constructor(public environment: Environment) {
-  }
-
-  addVariable(type: DeclarationType, name: Identifier, valueType: Type|TypeThunk) {
-    const valueTypeThunk = TypeThunk.resolve(valueType);
-    const variable = this.environment.getVariable(name.name);
-    if (type === DeclarationType.Assignment) {
-      if (!variable) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' not in scope`,
-          name.location
-        );
-      }
-      if (variable.isConstant) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' is constant`,
-          name.location
-        );
-      }
-      if (!valueTypeThunk.get().isCastableTo(variable.type.get())) {
-        throw CompilationError.typeError(
-          `Cannot assign '${valueType}' to type '${variable.type}'`,
-          name.location
-        );
-      }
-    } else {
-      if (this.environment.getOwnVariable(name.name)) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' already defined`,
-          name.location
-        );
-      }
-      this.environment.addVariable(name.name, valueTypeThunk, type === DeclarationType.Constant);
-    }
-  }
-
-  addType(name: Identifier, type: Type|TypeThunk) {
-    if (this.environment.getOwnType(name.name)) {
-      throw CompilationError.typeError(
-        `Type '${name.name}' already defined`,
-        name.location
-      );
-    }
-    this.environment.addType(name.name, type);
   }
 
   evaluateExpressions(asts: ExpressionAST[]) {
@@ -162,14 +113,14 @@ class TypeEvaluator {
     const type = (() => {
       switch (ast.declaration) {
       case "let":
-        return DeclarationType.Constant;
+        return AssignType.Constant;
       case "var":
-        return DeclarationType.Variable;
+        return AssignType.Variable;
       default:
-        return DeclarationType.Assignment;
+        return AssignType.Assign;
       }
     })();
-    this.addVariable(type, ast.left, right.type);
+    this.environment.assignVariable(type, ast.left, right.type);
     return new AssignmentExpression(ast.location, type, ast.left, right);
   }
 
@@ -209,8 +160,7 @@ class TypeEvaluator {
 
   evaluateMemberAccess(ast: MemberAccessAST) {
     const obj = this.evaluate(ast.object).get();
-    const member = new Identifier(ast.member.location, ast.member.name);
-    return new MemberAccessExpression(ast.location, obj, member)
+    return new MemberAccessExpression(ast.location, obj, ast.member)
   }
 
   evaluateFunction(ast: FunctionAST, thisType = voidType): ExpressionThunk {
@@ -224,7 +174,7 @@ class TypeEvaluator {
           typeName.location
         );
       }
-      subEnv.addVariable(name.name, type, true);
+      subEnv.assignVariable(AssignType.Constant, name, type);
       params.push([name, type]);
     }
     const funcThunk = FunctionExpression.thunk(
@@ -236,9 +186,9 @@ class TypeEvaluator {
 
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(ast.location, () => {
-        return new AssignmentExpression(ast.location, DeclarationType.Constant, ast.name, funcThunk.get());
+        return new AssignmentExpression(ast.location, AssignType.Constant, ast.name, funcThunk.get());
       });
-      this.addVariable(DeclarationType.Constant, ast.name, thunk.type);
+      this.environment.assignVariable(AssignType.Constant, ast.name, thunk.type);
       return thunk;
     } else {
       return funcThunk;
@@ -260,8 +210,8 @@ class TypeEvaluator {
       }
       return expr;
     });
-    this.addVariable(DeclarationType.Constant, ast.name, thunk.type);
-    this.addType(ast.name, thunk.type);
+    this.environment.assignVariable(AssignType.Constant, ast.name, thunk.type);
+    this.environment.addType(ast.name, thunk.type);
     return thunk;
   }
 }

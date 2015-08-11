@@ -13,7 +13,7 @@ import {NativeOperator, MethodOperator} from "../typing/Operator";
 import FunctionExpression from "../typing/expression/FunctionExpression";
 import ClassExpression from "../typing/expression/ClassExpression";
 
-import DeclarationType from "../typing/DeclarationType";
+import AssignType from "../typing/AssignType";
 
 function appendReturnType(expressions: Expression[]) {
   const len = expressions.length;
@@ -165,10 +165,10 @@ class CodeEmitter {
     const value = this.emitExpression(expr.value);
     const name = expr.assignable.name;
 
-    switch (expr.declarationType) {
-    case DeclarationType.Variable:
+    switch (expr.assignType) {
+    case AssignType.Variable:
       return `let ${name} = ${value}`;
-    case DeclarationType.Constant:
+    case AssignType.Constant:
       return `const ${name} = ${value}`;
     default:
       return `${name} = ${value}`;
