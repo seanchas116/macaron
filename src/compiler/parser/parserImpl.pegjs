@@ -165,6 +165,14 @@ MemberAccess
 {
   return new AST.MemberAccessAST(currentLocation(), obj, member);
 }
+  / "@" _ member:Identifier
+{
+  return new AST.MemberAccessAST(
+    currentLocation(),
+    new AST.IdentifierAST(currentLocation(), "this"),
+    member
+  );
+}
   / Value
 
 Assignable
