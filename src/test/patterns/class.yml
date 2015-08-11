@@ -8,3 +8,20 @@
     let foo = new Foo()
     foo.foo(1, 2)
   expected: 3
+
+- title: class forward reference
+  src: |
+    class Foo {
+      foo(x number, y number) {
+        let bar = new Bar()
+        bar.bar(x, y)
+      }
+    }
+    class Bar {
+      bar(x number, y number) {
+        x + y
+      }
+    }
+    let foo = new Foo()
+    foo.foo(1, 2)
+  expected: 3
