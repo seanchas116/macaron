@@ -96,6 +96,14 @@ class CodeEmitter {
     return `(${params}) => {\n${body}\n}`;
   }
 
+  emitClassMember(expr: Expression) {
+    if (expr instanceof FunctionExpression) {
+      return this.emitClassMethod(expr);
+    } else {
+      throw new Error(`Not supported expression: ${expr.constructor.name}`);
+    }
+  }
+
   emitClassMethod(expr: FunctionExpression) {
     const params = expr.parameters
       .map(p => p[0].name)
@@ -110,7 +118,8 @@ class CodeEmitter {
   emitClass(expr: ClassExpression) {
     const emitter = this.indented();
     const body = expr.members
-      .map(member => emitter.emitClassMethod(member))
+      .map(member => member.get())
+      .map(member => emitter.emitClassMember(member))
       .join("\n");
 
     return `class ${expr.name.name} {\n${body}\n}`;

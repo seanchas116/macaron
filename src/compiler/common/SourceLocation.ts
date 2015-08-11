@@ -6,4 +6,7 @@ class SourceLocation {
   toString() {
     return `${this.line}:${this.column}`;
   }
+  static empty() {
+    return new SourceLocation(1, 1, 0);
+  }
 }

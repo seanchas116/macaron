@@ -7,8 +7,9 @@ export default
 class Thunk<T> {
   private value: T;
   private getting = false;
+  location = SourceLocation.empty();
 
-  constructor(public location: SourceLocation, private getter: () => T) {
+  constructor(private getter: () => T) {
   }
 
   get() {
@@ -31,8 +32,8 @@ export
 class ExpressionThunk extends Thunk<Expression> {
   public type: TypeThunk;
 
-  constructor(location: SourceLocation, getter: () => Expression, type: Type = null) {
-    super(location, getter);
+  constructor(public location: SourceLocation, getter: () => Expression, type: Type = null) {
+    super(getter);
     if (type) {
       this.type = TypeThunk.resolve(type);
     } else {
@@ -51,18 +52,7 @@ class ExpressionThunk extends Thunk<Expression> {
 }
 
 export
-class TypeThunk {
-  private value: Type;
-
-  constructor(private getter: () => Type) {
-  }
-
-  get() {
-    if (!this.value) {
-      this.value = this.getter();
-    }
-    return this.value;
-  }
+class TypeThunk extends Thunk<Type> {
 
   static resolve(type: Type|TypeThunk) {
     if (type instanceof Type) {

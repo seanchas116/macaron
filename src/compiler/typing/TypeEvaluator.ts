@@ -81,7 +81,7 @@ class TypeEvaluator {
     }
   }
 
-  addType(name: Identifier, type: Type) {
+  addType(name: Identifier, type: Type|TypeThunk) {
     if (this.environment.getOwnType(name.name)) {
       throw CompilationError.typeError(
         `Type '${name.name}' already defined`,
@@ -116,44 +116,44 @@ class TypeEvaluator {
     return expressions;
   }
 
-  evaluate(ast: ExpressionAST): ExpressionThunk {
-    const expr: Expression|ExpressionThunk = (() => {
-      if (ast instanceof AssignmentAST) {
-        return this.evaluateAssignment(ast);
-      }
-      else if (ast instanceof UnaryAST) {
-        return this.evaluateUnary(ast);
-      }
-      else if (ast instanceof BinaryAST) {
-        return this.evaluateBinary(ast);
-      }
-      else if (ast instanceof IdentifierAST) {
-        return this.evaluateIdentifier(ast);
-      }
-      else if (ast instanceof NumberAST) {
-        return this.evalauteNumber(ast);
-      }
-      else if (ast instanceof StringAST) {
-        return this.evaluateString(ast);
-      }
-      else if (ast instanceof FunctionAST) {
-        return this.evaluateFunction(ast);
-      }
-      else if (ast instanceof FunctionCallAST) {
-        return this.evaluateFunctionCall(ast);
-      }
-      else if (ast instanceof ClassAST) {
-        return this.evaluateClass(ast);
-      }
-      else if (ast instanceof MemberAccessAST) {
-        return this.evaluateMemberAccess(ast);
-      }
-      else {
-        throw new Error(`Not supported AST: ${ast.constructor.name}`);
-      }
-    })();
+  private evaluateImpl(ast: ExpressionAST): Expression|ExpressionThunk {
+    if (ast instanceof AssignmentAST) {
+      return this.evaluateAssignment(ast);
+    }
+    else if (ast instanceof UnaryAST) {
+      return this.evaluateUnary(ast);
+    }
+    else if (ast instanceof BinaryAST) {
+      return this.evaluateBinary(ast);
+    }
+    else if (ast instanceof IdentifierAST) {
+      return this.evaluateIdentifier(ast);
+    }
+    else if (ast instanceof NumberAST) {
+      return this.evalauteNumber(ast);
+    }
+    else if (ast instanceof StringAST) {
+      return this.evaluateString(ast);
+    }
+    else if (ast instanceof FunctionAST) {
+      return this.evaluateFunction(ast);
+    }
+    else if (ast instanceof FunctionCallAST) {
+      return this.evaluateFunctionCall(ast);
+    }
+    else if (ast instanceof ClassAST) {
+      return this.evaluateClass(ast);
+    }
+    else if (ast instanceof MemberAccessAST) {
+      return this.evaluateMemberAccess(ast);
+    }
+    else {
+      throw new Error(`Not supported AST: ${ast.constructor.name}`);
+    }
+  }
 
-    return ExpressionThunk.resolve(expr);
+  evaluate(ast: ExpressionAST) {
+    return ExpressionThunk.resolve(this.evaluateImpl(ast));
   }
 
   evaluateAssignment(ast: AssignmentAST) {
@@ -213,7 +213,7 @@ class TypeEvaluator {
     return new MemberAccessExpression(ast.location, obj, member)
   }
 
-  evaluateFunction(ast: FunctionAST): Expression|ExpressionThunk {
+  evaluateFunction(ast: FunctionAST): ExpressionThunk {
     const subEnv = new Environment(this.environment);
     const params: [Identifier, Type][] = [];
     for (const {name, type: typeName} of ast.parameters) {
@@ -239,7 +239,7 @@ class TypeEvaluator {
       this.addVariable(DeclarationType.Constant, ast.name, thunk.type);
       return thunk;
     } else {
-      return getExpr();
+      return new ExpressionThunk(ast.location, getExpr);
     }
   }
 
@@ -250,10 +250,16 @@ class TypeEvaluator {
   }
 
   evaluateClass(ast: ClassAST) {
-    const members = this.evaluateExpressions(ast.members).map(e => e.get());
-    const expr = new ClassExpression(ast.location, ast.name, members);
-    this.addVariable(DeclarationType.Constant, ast.name, expr.type);
-    this.addType(ast.name, expr.type);
-    return expr;
+    const thunk = new ExpressionThunk(ast.location, () => {
+      const expr = new ClassExpression(ast.location, ast.name);
+      for (const memberAST of ast.members) {
+        const member = this.evaluateFunction(memberAST);
+        expr.addMember(memberAST.name, member);
+      }
+      return expr;
+    });
+    this.addVariable(DeclarationType.Constant, ast.name, thunk.type);
+    this.addType(ast.name, thunk.type);
+    return thunk;
   }
 }
