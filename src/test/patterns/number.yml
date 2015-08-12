@@ -10,11 +10,11 @@
   src: |
     6.67e-11
   expected: 6.67e-11
-- title: octal integer
-  src: |
-    0123
-  expected: 0123
 - title: hex integer
   src: |
     0x12FA
   expected: 0x12FA
+- title: binary integer
+  src: |
+    0b1101
+  expected: 13

@@ -60,6 +60,35 @@ Escaped
   return char;
 }
 
+FloatFrac
+  = "." [0-9]+
+
+FloatExp
+  = [eE] "-"? [0-9]+
+
+DecimalInt
+  = [0-9]+
+
+Float
+  = DecimalInt FloatFrac? FloatExp?
+{
+  return Number.parseFloat(text());
+}
+
+HexInt
+  = "0x" [0-9a-fA-F]+
+{
+  return Number.parseInt(text().slice(2), 16);
+}
+
+BinaryInt
+  = "0b" [01]+
+{
+  return Number.parseInt(text().slice(2), 2);
+}
+
+Number = BinaryInt / HexInt / Float
+
 String1Char
   = Escaped / [^']
 
@@ -207,9 +236,9 @@ Literal
 
 // TODO: parse other than integer
 NumberLiteral
-  = str:[0-9]+ _
+  = num:Number _
 {
-  return new AST.LiteralAST(currentLocation(), Number.parseFloat(str.join("")));
+  return new AST.LiteralAST(currentLocation(), num);
 }
 
 // TODO: parse escapes correctly
