@@ -4,7 +4,6 @@
 
 * `dynamic`
   * `any` / `void`
-    * `nil` (`null`, `undefined`)
     * `number`
     * `string`
     * `Object`
@@ -13,7 +12,7 @@
       * `String`
       * ...
 
-`Object?` = `Object|nil`
+`Object?` = `Object|void`
 
 ## Subtyping
 

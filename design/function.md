@@ -57,12 +57,8 @@ fooMethod.call(1, 1) //=> 2
 
 ## Trailing closure (block)
 
-FIXME: hard to parse
-
 ```
-xs.map { x =>
-}
-xs.map { (x number) number =>
+xs.map { x, i =>
 }
 
 describe("Foo") {

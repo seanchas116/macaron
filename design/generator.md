@@ -10,7 +10,7 @@ func yielding() {
   yield 2, 3
   yield ...[1,2,3]
 }
-yielding() //=> An Iterator
+yielding() //=> An Iterator<number>
 
 // empty generator function
 func empty() {
@@ -21,10 +21,16 @@ func empty() {
 ## await (async function)
 
 ```
+func getData() {
+  new Promise {resolve =>
+    resolve(new Data())
+  }
+}
+
 func asyncOp() {
   await getData()
 }
-asyncOp() //=> A Promise
+asyncOp() //=> A Promise<Data>
 
 // empty async function
 func empty() {

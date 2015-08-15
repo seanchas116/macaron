@@ -1,10 +1,6 @@
 # Literals
 
-## null
-
-* Same as JavaScript
-
-## undefined
+## null / undefined
 
 * Same as JavaScript
 

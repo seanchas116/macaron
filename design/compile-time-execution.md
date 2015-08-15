@@ -1,5 +1,7 @@
 # Compile-time execution
 
+**priority low**
+
 ## Use modules in compile-time
 
 ```

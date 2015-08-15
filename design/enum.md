@@ -6,11 +6,6 @@ enum Type {
   Bar
   Baz = 3
 }
-
-enum List<T> {
-  Cons(T, List<T>)
-  Nil
-}
 ```
 
 ## TODO
