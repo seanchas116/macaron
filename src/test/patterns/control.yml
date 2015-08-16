@@ -6,3 +6,12 @@
       "piyo"
     }
   expected: hoge
+
+- title: if else if
+  src: |
+    if 1 == 2 {
+      "hoge"
+    } else if 1 == 1 {
+      "piyo"
+    }
+  expected: "piyo"
