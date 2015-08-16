@@ -44,6 +44,13 @@ class FunctionCallAST extends ExpressionAST {
 }
 
 export
+class IfAST extends ExpressionAST {
+  constructor(location: SourceLocation, condition: ExpressionAST, ifTrue: ExpressionAST[], ifFalse: ExpressionAST[]) {
+    super(location);
+  }
+}
+
+export
 class IdentifierAST extends ExpressionAST {
   constructor(location: SourceLocation, public name: string) {
     super(location);

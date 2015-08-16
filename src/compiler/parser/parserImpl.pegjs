@@ -175,10 +175,25 @@ BinaryExpression
 }
 
 UnaryExpression
-  = FunctionCall
-  / operator:UnaryOperator _ argument:FunctionCall
+  = ControlExpression
+  / operator:UnaryOperator _ argument:ControlExpression
 {
   return new AST.UnaryAST(currentLocation(), operator, argument);
+}
+
+ControlExpression
+  = IfExpression / FunctionCall
+
+IfExpression
+  = "if" _ cond:Parentheses ifTrue:Block ifFalse:ElseExpression?
+{
+  return new AST.IfAST(currentLocation(), cond, ifTrue, ifFalse || []);
+}
+
+ElseExpression
+  = "else" _ expr:(e:IfExpression { return [e]; } / Block)
+{
+  return expr;
 }
 
 FunctionCall
@@ -226,7 +241,7 @@ Value
 }
 
 Parentheses
-  = "(" _  expr:Expression _ ")"
+  = "(" _  expr:Expression _ ")" _
 {
   return expr;
 }

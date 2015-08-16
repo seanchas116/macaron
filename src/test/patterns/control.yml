@@ -1,6 +1,6 @@
 - title: if else
   src: |
-    if 1 != 2 {
+    if (1 != 2) {
       "hoge"
     } else {
       "piyo"
@@ -9,9 +9,9 @@
 
 - title: if else if
   src: |
-    if 1 == 2 {
+    if (1 == 2) {
       "hoge"
-    } else if 1 == 1 {
+    } else if (1 == 1) {
       "piyo"
     }
   expected: "piyo"
