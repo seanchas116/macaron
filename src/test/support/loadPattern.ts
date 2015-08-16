@@ -12,7 +12,7 @@ interface TestPattern {
 
 export default
 function loadPatterns(): TestPattern[] {
-  const yamlGlob = path.join(__dirname, "../patterns/**/*.yml");
+  const yamlGlob = path.join(__dirname, "../../../src/test/patterns/**/*.yml");
   const yamlPaths: string[] = glob.sync(yamlGlob);
   return yamlPaths
     .map(path => yaml.safeLoad(fs.readFileSync(path, "utf8")))
