@@ -30,11 +30,11 @@ gulp.task("watch", ["build"], function () {
   gulp.watch(SRC, ["tsc"]);
 });
 
-gulp.task("test", ["build"], shell.task([
+gulp.task("test",  shell.task([
   `mocha --require ./babel-hook ${TESTS}`
 ]));
 
-gulp.task("test:debug", ["build"], shell.task([
+gulp.task("test:debug", shell.task([
   `node-debug _mocha --require ./babel-hook ${TESTS}`
 ]));
 
