@@ -10,15 +10,52 @@
 
 ## Number
 
-* Same as JavaScript
+### Decimal float
+
+```
+1234
+0.1234
+1.23e-10
+1.23E10
+```
+
+### Hexadecimal integer
+
+```
+0x01
+0xaaa
+0xFFCC
+```
+
+### Binary integer
+
+```
+0b0010
+0b11001011
+```
 
 ## String
 
-### Single/double quote string
+* All string literals support interpolation and tagging
+  * Compiled to template string literals
 
-* TODO: integrate it with template strings?
+### Single-line literal
 
-### Template string
+```
+"foo"
+'bar'
+String.raw"1 + 2 = #{1 + 2}"
+```
+
+### Raw string
+
+```
+"""
+  void main() {
+    gl_FragColor = vec4(#{color});
+  }
+"""
+```
 
 ## RegExp
 
