@@ -127,6 +127,6 @@ class OperatorAccessExpression extends Expression {
         operatorName.location
       );
     }
-    this.type = this.operator.type;
+    this.type = this.operator.type.get();
   }
 }

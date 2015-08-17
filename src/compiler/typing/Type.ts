@@ -15,12 +15,6 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   return ret;
 }
 
-function isCastableSignatures(fromSigs: CallSignature[], toSigs: CallSignature[]) {
-  return toSigs.every(toSig => {
-    return fromSigs.some(fromSig => fromSig.isCastableTo(toSig));
-  });
-}
-
 export default
 class Type {
   selfMembers = new Map<string, TypeThunk>();
@@ -81,10 +75,10 @@ class Type {
         return false;
       }
     }
-    if (!isCastableSignatures(this.callSignatures, other.callSignatures)) {
+    if (!CallSignature.isCastableTo(this.callSignatures, other.callSignatures)) {
       return false;
     }
-    if (!isCastableSignatures(this.newSignatures, other.newSignatures)) {
+    if (!CallSignature.isCastableTo(this.newSignatures, other.newSignatures)) {
       return false;
     }
     return true;

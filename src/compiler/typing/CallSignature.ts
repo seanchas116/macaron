@@ -35,4 +35,10 @@ class CallSignature {
     }
     return true;
   }
+
+  static isCastableTo(fromSigs: CallSignature[], toSigs: CallSignature[]) {
+    return toSigs.every(toSig => {
+      return fromSigs.some(fromSig => fromSig.isCastableTo(toSig));
+    });
+  }
 }
