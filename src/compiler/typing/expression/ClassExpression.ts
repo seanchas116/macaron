@@ -19,7 +19,7 @@ class ClassExpression extends Expression {
     // TODO: superclass
     const superType = this.superType =  voidType;
 
-    const type = this.type = new Type(name.name, superType, this);
+    const type = this.type = new Type(name.name, superType, location, this);
     type.newSignatures = [new CallSignature(voidType, [], type)];
   }
 

@@ -1,6 +1,7 @@
 import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
+import SourceLocation from "../common/SourceLocation";
 import {TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
 
@@ -23,7 +24,8 @@ class Type {
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
 
-  constructor(public name: string, public superType: Type = null, public expression: Expression = null) {
+  constructor(public name: string, public superType: Type = null, public location: SourceLocation = null, public expression: Expression = null) {
+    this.location = location || SourceLocation.empty();
   }
 
   toString() {

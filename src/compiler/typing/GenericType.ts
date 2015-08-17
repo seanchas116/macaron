@@ -34,7 +34,7 @@ class GenericType {
       const countBefore = this.typeParams.indexOf(variadicParam);
       const countAfter = this.typeParams.length - countBefore - 1;
 
-      const tuple = new TupleType(types.slice(countBefore, -countAfter));
+      const tuple = new TupleType(types.slice(countBefore, -countAfter), null);
 
       const args = types.slice(0, countBefore - 1)
         .concat([tuple])

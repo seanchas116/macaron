@@ -1,4 +1,5 @@
 import Type from "./Type";
+import SourceLocation from "../common/SourceLocation";
 const once = require("once");
 
 import {

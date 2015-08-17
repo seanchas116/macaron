@@ -1,10 +1,12 @@
 import Type from "../Type";
 import CallSignature from "../CallSignature";
+import SourceLocation from "../../common/SourceLocation";
 
 export default
 class FunctionType extends Type {
-  constructor(public selfType: Type, public params: Type[], public optionalParams: Type[], public returnType: Type) {
-    super("");
+  constructor(public selfType: Type, public params: Type[], public optionalParams: Type[], public returnType: Type, loc: SourceLocation) {
+    // TODO: add Function type
+    super("", null, loc);
 
     {
       const funcName = (() => {
