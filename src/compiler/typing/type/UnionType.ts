@@ -21,19 +21,19 @@ function unionMembers(type: UnionType, members1: Map<string, TypeThunk>, members
 
 function unionOperators(type: UnionType, operators1: Map<string, Operator>, operators2: Map<string, Operator>) {
   const ret = new Map<string, Operator>();
-  for (const [name, operator1] of operators1) {
+  for (const [name, op1] of operators1) {
     if (!operators2.has(name)) {
       continue;
     }
-    const operator2 = operators2.get(name);
-    if (operator1 instanceof MethodOperator && operator2 instanceof MethodOperator) {
-      if (operator1.methodName == operator2.methodName) {
-        ret.set(name, new MethodOperator(TypeThunk.resolve(type), operator1.methodName));
+    const op2 = operators2.get(name);
+    if (op1 instanceof MethodOperator && op2 instanceof MethodOperator) {
+      if (op1.methodName == op2.methodName) {
+        ret.set(name, new MethodOperator(TypeThunk.resolve(type), op1.methodName));
       }
     }
-    else if (operator1 instanceof NativeOperator && operator2 instanceof NativeOperator) {
-      if (operator1.nativeOperatorName === operator2.nativeOperatorName) {
-        ret.set(name, new NativeOperator(operator1.nativeOperatorName, TypeThunk.resolve(type)));
+    else if (op1 instanceof NativeOperator && op2 instanceof NativeOperator) {
+      if (op1.nativeOperatorName === op2.nativeOperatorName) {
+        ret.set(name, new NativeOperator(op1.nativeOperatorName, TypeThunk.resolve(type)));
       }
     }
   }
