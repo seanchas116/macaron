@@ -1,10 +1,13 @@
 import {voidType, numberType, booleanType, stringType} from "./nativeTypes";
 import Type from "./Type";
+import UnionType from "./type/UnionType";
 import AssignType from "./AssignType";
 import SourceLocation from "../common/SourceLocation";
 import Identifier from "./Identifier";
 import CompilationError from "../common/CompilationError";
 import Operator from "./Operator";
+import Environment from "./Environment";
+import {TypeThunk} from "./Thunk";
 
 export default
 class Expression {
@@ -128,5 +131,21 @@ class OperatorAccessExpression extends Expression {
       );
     }
     this.type = this.operator.type.get();
+  }
+}
+
+function blockType(block: Expression[]) {
+  if (block.length > 0) {
+    return block[block.length - 1].type;
+  } else {
+    return voidType;
+  }
+}
+
+export
+class IfExpression extends Expression {
+  constructor(location: SourceLocation, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
+    super(location);
+    this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], location);
   }
 }

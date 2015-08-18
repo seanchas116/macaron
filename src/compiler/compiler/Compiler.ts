@@ -20,7 +20,7 @@ class Compiler {
     }
 
     const emitter = new CodeEmitter();
-    const code = emitter.emitExpressions(expressions);
+    const code = emitter.emitTopLevelExpressions(expressions);
 
     return code;
   }

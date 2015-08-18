@@ -3,6 +3,7 @@ import {TypeThunk} from "./Thunk";
 import AssignType from "./AssignType";
 import Identifier from "./Identifier";
 import CompilationError from "../common/CompilationError";
+import {voidType} from "./nativeTypes";
 
 interface Variable {
   type: TypeThunk;
@@ -68,6 +69,21 @@ class Environment {
         type: TypeThunk.resolve(type),
         assignType
       });
+    }
+  }
+
+  addTempVariable(baseName: string) {
+    const newName = this.nonDuplicateVariableName(baseName);
+    this.assignVariable(AssignType.Builtin, new Identifier(newName, null), voidType);
+    return newName;
+  }
+
+  nonDuplicateVariableName(baseName: string) {
+    for (let i = 0; true; ++i) {
+      const name = baseName + i;
+      if (!this.getVariable(name)) {
+        return name;
+      }
     }
   }
 

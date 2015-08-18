@@ -10,6 +10,7 @@ import {
   FunctionCallAST,
   ClassAST,
   MemberAccessAST,
+  IfAST,
 } from "../parser/AST";
 
 import Expression, {
@@ -20,6 +21,7 @@ import Expression, {
   ReturnExpression,
   MemberAccessExpression,
   OperatorAccessExpression,
+  IfExpression,
 } from "./Expression";
 import FunctionExpression from "./expression/FunctionExpression";
 import ClassExpression from "./expression/ClassExpression";
@@ -93,6 +95,9 @@ class TypeEvaluator {
     }
     else if (ast instanceof MemberAccessAST) {
       return this.evaluateMemberAccess(ast);
+    }
+    else if (ast instanceof IfAST) {
+      return this.evaluateIf(ast);
     }
     else {
       throw new Error(`Not supported AST: ${ast.constructor.name}`);
@@ -192,5 +197,17 @@ class TypeEvaluator {
     this.environment.assignVariable(AssignType.Constant, ast.name, thunk.type);
     this.environment.addType(ast.name, thunk.type);
     return thunk;
+  }
+
+  evaluateIf(ast: IfAST) {
+    const tempVarName = this.environment.addTempVariable("__macaron$ifTemp");
+
+    const ifEnv = new Environment(this.environment);
+    const cond = new TypeEvaluator(ifEnv).evaluate(ast.condition).get();
+
+    const ifTrue = new TypeEvaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifTrue).map(e => e.get());
+    const ifFalse = new TypeEvaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifFalse).map(e => e.get());
+
+    return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
   }
 }

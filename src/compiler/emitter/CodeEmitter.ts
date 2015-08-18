@@ -5,7 +5,8 @@ import Expression, {
   AssignmentExpression,
   ReturnExpression,
   MemberAccessExpression,
-  OperatorAccessExpression
+  OperatorAccessExpression,
+  IfExpression,
 } from "../typing/Expression";
 
 import {NativeOperator, MethodOperator} from "../typing/Operator";
@@ -15,22 +16,38 @@ import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression"
 import ClassExpression from "../typing/expression/ClassExpression";
 
 import AssignType from "../typing/AssignType";
+import Identifier from "../typing/Identifier";
 
 export default
 class CodeEmitter {
 
+  prependings: string[] = [];
+
   constructor(public indentationWidth = 2, public indentationLevel = 0) {
   }
 
-  emitExpressions(expressions: Expression[]) {
-    const indentation = " ".repeat(this.indentationWidth * this.indentationLevel);
+  get indentation() {
+    return " ".repeat(this.indentationWidth * this.indentationLevel);
+  }
+
+  addPrepending(line: string) {
+    this.prependings.push(`${this.indentation}${line};\n`);
+  }
+
+  emitTopLevelExpressions(expressions: Expression[]) {
     return expressions
-      .map(e => this.emitExpression(e))
-      .map(line => `${indentation}${line};\n`)
+      .map(e => this.emitTopLevelExpression(e))
       .join("");
   }
 
-  emitExpression(expr: Expression): string {
+  emitTopLevelExpression(expr: Expression) {
+    const line = this.emitExpression(expr, true);
+    const result = [...this.prependings, `${this.indentation}${line};\n`].join("");
+    this.prependings = [];
+    return result;
+  }
+
+  emitExpression(expr: Expression, topLevel = false): string {
     if (expr instanceof IdentifierExpression) {
       return this.emitIdentifier(expr);
     }
@@ -57,6 +74,9 @@ class CodeEmitter {
     }
     else if (expr instanceof FunctionBodyExpression) {
       return this.emitFunctionBody(expr);
+    }
+    else if (expr instanceof IfExpression) {
+      return this.emitIf(expr, topLevel);
     }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
@@ -174,9 +194,56 @@ class CodeEmitter {
   }
 
   emitFunctionBody(expr: FunctionBodyExpression) {
-    const emitter = this.indented();
-    const body = emitter.emitExpressions(expr.expressions);
+    return this.emitBlock(expr.expressions);
+  }
+
+  emitIf(expr: IfExpression, topLevel: boolean) {
+    const cond = this.emitExpression(expr.condition);
+
+    if (topLevel) {
+      const ifTrue = this.emitBlock(expr.ifTrue);
+      if (expr.ifFalse.length > 0) {
+        const ifFalse = this.emitBlock(expr.ifFalse);
+        return `if (${cond}) ${ifTrue} else ${ifFalse}`;
+      }
+      else {
+        return `if (${cond}) ${ifTrue}`;
+      }
+    }
+    else {
+      this.addPrepending(`var ${expr.tempVarName}`);
+      const ifTrue = this.emitBlockWithAssign(expr.ifTrue, expr.tempVarName);
+      if (expr.ifFalse.length > 0) {
+        const ifFalse = this.emitBlockWithAssign(expr.ifFalse, expr.tempVarName);
+        this.addPrepending(`if (${cond}) ${ifTrue} else ${ifFalse}`);
+      }
+      else {
+        this.addPrepending(`if (${cond}) ${ifTrue}`);
+      }
+      return expr.tempVarName;
+    }
+  }
+
+  emitBlock(exprs: Expression[]) {
+    const body = this.indented().emitTopLevelExpressions(exprs);
     return `{\n${body}\n}`;
+  }
+
+  emitBlockWithAssign(exprs: Expression[], varName: string) {
+    if (exprs.length === 0) {
+      return this.emitBlock([]);
+    }
+    const last = exprs[exprs.length - 1];
+    const emittingExprs = [
+      ...exprs.slice(0, exprs.length - 1),
+      new AssignmentExpression(
+        last.location,
+        AssignType.Assign,
+        new Identifier(varName, last.location),
+        last
+      )
+    ];
+    return this.emitBlock(emittingExprs);
   }
 
   indented() {

@@ -45,7 +45,7 @@ class FunctionCallAST extends ExpressionAST {
 
 export
 class IfAST extends ExpressionAST {
-  constructor(location: SourceLocation, condition: ExpressionAST, ifTrue: ExpressionAST[], ifFalse: ExpressionAST[]) {
+  constructor(location: SourceLocation, public condition: ExpressionAST, public ifTrue: ExpressionAST[], public ifFalse: ExpressionAST[]) {
     super(location);
   }
 }
