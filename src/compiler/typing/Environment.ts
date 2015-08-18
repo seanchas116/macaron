@@ -111,6 +111,17 @@ class Environment {
     this.types.set(name.name, TypeThunk.resolve(type));
   }
 
+  getTypeOrError(name: Identifier) {
+    const type = this.getType(name.name);
+    if (!type) {
+      throw CompilationError.typeError(
+        `Type '${name.name}' already defined`,
+        name.location
+      );
+    }
+    return type;
+  }
+
   getType(name: string): TypeThunk {
     if (this.parent) {
       const parentType = this.parent.getType(name);

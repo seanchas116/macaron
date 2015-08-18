@@ -11,6 +11,8 @@ import {
   ClassAST,
   MemberAccessAST,
   IfAST,
+  TypeExpressionAST,
+  TypeIdentifierAST,
 } from "../parser/AST";
 
 import Expression, {
@@ -24,6 +26,7 @@ import Expression, {
   IfExpression,
 } from "./Expression";
 import FunctionExpression from "./expression/FunctionExpression";
+import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 import ClassExpression from "./expression/ClassExpression";
 
 import AssignType from "./AssignType";
@@ -32,6 +35,7 @@ import Environment from "./Environment";
 import Type from "./Type";
 import {ExpressionThunk, TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
+import CallSignature from "./CallSignature";
 
 import CompilationError from "../common/CompilationError";
 import SourceLocation from "../common/SourceLocation";
@@ -161,16 +165,35 @@ class TypeEvaluator {
   }
 
   evaluateFunction(ast: FunctionAST, thisType = voidType): ExpressionThunk {
-    const funcThunk = FunctionExpression.thunk(
-      ast.location, this.environment, ast.name, thisType, ast.parameters,
-      (env) => {
-        return new TypeEvaluator(env).evaluateExpressions(ast.expressions).map(e => e.get());
-      }
-    );
+    const {location} = ast;
+
+    const paramTypes: Type[] = [];
+    const subEnv = new Environment(this.environment);
+    const subEvaluator = new TypeEvaluator(subEnv);
+
+    for (const {name, type: typeExpr} of ast.parameters) {
+      const type = subEvaluator.evaluateType(typeExpr).get();
+      subEnv.assignVariable(AssignType.Constant, name, type);
+      paramTypes.push(type);
+    }
+
+    subEnv.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
+
+    const bodyThunk = new ExpressionThunk(location, () => {
+      const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
+      return new FunctionBodyExpression(location, body);
+    });
+    const type = new Type("function", voidType);
+    const callSig = new CallSignature(thisType, paramTypes, bodyThunk.type);
+    type.callSignatures.push(callSig);
+
+    const funcThunk = new ExpressionThunk(location, () => {
+      return new FunctionExpression(location, ast.name, type, ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
+    });
 
     if (ast.addAsVariable) {
-      const thunk = new ExpressionThunk(ast.location, () => {
-        return new AssignmentExpression(ast.location, AssignType.Constant, ast.name, funcThunk.get());
+      const thunk = new ExpressionThunk(location, () => {
+        return new AssignmentExpression(location, AssignType.Constant, ast.name, funcThunk.get());
       });
       this.environment.assignVariable(AssignType.Constant, ast.name, thunk.type);
       return thunk;
@@ -209,5 +232,18 @@ class TypeEvaluator {
     const ifFalse = new TypeEvaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
     return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
+  }
+
+  evaluateType(ast: TypeExpressionAST): TypeThunk {
+    if (ast instanceof TypeIdentifierAST) {
+      return this.evaluateTypeIdentifier(ast);
+    }
+    else {
+      throw new Error(`Not supported AST: ${ast.constructor.name}`);
+    }
+  }
+
+  evaluateTypeIdentifier(ast: TypeIdentifierAST) {
+    return this.environment.getTypeOrError(ast);
   }
 }

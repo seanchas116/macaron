@@ -143,6 +143,12 @@ IdentifierHead
 IdentifierTail
   = [a-zA-Z$_0-9]
 
+IdentifierString
+  = IdentifierHead IdentifierTail*
+{
+  return text();
+}
+
 _ = Whitespace*
 
 // whitespaces and >=0 separator
@@ -264,9 +270,9 @@ StringLiteral
 }
 
 Identifier
-  = head:IdentifierHead tail:IdentifierTail* _
+  = str:IdentifierString _
 {
-  return new AST.IdentifierAST(currentLocation(), head + tail.reduce((a, b) => a + b, ""));
+  return new AST.IdentifierAST(currentLocation(), str);
 }
 
 Lines
@@ -286,7 +292,7 @@ Block
 }
 
 Parameter
-  = name:Identifier type:Identifier
+  = name:Identifier type:TypeExpression
 {
   return new AST.ParameterAST(currentLocation(), name, type);
 }
@@ -348,4 +354,13 @@ ClassMethod
   = name:Identifier _ params:ParameterList _ exps:Block _
 {
   return new AST.FunctionAST(currentLocation(), name, params, exps);
+}
+
+TypeExpression
+  = TypeIdentifier
+
+TypeIdentifier
+  = str:IdentifierString _
+{
+  return new AST.TypeIdentifierAST(currentLocation(), str);
 }
