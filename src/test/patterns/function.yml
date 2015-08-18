@@ -32,3 +32,17 @@
     }
     f(1, 2)
   expected: 3
+
+- title: Fibonacci sequence
+  src: |
+    func fib(n number) number {
+      if n == 0 {
+        0
+      } else if n == 1 {
+        1
+      } else {
+        fib(n - 1) + fib(n - 2)
+      }
+    }
+    fib(10)
+  expected: 55
