@@ -189,7 +189,7 @@ class CodeEmitter {
   }
 
   emitFunctionBody(expr: FunctionBodyExpression) {
-    return this.emitBlock(expr.expressions);
+    return this.emitBlockWithReturn(expr.expressions);
   }
 
   emitIf(expr: IfExpression, topLevel: boolean) {
@@ -228,15 +228,29 @@ class CodeEmitter {
     if (exprs.length === 0) {
       return this.emitBlock([]);
     }
-    const last = exprs[exprs.length - 1];
+    const len = exprs.length;
+    const last = exprs[len - 1];
     const emittingExprs = [
-      ...exprs.slice(0, exprs.length - 1),
+      ...exprs.slice(0, len - 1),
       new AssignmentExpression(
         last.location,
         AssignType.Assign,
         new Identifier(varName, last.location),
         last
       )
+    ];
+    return this.emitBlock(emittingExprs);
+  }
+
+  emitBlockWithReturn(exprs: Expression[]) {
+    if (exprs.length === 0) {
+      return this.emitBlock([]);
+    }
+    const len = exprs.length;
+    const last = exprs[len - 1];
+    const emittingExprs = [
+      ...exprs.slice(0, len - 1),
+      new ReturnExpression(last.location, last)
     ];
     return this.emitBlock(emittingExprs);
   }
