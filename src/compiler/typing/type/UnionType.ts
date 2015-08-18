@@ -11,7 +11,6 @@ function unionMembers(type: UnionType, members1: Map<string, TypeThunk>, members
       continue;
     }
     const type2 = members2.get(name);
-    // TODO: accurate location
     ret.set(name, new TypeThunk(type.location, () => {
       return new UnionType([type1.get(), type2.get()], type.location);
     }));
