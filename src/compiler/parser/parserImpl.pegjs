@@ -185,7 +185,7 @@ ControlExpression
   = IfExpression / FunctionCall
 
 IfExpression
-  = "if" _ cond:Parentheses ifTrue:Block ifFalse:ElseExpression?
+  = "if" _ cond:Expression ifTrue:Block ifFalse:ElseExpression?
 {
   return new AST.IfAST(currentLocation(), cond, ifTrue, ifFalse || []);
 }
