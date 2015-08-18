@@ -26,7 +26,7 @@ class BinaryAST extends ExpressionAST {
 
 export
 class FunctionAST extends ExpressionAST {
-  constructor(location: SourceLocation, public name: IdentifierAST, public parameters: ParameterAST[], public expressions: ExpressionAST[], public addAsVariable = false) {
+  constructor(location: SourceLocation, public name: IdentifierAST, public parameters: ParameterAST[], public returnType: TypeExpressionAST, public expressions: ExpressionAST[], public addAsVariable = false) {
     super(location);
   }
 }
