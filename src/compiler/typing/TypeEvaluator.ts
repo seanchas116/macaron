@@ -184,7 +184,8 @@ class TypeEvaluator {
       return new FunctionBodyExpression(location, body);
     });
     const type = new Type("function", voidType);
-    const callSig = new CallSignature(thisType, paramTypes, bodyThunk.type);
+    const returnType = ast.returnType ? subEvaluator.evaluateType(ast.returnType) : bodyThunk.type;
+    const callSig = new CallSignature(thisType, paramTypes, returnType);
     type.callSignatures.push(callSig);
 
     const funcThunk = new ExpressionThunk(location, () => {
@@ -195,7 +196,7 @@ class TypeEvaluator {
       const thunk = new ExpressionThunk(location, () => {
         return new AssignmentExpression(location, AssignType.Constant, ast.name, funcThunk.get());
       });
-      this.environment.assignVariable(AssignType.Constant, ast.name, thunk.type);
+      this.environment.assignVariable(AssignType.Constant, ast.name, type);
       return thunk;
     } else {
       return funcThunk;
