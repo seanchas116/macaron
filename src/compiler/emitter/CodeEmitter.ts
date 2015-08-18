@@ -26,14 +26,6 @@ class CodeEmitter {
   constructor(public indentationWidth = 2, public indentationLevel = 0) {
   }
 
-  get indentation() {
-    return " ".repeat(this.indentationWidth * this.indentationLevel);
-  }
-
-  addPrepending(line: string) {
-    this.prependings.push(`${this.indentation}${line};\n`);
-  }
-
   emitTopLevelExpressions(expressions: Expression[]) {
     return expressions
       .map(e => this.emitTopLevelExpression(e))
@@ -41,8 +33,11 @@ class CodeEmitter {
   }
 
   emitTopLevelExpression(expr: Expression) {
+    const indentation = " ".repeat(this.indentationWidth * this.indentationLevel);
     const line = this.emitExpression(expr, true);
-    const result = [...this.prependings, `${this.indentation}${line};\n`].join("");
+    const result = [...this.prependings, line]
+      .map(line => `${indentation}${line};\n`)
+      .join("");
     this.prependings = [];
     return result;
   }
@@ -211,14 +206,14 @@ class CodeEmitter {
       }
     }
     else {
-      this.addPrepending(`var ${expr.tempVarName}`);
+      this.prependings.push(`var ${expr.tempVarName}`);
       const ifTrue = this.emitBlockWithAssign(expr.ifTrue, expr.tempVarName);
       if (expr.ifFalse.length > 0) {
         const ifFalse = this.emitBlockWithAssign(expr.ifFalse, expr.tempVarName);
-        this.addPrepending(`if (${cond}) ${ifTrue} else ${ifFalse}`);
+        this.prependings.push(`if (${cond}) ${ifTrue} else ${ifFalse}`);
       }
       else {
-        this.addPrepending(`if (${cond}) ${ifTrue}`);
+        this.prependings.push(`if (${cond}) ${ifTrue}`);
       }
       return expr.tempVarName;
     }
