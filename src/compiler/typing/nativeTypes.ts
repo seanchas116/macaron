@@ -40,8 +40,8 @@ const initNativeTypes: () => void = once(() => {
   }
 
   addNativeBinaryOp(anyType, "==", booleanType, "===");
+  addNativeBinaryOp(anyType, "!=", booleanType, "!==");
 
-  addNativeBinaryOp(numberType, "==", booleanType, "===");
   addNativeBinaryOp(numberType, "<", booleanType);
   addNativeBinaryOp(numberType, "<=", booleanType);
   addNativeBinaryOp(numberType, ">", booleanType);
