@@ -4,6 +4,7 @@ import Operator from "./Operator";
 import SourceLocation from "../common/SourceLocation";
 import {TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
+const HashMap = require("hashmap");
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   const ret = new Map<TKey, TValue>();
@@ -15,6 +16,8 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   }
   return ret;
 }
+
+const castResults: Map<[Type, Type], boolean> = new HashMap();
 
 export default
 class Type {
@@ -71,6 +74,18 @@ class Type {
     if (this === other) {
       return true;
     }
+
+    const memoizedResult = castResults.get([this, other]);
+    if (memoizedResult != null) {
+      return memoizedResult;
+    }
+    castResults.set([this, other], true); // temporarily set to true to avoid infinite recursion
+    const result = this.isCastableToImpl(other);
+    castResults.set([this, other], result);
+    return result;
+  }
+
+  private isCastableToImpl(other: Type) {
     for (const [name, member] of other.getMembers()) {
       const thisMember = this.getMember(name).get();
       if (!thisMember || !thisMember.isCastableTo(member.get())) {
