@@ -42,7 +42,7 @@ import SourceLocation from "../common/SourceLocation";
 import ErrorInfo from "../common/ErrorInfo";
 
 export default
-class TypeEvaluator {
+class Evaluator {
 
   constructor(public environment: Environment) {
   }
@@ -169,7 +169,7 @@ class TypeEvaluator {
 
     const paramTypes: Type[] = [];
     const subEnv = new Environment(this.environment);
-    const subEvaluator = new TypeEvaluator(subEnv);
+    const subEvaluator = new Evaluator(subEnv);
 
     for (const {name, type: typeExpr} of ast.parameters) {
       const type = subEvaluator.evaluateType(typeExpr).get();
@@ -227,10 +227,10 @@ class TypeEvaluator {
     const tempVarName = this.environment.addTempVariable("__macaron$ifTemp");
 
     const ifEnv = new Environment(this.environment);
-    const cond = new TypeEvaluator(ifEnv).evaluate(ast.condition).get();
+    const cond = new Evaluator(ifEnv).evaluate(ast.condition).get();
 
-    const ifTrue = new TypeEvaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifTrue).map(e => e.get());
-    const ifFalse = new TypeEvaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifFalse).map(e => e.get());
+    const ifTrue = new Evaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifTrue).map(e => e.get());
+    const ifFalse = new Evaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
     return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
   }
