@@ -2,12 +2,12 @@ import {voidType, numberType, booleanType, stringType} from "./nativeTypes";
 import Type from "./Type";
 import UnionType from "./type/UnionType";
 import AssignType from "./AssignType";
-import SourceLocation from "../common/SourceLocation";
 import Identifier from "./Identifier";
-import CompilationError from "../common/CompilationError";
 import Operator from "./Operator";
-import Environment from "./Environment";
 import {TypeThunk} from "./Thunk";
+
+import SourceLocation from "../common/SourceLocation";
+import CompilationError from "../common/CompilationError";
 
 export default
 class Expression {

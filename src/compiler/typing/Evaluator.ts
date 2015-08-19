@@ -31,7 +31,6 @@ import ClassExpression from "./expression/ClassExpression";
 
 import AssignType from "./AssignType";
 import Identifier from "./Identifier";
-import Environment from "./Environment";
 import Type from "./Type";
 import {ExpressionThunk, TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
