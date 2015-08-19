@@ -1,0 +1,31 @@
+- title: subtyping class OK
+  src: |
+    class Foo {
+      foo(x number, y number) {
+        x + y
+      }
+    }
+    class Bar {
+      foo(x number, y number) {
+        x + y
+      }
+    }
+    var foo = new Foo()
+    foo = new Bar()
+    foo.foo(1, 2)
+  expected: 3
+- title: subtyping class NG
+  src: |
+    class Foo {
+      foo(x number, y number) {
+        x + y
+      }
+    }
+    class Bar {
+      bar(x number, y number) {
+        x + y
+      }
+    }
+    var foo = new Foo()
+    foo = new Bar()
+  error: Cannot assign
