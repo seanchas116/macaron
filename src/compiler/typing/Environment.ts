@@ -16,6 +16,10 @@ class Environment {
   constructor(public parent: Environment = null) {
   }
 
+  newChild() {
+    return new Environment(this);
+  }
+
   addTempVariable(baseName: string) {
     const name = this.nonDuplicateVariableName(baseName);
     this.variables.set(name, {

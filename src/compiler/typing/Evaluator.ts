@@ -41,10 +41,12 @@ import CompilationError from "../common/CompilationError";
 import SourceLocation from "../common/SourceLocation";
 import ErrorInfo from "../common/ErrorInfo";
 
+import EvaluationContext from "./EvaluationContext";
+
 export default
 class Evaluator {
 
-  constructor(public environment: Environment) {
+  constructor(public context: EvaluationContext) {
   }
 
   evaluateExpressions(asts: ExpressionAST[]) {
@@ -125,7 +127,7 @@ class Evaluator {
         return AssignType.Assign;
       }
     })();
-    this.assignVariable(type, ast.left, right.type);
+    this.context.assignVariable(type, ast.left, right.type);
     return new AssignmentExpression(ast.location, type, ast.left, right);
   }
 
@@ -145,13 +147,7 @@ class Evaluator {
   }
 
   evaluateIdentifier(ast: IdentifierAST) {
-    const variable = this.environment.getVariable(ast.name);
-    if (!variable) {
-      throw CompilationError.typeError(
-        `Variable '${ast.name}' not in scope`,
-        ast.location
-      );
-    }
+    const variable = this.context.getVariable(ast);
     return new IdentifierExpression(ast, variable.type.get());
   }
 
@@ -168,16 +164,16 @@ class Evaluator {
     const {location} = ast;
 
     const paramTypes: Type[] = [];
-    const subEnv = new Environment(this.environment);
-    const subEvaluator = new Evaluator(subEnv);
+    const subContext = this.context.newChild();
+    const subEvaluator = new Evaluator(subContext);
 
     for (const {name, type: typeExpr} of ast.parameters) {
       const type = subEvaluator.evaluateType(typeExpr).get();
-      subEvaluator.assignVariable(AssignType.Constant, name, type);
+      subContext.assignVariable(AssignType.Constant, name, type);
       paramTypes.push(type);
     }
 
-    subEvaluator.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
+    subContext.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
 
     const bodyThunk = new ExpressionThunk(location, () => {
       const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
@@ -196,7 +192,7 @@ class Evaluator {
       const thunk = new ExpressionThunk(location, () => {
         return new AssignmentExpression(location, AssignType.Constant, ast.name, funcThunk.get());
       });
-      this.assignVariable(AssignType.Constant, ast.name, type);
+      this.context.assignVariable(AssignType.Constant, ast.name, type);
       return thunk;
     } else {
       return funcThunk;
@@ -218,19 +214,19 @@ class Evaluator {
       }
       return expr;
     });
-    this.assignVariable(AssignType.Constant, ast.name, thunk.type);
-    this.addType(ast.name, thunk.type);
+    this.context.assignVariable(AssignType.Constant, ast.name, thunk.type);
+    this.context.addType(ast.name, thunk.type);
     return thunk;
   }
 
   evaluateIf(ast: IfAST) {
-    const tempVarName = this.environment.addTempVariable("__macaron$ifTemp");
+    const tempVarName = this.context.environment.addTempVariable("__macaron$ifTemp");
 
-    const ifEnv = new Environment(this.environment);
-    const cond = new Evaluator(ifEnv).evaluate(ast.condition).get();
+    const ifContext = this.context.newChild();
+    const cond = new Evaluator(ifContext).evaluate(ast.condition).get();
 
-    const ifTrue = new Evaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifTrue).map(e => e.get());
-    const ifFalse = new Evaluator(new Environment(ifEnv)).evaluateExpressions(ast.ifFalse).map(e => e.get());
+    const ifTrue = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifTrue).map(e => e.get());
+    const ifFalse = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
     return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
   }
@@ -245,82 +241,6 @@ class Evaluator {
   }
 
   evaluateTypeIdentifier(ast: TypeIdentifierAST) {
-    return this.getType(ast);
-  }
-
-  assignToExistingVariable(name: Identifier, type: Type|TypeThunk) {
-    const variable = this.environment.getVariable(name.name);
-    if (!variable) {
-      throw CompilationError.typeError(
-        `Variable '${name.name}' not in scope`,
-        name.location
-      );
-    }
-    if (variable.assignType === AssignType.Constant) {
-      throw CompilationError.typeError(
-        `Variable '${name.name}' is constant and cannot be reassigned`,
-        name.location
-      );
-    }
-    if (variable.assignType === AssignType.Builtin) {
-      throw CompilationError.typeError(
-        `Variable '${name.name}' is builtin and cannot be reassigned`,
-        name.location
-      );
-    }
-    const typeThunk = TypeThunk.resolve(type);
-    if (!typeThunk.get().isCastableTo(variable.type.get())) {
-      throw CompilationError.typeError(
-        `Cannot assign '${type}' to type '${variable.type}'`,
-        name.location
-      );
-    }
-  }
-
-  assignVariable(assignType: AssignType, name: Identifier, type: Type|TypeThunk) {
-    if (assignType === AssignType.Assign) {
-      this.assignToExistingVariable(name, type);
-    }
-    else {
-      const variable = this.environment.getVariable(name.name);
-      if (variable && variable.assignType === AssignType.Builtin) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' is builtin and cannot be redefined`,
-          name.location
-        );
-      }
-      if (this.environment.getOwnVariable(name.name)) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' already defined`,
-          name.location
-        );
-      }
-      this.environment.variables.set(name.name, {
-        type: TypeThunk.resolve(type),
-        assignType
-      });
-    }
-  }
-
-  addType(name: Identifier, type: TypeThunk|Type) {
-    if (this.environment.getOwnType(name.name)) {
-      throw CompilationError.typeError(
-        `Type '${name.name}' already defined`,
-        name.location
-      );
-    }
-
-    this.environment.types.set(name.name, TypeThunk.resolve(type));
-  }
-
-  getType(name: Identifier) {
-    const type = this.environment.getType(name.name);
-    if (!type) {
-      throw CompilationError.typeError(
-        `Type '${name.name}' already defined`,
-        name.location
-      );
-    }
-    return type;
+    return this.context.getType(ast);
   }
 }
