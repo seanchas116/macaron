@@ -125,7 +125,7 @@ class TypeEvaluator {
         return AssignType.Assign;
       }
     })();
-    this.environment.assignVariable(type, ast.left, right.type);
+    this.assignVariable(type, ast.left, right.type);
     return new AssignmentExpression(ast.location, type, ast.left, right);
   }
 
@@ -173,11 +173,11 @@ class TypeEvaluator {
 
     for (const {name, type: typeExpr} of ast.parameters) {
       const type = subEvaluator.evaluateType(typeExpr).get();
-      subEnv.assignVariable(AssignType.Constant, name, type);
+      subEvaluator.assignVariable(AssignType.Constant, name, type);
       paramTypes.push(type);
     }
 
-    subEnv.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
+    subEvaluator.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
 
     const bodyThunk = new ExpressionThunk(location, () => {
       const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
@@ -196,7 +196,7 @@ class TypeEvaluator {
       const thunk = new ExpressionThunk(location, () => {
         return new AssignmentExpression(location, AssignType.Constant, ast.name, funcThunk.get());
       });
-      this.environment.assignVariable(AssignType.Constant, ast.name, type);
+      this.assignVariable(AssignType.Constant, ast.name, type);
       return thunk;
     } else {
       return funcThunk;
@@ -218,8 +218,8 @@ class TypeEvaluator {
       }
       return expr;
     });
-    this.environment.assignVariable(AssignType.Constant, ast.name, thunk.type);
-    this.environment.addType(ast.name, thunk.type);
+    this.assignVariable(AssignType.Constant, ast.name, thunk.type);
+    this.addType(ast.name, thunk.type);
     return thunk;
   }
 
@@ -245,6 +245,82 @@ class TypeEvaluator {
   }
 
   evaluateTypeIdentifier(ast: TypeIdentifierAST) {
-    return this.environment.getTypeOrError(ast);
+    return this.getType(ast);
+  }
+
+  assignToExistingVariable(name: Identifier, type: Type|TypeThunk) {
+    const variable = this.environment.getVariable(name.name);
+    if (!variable) {
+      throw CompilationError.typeError(
+        `Variable '${name.name}' not in scope`,
+        name.location
+      );
+    }
+    if (variable.assignType === AssignType.Constant) {
+      throw CompilationError.typeError(
+        `Variable '${name.name}' is constant and cannot be reassigned`,
+        name.location
+      );
+    }
+    if (variable.assignType === AssignType.Builtin) {
+      throw CompilationError.typeError(
+        `Variable '${name.name}' is builtin and cannot be reassigned`,
+        name.location
+      );
+    }
+    const typeThunk = TypeThunk.resolve(type);
+    if (!typeThunk.get().isCastableTo(variable.type.get())) {
+      throw CompilationError.typeError(
+        `Cannot assign '${type}' to type '${variable.type}'`,
+        name.location
+      );
+    }
+  }
+
+  assignVariable(assignType: AssignType, name: Identifier, type: Type|TypeThunk) {
+    if (assignType === AssignType.Assign) {
+      this.assignToExistingVariable(name, type);
+    }
+    else {
+      const variable = this.environment.getVariable(name.name);
+      if (variable && variable.assignType === AssignType.Builtin) {
+        throw CompilationError.typeError(
+          `Variable '${name.name}' is builtin and cannot be redefined`,
+          name.location
+        );
+      }
+      if (this.environment.getOwnVariable(name.name)) {
+        throw CompilationError.typeError(
+          `Variable '${name.name}' already defined`,
+          name.location
+        );
+      }
+      this.environment.variables.set(name.name, {
+        type: TypeThunk.resolve(type),
+        assignType
+      });
+    }
+  }
+
+  addType(name: Identifier, type: TypeThunk|Type) {
+    if (this.environment.getOwnType(name.name)) {
+      throw CompilationError.typeError(
+        `Type '${name.name}' already defined`,
+        name.location
+      );
+    }
+
+    this.environment.types.set(name.name, TypeThunk.resolve(type));
+  }
+
+  getType(name: Identifier) {
+    const type = this.environment.getType(name.name);
+    if (!type) {
+      throw CompilationError.typeError(
+        `Type '${name.name}' already defined`,
+        name.location
+      );
+    }
+    return type;
   }
 }

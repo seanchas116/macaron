@@ -1,8 +1,6 @@
 import Type from "./Type";
 import {TypeThunk} from "./Thunk";
 import AssignType from "./AssignType";
-import Identifier from "./Identifier";
-import CompilationError from "../common/CompilationError";
 import {voidType} from "./nativeTypes";
 
 interface Variable {
@@ -18,64 +16,13 @@ class Environment {
   constructor(public parent: Environment = null) {
   }
 
-  assignToExistingVariable(name: Identifier, type: Type|TypeThunk) {
-    const variable = this.getVariable(name.name);
-    if (!variable) {
-      throw CompilationError.typeError(
-        `Variable '${name.name}' not in scope`,
-        name.location
-      );
-    }
-    if (variable.assignType === AssignType.Constant) {
-      throw CompilationError.typeError(
-        `Variable '${name.name}' is constant and cannot be reassigned`,
-        name.location
-      );
-    }
-    if (variable.assignType === AssignType.Builtin) {
-      throw CompilationError.typeError(
-        `Variable '${name.name}' is builtin and cannot be reassigned`,
-        name.location
-      );
-    }
-    const typeThunk = TypeThunk.resolve(type);
-    if (!typeThunk.get().isCastableTo(variable.type.get())) {
-      throw CompilationError.typeError(
-        `Cannot assign '${type}' to type '${variable.type}'`,
-        name.location
-      );
-    }
-  }
-
-  assignVariable(assignType: AssignType, name: Identifier, type: Type|TypeThunk) {
-    if (assignType === AssignType.Assign) {
-      this.assignToExistingVariable(name, type);
-    }
-    else {
-      const variable = this.getVariable(name.name);
-      if (variable && variable.assignType === AssignType.Builtin) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' is builtin and cannot be redefined`,
-          name.location
-        );
-      }
-      if (this.getOwnVariable(name.name)) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' already defined`,
-          name.location
-        );
-      }
-      this.variables.set(name.name, {
-        type: TypeThunk.resolve(type),
-        assignType
-      });
-    }
-  }
-
   addTempVariable(baseName: string) {
-    const newName = this.nonDuplicateVariableName(baseName);
-    this.assignVariable(AssignType.Builtin, new Identifier(newName, null), voidType);
-    return newName;
+    const name = this.nonDuplicateVariableName(baseName);
+    this.variables.set(name, {
+      type: TypeThunk.resolve(voidType),
+      assignType: AssignType.Builtin
+    });
+    return name;
   }
 
   nonDuplicateVariableName(baseName: string) {
@@ -85,6 +32,10 @@ class Environment {
         return name;
       }
     }
+  }
+
+  setVariable(name: string, variable: Variable) {
+    this.variables.set(name, variable);
   }
 
   getVariable(name: string): Variable {
@@ -100,26 +51,8 @@ class Environment {
     return this.variables.get(name);
   }
 
-  addType(name: Identifier, type: TypeThunk|Type) {
-    if (this.getOwnType(name.name)) {
-      throw CompilationError.typeError(
-        `Type '${name.name}' already defined`,
-        name.location
-      );
-    }
-
-    this.types.set(name.name, TypeThunk.resolve(type));
-  }
-
-  getTypeOrError(name: Identifier) {
-    const type = this.getType(name.name);
-    if (!type) {
-      throw CompilationError.typeError(
-        `Type '${name.name}' already defined`,
-        name.location
-      );
-    }
-    return type;
+  setType(name: string, type: Type|TypeThunk) {
+    this.types.set(name, TypeThunk.resolve(type));
   }
 
   getType(name: string): TypeThunk {

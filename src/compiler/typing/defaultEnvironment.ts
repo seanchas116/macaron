@@ -8,6 +8,7 @@ import {
   voidType,
   initNativeTypes
 } from "./nativeTypes";
+import {TypeThunk} from "./Thunk";
 
 export default
 function defaultEnvironment() {
@@ -15,16 +16,16 @@ function defaultEnvironment() {
 
   const env = new Environment();
 
-  env.addType(new Identifier("number"), numberType);
-  env.addType(new Identifier("boolean"), booleanType);
-  env.addType(new Identifier("string"), stringType);
-  env.addType(new Identifier("void"), voidType);
-  env.addType(new Identifier("any"), voidType);
+  env.setType("number", numberType);
+  env.setType("boolean", booleanType);
+  env.setType("string", stringType);
+  env.setType("void", voidType);
+  env.setType("any", voidType);
 
-  env.assignVariable(AssignType.Builtin, new Identifier("true"), booleanType);
-  env.assignVariable(AssignType.Builtin, new Identifier("false"), booleanType);
-  env.assignVariable(AssignType.Builtin, new Identifier("null"), voidType);
-  env.assignVariable(AssignType.Builtin, new Identifier("undefined"), voidType);
+  env.setVariable("true", {type: TypeThunk.resolve(booleanType), assignType: AssignType.Builtin});
+  env.setVariable("false", {type: TypeThunk.resolve(booleanType), assignType: AssignType.Builtin});
+  env.setVariable("null", {type: TypeThunk.resolve(voidType), assignType: AssignType.Builtin});
+  env.setVariable("undefined", {type: TypeThunk.resolve(voidType), assignType: AssignType.Builtin});
 
   return env;
 }
