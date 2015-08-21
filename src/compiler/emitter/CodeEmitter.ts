@@ -3,6 +3,7 @@ import Expression, {
   LiteralExpression,
   FunctionCallExpression,
   AssignmentExpression,
+  NewVariableExpression,
   ReturnExpression,
   MemberAccessExpression,
   OperatorAccessExpression,
@@ -14,6 +15,8 @@ import {NativeOperator, MethodOperator} from "../typing/Operator";
 import FunctionExpression from "../typing/expression/FunctionExpression";
 import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression";
 import ClassExpression from "../typing/expression/ClassExpression";
+
+import {Constness} from "../typing/Member";
 
 import AssignType from "../typing/AssignType";
 import Identifier from "../typing/Identifier";
@@ -57,6 +60,9 @@ class CodeEmitter {
     }
     else if (expr instanceof AssignmentExpression) {
       return this.emitAssignment(expr);
+    }
+    else if (expr instanceof NewVariableExpression) {
+      return this.emitNewVariable(expr);
     }
     else if (expr instanceof ReturnExpression) {
       return this.emitReturn(expr);
@@ -164,18 +170,25 @@ class CodeEmitter {
   }
 
   emitAssignment(expr: AssignmentExpression) {
-    // TODO: AssignmentExpression must be top-level
+    const value = this.emitExpression(expr.value);
+    const name = expr.assignable.name;
+
+    return `${name} = ${value}`;
+  }
+
+  emitNewVariable(expr: NewVariableExpression) {
+    // TODO: new variable must be top-level
 
     const value = this.emitExpression(expr.value);
     const name = expr.assignable.name;
 
-    switch (expr.assignType) {
-    case AssignType.Variable:
+    switch (expr.constness) {
+    case Constness.Variable:
       return `let ${name} = ${value}`;
-    case AssignType.Constant:
+    case Constness.Constant:
       return `const ${name} = ${value}`;
     default:
-      return `${name} = ${value}`;
+      throw new Error("unsupported constness");
     }
   }
 
@@ -234,7 +247,6 @@ class CodeEmitter {
       ...exprs.slice(0, len - 1),
       new AssignmentExpression(
         last.location,
-        AssignType.Assign,
         new Identifier(varName, last.location),
         last
       )

@@ -9,6 +9,8 @@ import {
   initNativeTypes
 } from "./nativeTypes";
 import {TypeThunk} from "./Thunk";
+import Member, {Constness} from "./Member";
+import MetaValue from "./MetaValue";
 
 export default
 function defaultEnvironment() {
@@ -22,10 +24,10 @@ function defaultEnvironment() {
   env.setType("void", voidType);
   env.setType("any", voidType);
 
-  env.setVariable("true", {type: TypeThunk.resolve(booleanType), assignType: AssignType.Builtin});
-  env.setVariable("false", {type: TypeThunk.resolve(booleanType), assignType: AssignType.Builtin});
-  env.setVariable("null", {type: TypeThunk.resolve(voidType), assignType: AssignType.Builtin});
-  env.setVariable("undefined", {type: TypeThunk.resolve(voidType), assignType: AssignType.Builtin});
+  env.setVariable("true", new Member(Constness.Builtin, new MetaValue(booleanType, true)));
+  env.setVariable("false", new Member(Constness.Builtin, new MetaValue(booleanType, false)));
+  env.setVariable("null", new Member(Constness.Builtin, new MetaValue(voidType)));
+  env.setVariable("undefined", new Member(Constness.Builtin, new MetaValue(voidType)));
 
   return env;
 }

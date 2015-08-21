@@ -36,7 +36,7 @@ class ExpressionThunk extends Thunk<Expression> {
     if (type) {
       this.type = TypeThunk.resolve(type);
     } else {
-      this.type = new TypeThunk(location, () => this.get().type);
+      this.type = new TypeThunk(location, () => this.get().metaValue.type.get());
     }
   }
 

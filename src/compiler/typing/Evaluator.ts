@@ -19,6 +19,7 @@ import Expression, {
   LiteralExpression,
   IdentifierExpression,
   AssignmentExpression,
+  NewVariableExpression,
   FunctionCallExpression,
   ReturnExpression,
   MemberAccessExpression,
@@ -35,6 +36,8 @@ import Type from "./Type";
 import {ExpressionThunk, TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
+import Member, {Constness} from "./Member";
+import MetaValue from "./MetaValue";
 
 import CompilationError from "../common/CompilationError";
 import SourceLocation from "../common/SourceLocation";
@@ -116,18 +119,25 @@ class Evaluator {
   evaluateAssignment(ast: AssignmentAST) {
     const varName = ast.left.name;
     const right = this.evaluate(ast.right).get();
-    const type = (() => {
-      switch (ast.declaration) {
-      case "let":
-        return AssignType.Constant;
-      case "var":
-        return AssignType.Variable;
-      default:
-        return AssignType.Assign;
-      }
-    })();
-    this.context.assignVariable(type, ast.left, right.type);
-    return new AssignmentExpression(ast.location, type, ast.left, right);
+
+    if (ast.declaration) {
+      const constness = (() => {
+        switch (ast.declaration) {
+        case "let":
+          return Constness.Constant;
+        case "var":
+          return Constness.Variable;
+        default:
+          throw new Error(`not supported declaration: ${ast.declaration}`);
+        }
+      })();
+      this.context.addVariable(constness, ast.left, right.metaValue);
+      return new NewVariableExpression(ast.location, constness, ast.left, right);
+    }
+    else {
+      this.context.assignVariable(ast.left, right.metaValue);
+      return new AssignmentExpression(ast.location, ast.left, right);
+    }
   }
 
   evaluateUnary(ast: UnaryAST) {
@@ -147,7 +157,7 @@ class Evaluator {
 
   evaluateIdentifier(ast: IdentifierAST) {
     const variable = this.context.getVariable(ast);
-    return new IdentifierExpression(ast, variable.type.get());
+    return new IdentifierExpression(ast, variable.metaValue);
   }
 
   evalauteLiteral(ast: LiteralAST) {
@@ -168,11 +178,11 @@ class Evaluator {
 
     for (const {name, type: typeExpr} of ast.parameters) {
       const type = subEvaluator.evaluateType(typeExpr).get();
-      subContext.assignVariable(AssignType.Constant, name, type);
+      subContext.addVariable(Constness.Constant, name, new MetaValue(type));
       paramTypes.push(type);
     }
 
-    subContext.assignVariable(AssignType.Constant, new Identifier("this"), thisType);
+    subContext.addVariable(Constness.Constant, new Identifier("this"), new MetaValue(thisType));
 
     const bodyThunk = new ExpressionThunk(location, () => {
       const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
@@ -189,9 +199,9 @@ class Evaluator {
 
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(location, () => {
-        return new AssignmentExpression(location, AssignType.Constant, ast.name, funcThunk.get());
+        return new NewVariableExpression(location, Constness.Constant, ast.name, funcThunk.get());
       });
-      this.context.assignVariable(AssignType.Constant, ast.name, type);
+      this.context.addVariable(Constness.Constant, ast.name, new MetaValue(type));
       return thunk;
     } else {
       return funcThunk;
@@ -208,12 +218,12 @@ class Evaluator {
     const thunk = new ExpressionThunk(ast.location, () => {
       const expr = new ClassExpression(ast.location, ast.name);
       for (const memberAST of ast.members) {
-        const member = this.evaluateFunction(memberAST, expr.type);
+        const member = this.evaluateFunction(memberAST, expr.metaValue.type.get());
         expr.addMember(memberAST.name, member);
       }
       return expr;
     });
-    this.context.assignVariable(AssignType.Constant, ast.name, thunk.type);
+    this.context.addVariable(Constness.Constant, ast.name, new MetaValue(thunk.type));
     this.context.addType(ast.name, thunk.type);
     return thunk;
   }

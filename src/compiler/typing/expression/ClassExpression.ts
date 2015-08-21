@@ -4,6 +4,7 @@ import Type from "../Type";
 import {voidType} from "../nativeTypes";
 import CallSignature from "../CallSignature";
 import Thunk, {ExpressionThunk, TypeThunk} from "../Thunk";
+import MetaValue from "../MetaValue";
 import CompilationError from "../../common/CompilationError";
 import FunctionExpression from "./FunctionExpression";
 import SourceLocation from "../../common/SourceLocation";
@@ -19,12 +20,13 @@ class ClassExpression extends Expression {
     // TODO: superclass
     const superType = this.superType =  voidType;
 
-    const type = this.type = new Type(name.name, superType, location, this);
+    const type = new Type(name.name, superType, location, this);
+    this.metaValue = new MetaValue(type);
     type.newSignatures = [new CallSignature(voidType, [], type)];
   }
 
   addMember(name: Identifier, member: ExpressionThunk) {
-    const type = this.type;
+    const type = this.getType();
     type.addMember(name.name, member.type);
 
     const superMember = this.superType.getMember(name.name);

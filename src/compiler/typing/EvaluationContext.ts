@@ -3,7 +3,8 @@ import Type from "./Type";
 import {TypeThunk} from "./Thunk";
 import Identifier from "./Identifier";
 import CompilationError from "../common/CompilationError";
-import AssignType from "./AssignType";
+import Member, {Constness} from "./Member";
+import MetaValue from "./MetaValue";
 
 export default
 class EvaluationContext {
@@ -26,7 +27,7 @@ class EvaluationContext {
     return variable;
   }
 
-  assignToExistingVariable(name: Identifier, type: Type|TypeThunk) {
+  assignVariable(name: Identifier, metaValue: MetaValue) {
     const variable = this.environment.getVariable(name.name);
     if (!variable) {
       throw CompilationError.typeError(
@@ -34,50 +35,43 @@ class EvaluationContext {
         name.location
       );
     }
-    if (variable.assignType === AssignType.Constant) {
+    if (variable.constness === Constness.Constant) {
       throw CompilationError.typeError(
         `Variable '${name.name}' is constant and cannot be reassigned`,
         name.location
       );
     }
-    if (variable.assignType === AssignType.Builtin) {
+    if (variable.constness === Constness.Builtin) {
       throw CompilationError.typeError(
         `Variable '${name.name}' is builtin and cannot be reassigned`,
         name.location
       );
     }
-    const typeThunk = TypeThunk.resolve(type);
-    if (!typeThunk.get().isCastableTo(variable.type.get())) {
+    const type = metaValue.type.get();
+    const variableType = variable.metaValue.type.get();
+    if (!type.isCastableTo(variableType)) {
       throw CompilationError.typeError(
-        `Cannot assign '${type}' to type '${variable.type}'`,
+        `Cannot assign '${type}' to type '${variableType}'`,
         name.location
       );
     }
   }
 
-  assignVariable(assignType: AssignType, name: Identifier, type: Type|TypeThunk) {
-    if (assignType === AssignType.Assign) {
-      this.assignToExistingVariable(name, type);
+  addVariable(constness: Constness, name: Identifier, metaValue: MetaValue) {
+    const variable = this.environment.getVariable(name.name);
+    if (variable && variable.constness === Constness.Builtin) {
+      throw CompilationError.typeError(
+        `Variable '${name.name}' is builtin and cannot be redefined`,
+        name.location
+      );
     }
-    else {
-      const variable = this.environment.getVariable(name.name);
-      if (variable && variable.assignType === AssignType.Builtin) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' is builtin and cannot be redefined`,
-          name.location
-        );
-      }
-      if (this.environment.getOwnVariable(name.name)) {
-        throw CompilationError.typeError(
-          `Variable '${name.name}' already defined`,
-          name.location
-        );
-      }
-      this.environment.variables.set(name.name, {
-        type: TypeThunk.resolve(type),
-        assignType
-      });
+    if (this.environment.getOwnVariable(name.name)) {
+      throw CompilationError.typeError(
+        `Variable '${name.name}' already defined`,
+        name.location
+      );
     }
+    this.environment.variables.set(name.name, new Member(constness, metaValue));
   }
 
   addType(name: Identifier, type: TypeThunk|Type) {

@@ -2,6 +2,8 @@ import Type from "./Type";
 import {TypeThunk} from "./Thunk";
 import AssignType from "./AssignType";
 import {voidType} from "./nativeTypes";
+import Member, {Constness} from "./Member";
+import MetaValue from "./MetaValue";
 
 interface Variable {
   type: TypeThunk;
@@ -10,7 +12,7 @@ interface Variable {
 
 export default
 class Environment {
-  variables = new Map<string, Variable>();
+  variables = new Map<string, Member>();
   types = new Map<string, TypeThunk>();
 
   constructor(public parent: Environment = null) {
@@ -22,10 +24,7 @@ class Environment {
 
   addTempVariable(baseName: string) {
     const name = this.nonDuplicateVariableName(baseName);
-    this.variables.set(name, {
-      type: TypeThunk.resolve(voidType),
-      assignType: AssignType.Builtin
-    });
+    this.variables.set(name, new Member(Constness.Constant, new MetaValue(voidType)));
     return name;
   }
 
@@ -38,11 +37,11 @@ class Environment {
     }
   }
 
-  setVariable(name: string, variable: Variable) {
+  setVariable(name: string, variable: Member) {
     this.variables.set(name, variable);
   }
 
-  getVariable(name: string): Variable {
+  getVariable(name: string): Member {
     if (this.parent) {
       const parentVariable = this.parent.getVariable(name);
       if (parentVariable) {

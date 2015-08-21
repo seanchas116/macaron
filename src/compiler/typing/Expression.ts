@@ -1,34 +1,45 @@
 import {voidType, numberType, booleanType, stringType} from "./nativeTypes";
 import Type from "./Type";
 import UnionType from "./type/UnionType";
-import AssignType from "./AssignType";
 import Identifier from "./Identifier";
 import Operator from "./Operator";
 import {TypeThunk} from "./Thunk";
+import MetaValue from "./MetaValue";
+import {Constness} from "./Member";
 
 import SourceLocation from "../common/SourceLocation";
 import CompilationError from "../common/CompilationError";
 
 export default
 class Expression {
-  type = voidType;
+  metaValue = new MetaValue(voidType);
 
   constructor(public location: SourceLocation) {
+  }
+
+  getType() {
+    return this.metaValue.type.get();
   }
 }
 
 export
 class IdentifierExpression extends Expression {
-  constructor(public name: Identifier, public type: Type) {
+  constructor(public name: Identifier, public metaValue: MetaValue) {
     super(name.location);
   }
 }
 
 export
 class AssignmentExpression extends Expression {
-  constructor(location: SourceLocation, public assignType: AssignType, public assignable: Identifier, public value: Expression) {
+  constructor(location: SourceLocation, public assignable: Identifier, public value: Expression) {
     super(location);
-    this.type = value.type;
+  }
+}
+
+export
+class NewVariableExpression extends Expression {
+  constructor(location: SourceLocation, public constness: Constness, public assignable: Identifier, public value: Expression) {
+    super(location);
   }
 }
 
@@ -47,23 +58,24 @@ class FunctionCallExpression extends Expression {
     let selfType = voidType;
     if (!isNewCall) {
       if (func instanceof MemberAccessExpression) {
-        selfType = func.object.type;
+        selfType = func.object.getType();
       }
       if (func instanceof OperatorAccessExpression) {
-        selfType = func.object.type;
+        selfType = func.object.getType();
       }
     }
 
-    const sigs = isNewCall ? func.type.newSignatures : func.type.callSignatures;
-    const argTypes = args.map(a => a.type);
+    const funcType = func.getType();
+    const sigs = isNewCall ? funcType.newSignatures : funcType.callSignatures;
+    const argTypes = args.map(a => a.getType());
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes));
     if (!sig) {
       throw CompilationError.typeError(
-        `Type '${func.type}' cannot be called with ['${argTypes.join(",")}']`,
+        `Type '${funcType}' cannot be called with ['${argTypes.join(",")}']`,
         location
       );
     }
-    this.type = sig.returnType.get();
+    this.metaValue = new MetaValue(sig.returnType.get());
   }
 }
 
@@ -71,20 +83,19 @@ export
 class LiteralExpression extends Expression {
   constructor(location: SourceLocation, public value: any) {
     super(location);
-    switch (typeof value) {
-      case "number":
-        this.type = numberType;
-        break;
-      case "string":
-        this.type = stringType;
-        break;
-      case "boolean":
-        this.type = booleanType;
-        break;
-      default:
-        this.type = voidType;
-        break;
-    }
+    const type = (() => {
+      switch (typeof value) {
+        case "number":
+          return numberType;
+        case "string":
+          return stringType;
+        case "boolean":
+          return booleanType;
+        default:
+          return voidType;
+      }
+    })();
+    this.metaValue = new MetaValue(type);
   }
 }
 
@@ -92,7 +103,7 @@ export
 class ReturnExpression extends Expression {
   constructor(location: SourceLocation, public expression: Expression) {
     super(location);
-    this.type = expression.type;
+    this.metaValue = expression.metaValue;
   }
 }
 
@@ -100,14 +111,15 @@ export
 class MemberAccessExpression extends Expression {
   constructor(location: SourceLocation, public object: Expression , public member: Identifier) {
     super(location);
+    const objectType = object.getType();
 
-    if (!object.type.getMember(member.name)) {
+    if (!objectType.getMember(member.name)) {
       throw CompilationError.typeError(
-        `Type '${object.type}' don't have member '${member.name}'`,
+        `Type '${objectType}' don't have member '${member.name}'`,
         location
       );
     }
-    this.type = object.type.getMember(member.name).get();
+    this.metaValue = new MetaValue(objectType.getMember(member.name));
   }
 }
 
@@ -117,26 +129,27 @@ class OperatorAccessExpression extends Expression {
 
   constructor(location: SourceLocation, public object: Expression, operatorName: Identifier, arity: number) {
     super(location);
+    const objectType = object.getType();
     if (arity === 1) {
-      this.operator = object.type.getUnaryOperators().get(operatorName.name);
+      this.operator = objectType.getUnaryOperators().get(operatorName.name);
     } else if (arity === 2) {
-      this.operator = object.type.getBinaryOperators().get(operatorName.name);
+      this.operator = objectType.getBinaryOperators().get(operatorName.name);
     } else {
       throw new Error("unsupported arity");
     }
     if (!this.operator) {
       throw CompilationError.typeError(
-        `No operator '${operatorName.name}' for type '${object.type}'`,
+        `No operator '${operatorName.name}' for type '${objectType}'`,
         operatorName.location
       );
     }
-    this.type = this.operator.type.get();
+    this.metaValue = new MetaValue(this.operator.type.get());
   }
 }
 
 function blockType(block: Expression[]) {
   if (block.length > 0) {
-    return block[block.length - 1].type;
+    return block[block.length - 1].getType();
   } else {
     return voidType;
   }
@@ -146,6 +159,6 @@ export
 class IfExpression extends Expression {
   constructor(location: SourceLocation, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
     super(location);
-    this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], location);
+    this.metaValue = new MetaValue(new UnionType([blockType(ifTrue), blockType(ifFalse)], location));
   }
 }
