@@ -157,7 +157,12 @@ class Evaluator {
 
   evaluateIdentifier(ast: IdentifierAST) {
     const variable = this.context.getVariable(ast);
-    return new IdentifierExpression(ast, variable.metaValue);
+    const metaValue = variable.metaValue;
+    let literalValue: any = null;
+    if (variable.constness != Constness.Variable) {
+      literalValue = metaValue.literalValue;
+    }
+    return new IdentifierExpression(ast, new MetaValue(metaValue.type, literalValue));
   }
 
   evalauteLiteral(ast: LiteralAST) {
