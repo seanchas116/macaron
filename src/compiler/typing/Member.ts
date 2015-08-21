@@ -11,4 +11,7 @@ export default
 class Member {
   constructor(public constness: Constness, public metaValue: MetaValue) {
   }
+  getType() {
+    return this.metaValue.type.get();
+  }
 }

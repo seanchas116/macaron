@@ -119,7 +119,7 @@ class MemberAccessExpression extends Expression {
         location
       );
     }
-    this.metaValue = new MetaValue(objectType.getMember(member.name));
+    this.metaValue = objectType.getMember(member.name).metaValue;
   }
 }
 

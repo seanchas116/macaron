@@ -1,9 +1,10 @@
 import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
-import SourceLocation from "../common/SourceLocation";
+import Member from "./Member";
 import {TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
+import SourceLocation from "../common/SourceLocation";
 const HashMap = require("hashmap");
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
@@ -21,7 +22,7 @@ const castResults: Map<[Type, Type], boolean> = new HashMap();
 
 export default
 class Type {
-  selfMembers = new Map<string, TypeThunk>();
+  selfMembers = new Map<string, Member>();
   selfBinaryOperators = new Map<string, Operator>();
   selfUnaryOperators = new Map<string, Operator>();
   callSignatures: CallSignature[] = [];
@@ -35,11 +36,11 @@ class Type {
     return this.name;
   }
 
-  addMember(name: string, type: Type|TypeThunk) {
-    this.selfMembers.set(name, TypeThunk.resolve(type));
+  addMember(name: string, member: Member) {
+    this.selfMembers.set(name, member);
   }
 
-  getMember(name: string): TypeThunk {
+  getMember(name: string): Member {
     if (this.superType) {
       const member = this.superType.getMember(name);
       if (member) {
@@ -49,7 +50,7 @@ class Type {
     return this.selfMembers.get(name);
   }
 
-  getMembers(): Map<string, TypeThunk> {
+  getMembers(): Map<string, Member> {
     if (!this.superType) {
       return this.selfMembers;
     }
@@ -85,10 +86,14 @@ class Type {
     return result;
   }
 
+  equals(other: Type) {
+    return this.isCastableTo(other) && other.isCastableTo(this);
+  }
+
   private isCastableToImpl(other: Type) {
     for (const [name, member] of other.getMembers()) {
-      const thisMember = this.getMember(name).get();
-      if (!thisMember || !thisMember.isCastableTo(member.get())) {
+      const thisMember = this.getMember(name).getType();
+      if (!thisMember || !thisMember.isCastableTo(member.getType())) {
         return false;
       }
     }

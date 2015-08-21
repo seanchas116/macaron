@@ -224,7 +224,7 @@ class Evaluator {
       const expr = new ClassExpression(ast.location, ast.name);
       for (const memberAST of ast.members) {
         const member = this.evaluateFunction(memberAST, expr.metaValue.type.get());
-        expr.addMember(memberAST.name, member);
+        expr.addMember(Constness.Constant, memberAST.name, member);
       }
       return expr;
     });

@@ -22,7 +22,7 @@ class MethodOperator extends Operator {
   constructor(objType: Type|TypeThunk, public methodName: string) {
     super();
     const objTypeThunk = TypeThunk.resolve(objType);
-    this.type = new TypeThunk(objTypeThunk.location, () => objTypeThunk.get().getMember(methodName).get());
+    this.type = new TypeThunk(objTypeThunk.location, () => objTypeThunk.get().getMember(methodName).getType());
     if (!this.type) {
       throw new Error("no method found");
     }

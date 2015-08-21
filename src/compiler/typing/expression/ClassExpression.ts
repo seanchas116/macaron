@@ -5,6 +5,7 @@ import {voidType} from "../nativeTypes";
 import CallSignature from "../CallSignature";
 import Thunk, {ExpressionThunk, TypeThunk} from "../Thunk";
 import MetaValue from "../MetaValue";
+import Member, {Constness} from "../Member";
 import CompilationError from "../../common/CompilationError";
 import FunctionExpression from "./FunctionExpression";
 import SourceLocation from "../../common/SourceLocation";
@@ -25,12 +26,12 @@ class ClassExpression extends Expression {
     type.newSignatures = [new CallSignature(voidType, [], type)];
   }
 
-  addMember(name: Identifier, member: ExpressionThunk) {
+  addMember(constness: Constness, name: Identifier, member: ExpressionThunk) {
     const type = this.getType();
-    type.addMember(name.name, member.type);
+    type.addMember(name.name, new Member(constness, new MetaValue(member.type)));
 
     const superMember = this.superType.getMember(name.name);
-    if (superMember && !type.isCastableTo(superMember.get())) {
+    if (superMember && !type.isCastableTo(superMember.getType())) {
       throw CompilationError.typeError(
         `Type of "${name}" is not compatible to super types`,
         name.location

@@ -3,17 +3,27 @@ import {TypeThunk} from "../Thunk";
 import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
+import Member, {Constness} from "../Member";
+import MetaValue from "../MetaValue";
 
-function unionMembers(type: UnionType, members1: Map<string, TypeThunk>, members2: Map<string, TypeThunk>) {
-  const ret = new Map<string, TypeThunk>();
-  for (const [name, type1] of members1) {
+function unionMembers(type: UnionType, members1: Map<string, Member>, members2: Map<string, Member>) {
+  const ret = new Map<string, Member>();
+  for (const [name, member1] of members1) {
     if (!members2.has(name)) {
       continue;
     }
-    const type2 = members2.get(name);
-    ret.set(name, new TypeThunk(type.location, () => {
-      return new UnionType([type1.get(), type2.get()], type.location);
-    }));
+    const member2 = members2.get(name);
+    if (member1.constness == Constness.Variable || member2.constness == Constness.Variable) {
+      // nonvariant
+      if (member1.getType().equals(member2.getType())) {
+        ret.set(name, new Member(Constness.Variable, new MetaValue(member1.getType())));
+      }
+    }
+
+    const unionType = new TypeThunk(type.location, () => {
+      return new UnionType([member1.getType(), member2.getType()], type.location);
+    });
+    ret.set(name, new Member(Constness.Constant, new MetaValue(unionType)));
   }
   return ret;
 }
@@ -83,7 +93,7 @@ class UnionType extends Type {
 
     this.selfMembers = types.reduce((members, type) => {
       return unionMembers(this, members, type.getMembers());
-    }, new Map<string, TypeThunk>());
+    }, new Map<string, Member>());
 
     this.selfUnaryOperators = types.reduce((operators, type) => {
       return unionOperators(this, operators, type.getUnaryOperators());
