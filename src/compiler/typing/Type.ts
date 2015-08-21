@@ -1,7 +1,7 @@
 import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
-import Member from "./Member";
+import Member, {Constness} from "./Member";
 import {TypeThunk} from "./Thunk";
 import {voidType} from "./nativeTypes";
 import SourceLocation from "../common/SourceLocation";
@@ -91,10 +91,22 @@ class Type {
   }
 
   private isCastableToImpl(other: Type) {
-    for (const [name, member] of other.getMembers()) {
-      const thisMember = this.getMember(name).getType();
-      if (!thisMember || !thisMember.isCastableTo(member.getType())) {
+    for (const [name, memberOther] of other.getMembers()) {
+      const memberThis = this.getMember(name);
+      if (!memberThis) {
         return false;
+      }
+      if (memberOther.constness == Constness.Variable) {
+        // nonvariant
+        if (!memberThis.getType().equals(memberOther.getType())) {
+          return false;
+        }
+      }
+      else {
+        // covariant
+        if (!memberThis.getType().isCastableTo(memberOther.getType())) {
+          return false;
+        }
       }
     }
     if (!CallSignature.isCastableTo(this.callSignatures, other.callSignatures)) {
