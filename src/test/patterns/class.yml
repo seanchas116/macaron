@@ -39,3 +39,19 @@
     let foo = new Foo()
     foo.foo(1, 2)
   expected: 3
+
+- title: inheritance
+  src: |
+    class Foo {
+      foo(x number, y number) {
+        x + y
+      }
+    }
+    class Bar : Bar {
+      bar(x number, y number, z number) {
+        x + y + z
+      }
+    }
+    let bar = new Bar()
+    bar.foo(1, 2) + bar.bar(3, 4, 5)
+  expected: 15
