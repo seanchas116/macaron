@@ -1,5 +1,4 @@
 import Environment from "./Environment";
-import AssignType from "./AssignType";
 import Identifier from "./Identifier";
 import {
   numberType,

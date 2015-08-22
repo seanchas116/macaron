@@ -17,8 +17,6 @@ import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression"
 import ClassExpression from "../typing/expression/ClassExpression";
 
 import {Constness} from "../typing/Member";
-
-import AssignType from "../typing/AssignType";
 import Identifier from "../typing/Identifier";
 
 export default

@@ -1,14 +1,8 @@
 import Type from "./Type";
 import TypeThunk from "./thunk/TypeThunk";
-import AssignType from "./AssignType";
 import {voidType} from "./nativeTypes";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
-
-interface Variable {
-  type: TypeThunk;
-  assignType: AssignType;
-}
 
 export default
 class Environment {

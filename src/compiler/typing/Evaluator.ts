@@ -30,7 +30,6 @@ import FunctionExpression from "./expression/FunctionExpression";
 import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 import ClassExpression from "./expression/ClassExpression";
 
-import AssignType from "./AssignType";
 import Identifier from "./Identifier";
 import Type from "./Type";
 import TypeThunk from "./thunk/TypeThunk";
