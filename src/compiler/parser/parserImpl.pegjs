@@ -292,7 +292,7 @@ Block
 }
 
 Parameter
-  = name:Identifier type:TypeExpression
+  = name:Identifier type:Expression
 {
   return new AST.ParameterAST(currentLocation(), name, type);
 }
@@ -320,7 +320,7 @@ Function
 }
 
 NamedFunction
-  = FuncKeyword name:Identifier parameters:ParameterList returnType:TypeExpression? expressions:Block
+  = FuncKeyword name:Identifier parameters:ParameterList returnType:Expression? expressions:Block
 {
   return new AST.FunctionAST(currentLocation(), name, parameters, returnType, expressions, true);
 }
@@ -354,13 +354,4 @@ ClassMethod
   = name:Identifier _ params:ParameterList _ exps:Block _
 {
   return new AST.FunctionAST(currentLocation(), name, params, null, exps);
-}
-
-TypeExpression
-  = TypeIdentifier
-
-TypeIdentifier
-  = str:IdentifierString _
-{
-  return new AST.TypeIdentifierAST(currentLocation(), str);
 }

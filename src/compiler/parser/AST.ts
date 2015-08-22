@@ -26,7 +26,7 @@ class BinaryAST extends ExpressionAST {
 
 export
 class FunctionAST extends ExpressionAST {
-  constructor(location: SourceLocation, public name: IdentifierAST, public parameters: ParameterAST[], public returnType: TypeExpressionAST, public expressions: ExpressionAST[], public addAsVariable = false) {
+  constructor(location: SourceLocation, public name: IdentifierAST, public parameters: ParameterAST[], public returnType: ExpressionAST, public expressions: ExpressionAST[], public addAsVariable = false) {
     super(location);
   }
 }
@@ -81,7 +81,7 @@ class OperatorAST extends AST {
 export
 class ParameterAST extends AST {
   // FIXME: support type more than Identifier
-  constructor(location: SourceLocation, public name: IdentifierAST, public type: TypeExpressionAST) {
+  constructor(location: SourceLocation, public name: IdentifierAST, public type: ExpressionAST) {
     super(location);
   }
 }
@@ -96,17 +96,6 @@ class UnaryAST extends ExpressionAST {
 export
 class ClassAST extends ExpressionAST {
   constructor(location: SourceLocation, public name: IdentifierAST, public members: FunctionAST[]) {
-    super(location);
-  }
-}
-
-export
-class TypeExpressionAST extends ExpressionAST {
-}
-
-export
-class TypeIdentifierAST extends TypeExpressionAST {
-  constructor(location: SourceLocation, public name: string) {
     super(location);
   }
 }

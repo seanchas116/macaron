@@ -11,8 +11,6 @@ import {
   ClassAST,
   MemberAccessAST,
   IfAST,
-  TypeExpressionAST,
-  TypeIdentifierAST,
 } from "../parser/AST";
 
 import Expression, {
@@ -262,16 +260,8 @@ class Evaluator {
     return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
   }
 
-  evaluateTypeImpl(ast: TypeExpressionAST): MetaValue {
-    if (ast instanceof TypeIdentifierAST) {
-      return this.evaluateTypeIdentifier(ast);
-    }
-    else {
-      throw new Error(`Not supported AST: ${ast.constructor.name}`);
-    }
-  }
-  evaluateType(ast: TypeExpressionAST) {
-    const metaValue = this.evaluateTypeImpl(ast);
+  evaluateType(ast: ExpressionAST) {
+    const metaValue = this.evaluate(ast).get().metaValue;
     if (!metaValue.metaType) {
       throw CompilationError.typeError(
         `Expression does not represent type`,
@@ -279,9 +269,5 @@ class Evaluator {
       );
     }
     return metaValue.metaType;
-  }
-
-  evaluateTypeIdentifier(ast: TypeIdentifierAST) {
-    return this.evaluateIdentifier(ast).metaValue;
   }
 }
