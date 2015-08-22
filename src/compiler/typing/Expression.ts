@@ -143,7 +143,7 @@ class OperatorAccessExpression extends Expression {
         operatorName.location
       );
     }
-    this.metaValue = new MetaValue(this.operator.type.get());
+    this.metaValue = new MetaValue(this.operator.type);
   }
 }
 

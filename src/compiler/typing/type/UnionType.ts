@@ -37,12 +37,12 @@ function unionOperators(type: UnionType, operators1: Map<string, Operator>, oper
     const op2 = operators2.get(name);
     if (op1 instanceof MethodOperator && op2 instanceof MethodOperator) {
       if (op1.methodName == op2.methodName) {
-        ret.set(name, new MethodOperator(TypeThunk.resolve(type), op1.methodName));
+        ret.set(name, new MethodOperator(type, op1.methodName));
       }
     }
     else if (op1 instanceof NativeOperator && op2 instanceof NativeOperator) {
       if (op1.nativeOperatorName === op2.nativeOperatorName) {
-        ret.set(name, new NativeOperator(op1.nativeOperatorName, TypeThunk.resolve(type)));
+        ret.set(name, new NativeOperator(op1.nativeOperatorName, type));
       }
     }
   }
