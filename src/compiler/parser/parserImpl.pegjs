@@ -331,10 +331,16 @@ ArgumentList
   return args;
 }
 
-Class
-  = ClassKeyword name:Identifier __ "{" __ members:ClassMembers "}" _
+Superclass
+  = ":" _ superclass:Expression
 {
-  return new AST.ClassAST(currentLocation(), name, members);
+  return superclass;
+}
+
+Class
+  = ClassKeyword name:Identifier superclass: Superclass? __ "{" __ members:ClassMembers "}" _
+{
+  return new AST.ClassAST(currentLocation(), name, superclass, members);
 }
 
 ClassMembers

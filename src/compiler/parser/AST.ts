@@ -95,7 +95,7 @@ class UnaryAST extends ExpressionAST {
 
 export
 class ClassAST extends ExpressionAST {
-  constructor(location: SourceLocation, public name: IdentifierAST, public members: FunctionAST[]) {
+  constructor(location: SourceLocation, public name: IdentifierAST, public superclass: ExpressionAST, public members: FunctionAST[]) {
     super(location);
   }
 }
