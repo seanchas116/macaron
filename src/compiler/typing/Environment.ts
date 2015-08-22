@@ -1,5 +1,5 @@
 import Type from "./Type";
-import {TypeThunk} from "./Thunk";
+import TypeThunk from "./thunk/TypeThunk";
 import AssignType from "./AssignType";
 import {voidType} from "./nativeTypes";
 import Member, {Constness} from "./Member";
@@ -13,7 +13,6 @@ interface Variable {
 export default
 class Environment {
   variables = new Map<string, Member>();
-  types = new Map<string, TypeThunk>();
 
   constructor(public parent: Environment = null) {
   }
@@ -52,22 +51,5 @@ class Environment {
   }
   getOwnVariable(name: string) {
     return this.variables.get(name);
-  }
-
-  setType(name: string, type: Type|TypeThunk) {
-    this.types.set(name, TypeThunk.resolve(type));
-  }
-
-  getType(name: string): TypeThunk {
-    if (this.parent) {
-      const parentType = this.parent.getType(name);
-      if (parentType) {
-        return parentType;
-      }
-    }
-    return this.getOwnType(name);
-  }
-  getOwnType(name: string) {
-    return this.types.get(name);
   }
 }

@@ -3,7 +3,7 @@ import Type from "./Type";
 import UnionType from "./type/UnionType";
 import Identifier from "./Identifier";
 import Operator from "./Operator";
-import {TypeThunk} from "./Thunk";
+import TypeThunk from "./thunk/TypeThunk";
 import MetaValue from "./MetaValue";
 import {Constness} from "./Member";
 

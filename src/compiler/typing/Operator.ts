@@ -1,6 +1,6 @@
 import CallSignature from "./CallSignature";
 import Type from "./Type";
-import {TypeThunk} from "./Thunk";
+import TypeThunk from "./thunk/TypeThunk";
 import {voidType} from "./nativeTypes";
 
 export default

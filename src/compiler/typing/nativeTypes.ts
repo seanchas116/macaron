@@ -9,6 +9,9 @@ import {
 import CallSignature from "./CallSignature";
 
 export
+const typeOnlyType = new Type("[type]");
+
+export
 const anyType = new Type("any");
 
 export

@@ -33,7 +33,8 @@ import ClassExpression from "./expression/ClassExpression";
 import AssignType from "./AssignType";
 import Identifier from "./Identifier";
 import Type from "./Type";
-import {ExpressionThunk, TypeThunk} from "./Thunk";
+import TypeThunk from "./thunk/TypeThunk";
+import ExpressionThunk from "./thunk/ExpressionThunk";
 import {voidType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
@@ -228,8 +229,8 @@ class Evaluator {
       }
       return expr;
     });
-    this.context.addVariable(Constness.Constant, ast.name, new MetaValue(thunk.type));
-    this.context.addType(ast.name, thunk.type);
+    // TODO: fix class type
+    this.context.addVariable(Constness.Constant, ast.name, new MetaValue(thunk.type, null, thunk.type));
     return thunk;
   }
 

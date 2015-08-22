@@ -1,10 +1,11 @@
 import Environment from "./Environment";
 import Type from "./Type";
-import {TypeThunk} from "./Thunk";
+import TypeThunk from "./thunk/TypeThunk";
 import Identifier from "./Identifier";
 import CompilationError from "../common/CompilationError";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
+import {typeOnlyType} from "./nativeTypes";
 
 export default
 class EvaluationContext {
@@ -75,21 +76,15 @@ class EvaluationContext {
   }
 
   addType(name: Identifier, type: TypeThunk|Type) {
-    if (this.environment.getOwnType(name.name)) {
-      throw CompilationError.typeError(
-        `Type '${name.name}' already defined`,
-        name.location
-      );
-    }
-
-    this.environment.types.set(name.name, TypeThunk.resolve(type));
+    this.addVariable(Constness.Constant, name, new MetaValue(typeOnlyType, null, type));
   }
 
   getType(name: Identifier) {
-    const type = this.environment.getType(name.name);
+    const variable = this.getVariable(name);
+    const type = variable.metaValue.metaType;
     if (!type) {
       throw CompilationError.typeError(
-        `Type '${name.name}' already defined`,
+        `'${name.name}' is not a type`,
         name.location
       );
     }

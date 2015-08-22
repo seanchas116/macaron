@@ -6,9 +6,10 @@ import {
   booleanType,
   stringType,
   voidType,
-  initNativeTypes
+  initNativeTypes,
+  typeOnlyType,
 } from "./nativeTypes";
-import {TypeThunk} from "./Thunk";
+import TypeThunk from "./thunk/TypeThunk";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
 
@@ -18,11 +19,11 @@ function defaultEnvironment() {
 
   const env = new Environment();
 
-  env.setType("number", numberType);
-  env.setType("boolean", booleanType);
-  env.setType("string", stringType);
-  env.setType("void", voidType);
-  env.setType("any", voidType);
+  env.setVariable("number", new Member(Constness.Constant, new MetaValue(typeOnlyType, null, numberType)));
+  env.setVariable("boolean", new Member(Constness.Constant, new MetaValue(typeOnlyType, null, booleanType)));
+  env.setVariable("string", new Member(Constness.Constant, new MetaValue(typeOnlyType, null, stringType)));
+  env.setVariable("void", new Member(Constness.Constant, new MetaValue(typeOnlyType, null, voidType)));
+  env.setVariable("any", new Member(Constness.Constant, new MetaValue(typeOnlyType, null, voidType)));
 
   env.setVariable("true", new Member(Constness.Builtin, new MetaValue(booleanType, true)));
   env.setVariable("false", new Member(Constness.Builtin, new MetaValue(booleanType, false)));

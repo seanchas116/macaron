@@ -1,5 +1,5 @@
 import Type from "../Type";
-import {TypeThunk} from "../Thunk";
+import TypeThunk from "../thunk/TypeThunk";
 import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";

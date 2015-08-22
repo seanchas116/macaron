@@ -42,6 +42,8 @@
         "./src/compiler/typing/expression/FunctionBodyExpression.ts",
         "./src/compiler/typing/expression/FunctionExpression.ts",
         "./src/compiler/typing/nativeTypes.ts",
+        "./src/compiler/typing/thunk/ExpressionThunk.ts",
+        "./src/compiler/typing/thunk/TypeThunk.ts",
         "./src/compiler/typing/type/FunctionType.ts",
         "./src/compiler/typing/type/TupleType.ts",
         "./src/compiler/typing/type/UnionType.ts",
