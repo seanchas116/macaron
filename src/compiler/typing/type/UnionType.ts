@@ -59,9 +59,7 @@ function unionCallSignatures(type: UnionType, signatures1: CallSignature[], sign
   for (const sig1 of signatures1) {
     for (const sig2 of signatures2) {
       if (deepEqual(sig1.params, sig2.params) && sig1.selfType === sig2.selfType) {
-        const returnType = new TypeThunk(type.location, () => {
-          return new UnionType([sig1.returnType.get(), sig2.returnType.get()], type.location);
-        });
+        const returnType = new UnionType([sig1.returnType, sig2.returnType], type.location);
         signatures.push(new CallSignature(sig1.selfType, sig1.params, returnType));
       }
     }

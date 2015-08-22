@@ -75,7 +75,7 @@ class FunctionCallExpression extends Expression {
         location
       );
     }
-    this.metaValue = new MetaValue(sig.returnType.get());
+    this.metaValue = new MetaValue(sig.returnType);
   }
 }
 

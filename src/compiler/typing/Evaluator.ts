@@ -193,20 +193,35 @@ class Evaluator {
       const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
       return new FunctionBodyExpression(location, body);
     });
-    const type = new Type("function", voidType);
-    const returnType = ast.returnType ? subEvaluator.evaluateType(ast.returnType) : bodyThunk.type;
-    const callSig = new CallSignature(thisType, paramTypes, returnType);
-    type.callSignatures.push(callSig);
+
+    const createType = (returnType: Type) => {
+      const type = new Type("function", voidType);
+      const callSig = new CallSignature(thisType, paramTypes, returnType);
+      type.callSignatures.push(callSig);
+      return type;
+    }
+
+    let typeThunk: TypeThunk;
+    if (ast.returnType) {
+      const returnType = subEvaluator.evaluateType(ast.returnType).get();
+      typeThunk = TypeThunk.resolve(createType(returnType));
+    }
+    else {
+      typeThunk = new TypeThunk(ast.location, () => {
+        const returnType = bodyThunk.type.get();
+        return createType(returnType);
+      });
+    }
 
     const funcThunk = new ExpressionThunk(location, () => {
-      return new FunctionExpression(location, ast.name, type, ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
+      return new FunctionExpression(location, ast.name, typeThunk.get(), ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
     });
 
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(location, () => {
         return new NewVariableExpression(location, Constness.Constant, ast.name, funcThunk.get());
       });
-      this.context.addVariable(Constness.Constant, ast.name, new MetaValue(type));
+      this.context.addVariable(Constness.Constant, ast.name, new MetaValue(typeThunk));
       return thunk;
     } else {
       return funcThunk;
