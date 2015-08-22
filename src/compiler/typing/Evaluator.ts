@@ -241,7 +241,7 @@ class Evaluator {
     const thunk = new ExpressionThunk(ast.location, () => {
       const expr = new ClassExpression(ast.location, ast.name);
       for (const memberAST of ast.members) {
-        const member = this.evaluateFunction(memberAST, expr.metaValue.type);
+        const member = this.evaluateFunction(memberAST, expr.selfType);
         expr.addMember(Constness.Constant, memberAST.name, member);
       }
       return expr;
