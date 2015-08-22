@@ -1,10 +1,10 @@
 import Type from "../Type";
-import TypeThunk from "../thunk/TypeThunk";
 import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
 import Member, {Constness} from "../Member";
 import MetaValue from "../MetaValue";
+import MetaValueThunk from "../thunk/MetaValueThunk";
 
 function unionMembers(type: UnionType, members1: Map<string, Member>, members2: Map<string, Member>) {
   const ret = new Map<string, Member>();
@@ -20,10 +20,11 @@ function unionMembers(type: UnionType, members1: Map<string, Member>, members2: 
       }
     }
 
-    const unionType = new TypeThunk(type.location, () => {
-      return new UnionType([member1.getType(), member2.getType()], type.location);
+    const unionMetaValue = new MetaValueThunk(type.location, () => {
+      const unionType = new UnionType([member1.getType(), member2.getType()], type.location);
+      return new MetaValue(unionType);
     });
-    ret.set(name, new Member(Constness.Constant, new MetaValue(unionType)));
+    ret.set(name, new Member(Constness.Constant, unionMetaValue));
   }
   return ret;
 }

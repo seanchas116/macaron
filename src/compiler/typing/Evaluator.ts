@@ -32,12 +32,12 @@ import ClassExpression from "./expression/ClassExpression";
 
 import Identifier from "./Identifier";
 import Type from "./Type";
-import TypeThunk from "./thunk/TypeThunk";
 import ExpressionThunk from "./thunk/ExpressionThunk";
 import {voidType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
+import MetaValueThunk from "./thunk/MetaValueThunk";
 
 import CompilationError from "../common/CompilationError";
 import SourceLocation from "../common/SourceLocation";
@@ -157,12 +157,13 @@ class Evaluator {
 
   evaluateIdentifier(ast: IdentifierAST) {
     const variable = this.context.getVariable(ast);
-    const metaValue = variable.metaValue;
+    const metaValue = variable.metaValue.get();
+
     let literalValue: any = null;
     if (variable.constness != Constness.Variable) {
       literalValue = metaValue.literalValue;
     }
-    return new IdentifierExpression(ast, new MetaValue(metaValue.type, literalValue));
+    return new IdentifierExpression(ast, new MetaValue(metaValue.type, literalValue, metaValue.metaType));
   }
 
   evalauteLiteral(ast: LiteralAST) {
@@ -182,7 +183,7 @@ class Evaluator {
     const subEvaluator = new Evaluator(subContext);
 
     for (const {name, type: typeExpr} of ast.parameters) {
-      const type = subEvaluator.evaluateType(typeExpr).get();
+      const type = subEvaluator.evaluateType(typeExpr);
       subContext.addVariable(Constness.Constant, name, new MetaValue(type));
       paramTypes.push(type);
     }
@@ -201,27 +202,29 @@ class Evaluator {
       return type;
     }
 
-    let typeThunk: TypeThunk;
+    let metaValueThunk: MetaValueThunk;
     if (ast.returnType) {
-      const returnType = subEvaluator.evaluateType(ast.returnType).get();
-      typeThunk = TypeThunk.resolve(createType(returnType));
+      const returnType = subEvaluator.evaluateType(ast.returnType);
+      const type = createType(returnType);
+      metaValueThunk = MetaValueThunk.resolve(new MetaValue(type));
     }
     else {
-      typeThunk = new TypeThunk(ast.location, () => {
-        const returnType = bodyThunk.type.get();
-        return createType(returnType);
+      metaValueThunk = new MetaValueThunk(ast.location, () => {
+        const returnType = bodyThunk.get().metaValue.type;
+        const type = createType(returnType);
+        return new MetaValue(type);
       });
     }
 
     const funcThunk = new ExpressionThunk(location, () => {
-      return new FunctionExpression(location, ast.name, typeThunk.get(), ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
+      return new FunctionExpression(location, ast.name, metaValueThunk.get().type, ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
     });
 
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(location, () => {
         return new NewVariableExpression(location, Constness.Constant, ast.name, funcThunk.get());
       });
-      this.context.addVariable(Constness.Constant, ast.name, new MetaValue(typeThunk));
+      this.context.addVariable(Constness.Constant, ast.name, metaValueThunk);
       return thunk;
     } else {
       return funcThunk;
@@ -238,13 +241,12 @@ class Evaluator {
     const thunk = new ExpressionThunk(ast.location, () => {
       const expr = new ClassExpression(ast.location, ast.name);
       for (const memberAST of ast.members) {
-        const member = this.evaluateFunction(memberAST, expr.metaValue.type.get());
+        const member = this.evaluateFunction(memberAST, expr.metaValue.type);
         expr.addMember(Constness.Constant, memberAST.name, member);
       }
       return expr;
     });
-    // TODO: fix class type
-    this.context.addVariable(Constness.Constant, ast.name, new MetaValue(thunk.type, null, thunk.type));
+    this.context.addVariable(Constness.Constant, ast.name, thunk.metaValue);
     return thunk;
   }
 
@@ -260,7 +262,7 @@ class Evaluator {
     return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
   }
 
-  evaluateType(ast: TypeExpressionAST): TypeThunk {
+  evaluateTypeImpl(ast: TypeExpressionAST): MetaValue {
     if (ast instanceof TypeIdentifierAST) {
       return this.evaluateTypeIdentifier(ast);
     }
@@ -268,8 +270,18 @@ class Evaluator {
       throw new Error(`Not supported AST: ${ast.constructor.name}`);
     }
   }
+  evaluateType(ast: TypeExpressionAST) {
+    const metaValue = this.evaluateTypeImpl(ast);
+    if (!metaValue.metaType) {
+      throw CompilationError.typeError(
+        `Expression does not represent type`,
+        ast.location
+      );
+    }
+    return metaValue.metaType;
+  }
 
   evaluateTypeIdentifier(ast: TypeIdentifierAST) {
-    return this.context.getType(ast);
+    return this.evaluateIdentifier(ast).metaValue;
   }
 }

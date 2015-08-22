@@ -17,7 +17,7 @@ class Expression {
   }
 
   getType() {
-    return this.metaValue.type.get();
+    return this.metaValue.type;
   }
 }
 
@@ -118,7 +118,7 @@ class MemberAccessExpression extends Expression {
         location
       );
     }
-    this.metaValue = objectType.getMember(member.name).metaValue;
+    this.metaValue = objectType.getMember(member.name).metaValue.get();
   }
 }
 

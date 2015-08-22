@@ -4,7 +4,6 @@ import Type from "../Type";
 import {voidType} from "../nativeTypes";
 import CallSignature from "../CallSignature";
 import Thunk from "../Thunk";
-import TypeThunk from "../thunk/TypeThunk";
 import ExpressionThunk from "../thunk/ExpressionThunk";
 import MetaValue from "../MetaValue";
 import Member, {Constness} from "../Member";
@@ -23,6 +22,7 @@ class ClassExpression extends Expression {
     // TODO: superclass
     const superType = this.superType =  voidType;
 
+    // TODO: fix class type
     const type = new Type(name.name, superType, location, this);
     this.metaValue = new MetaValue(type);
     type.newSignatures = [new CallSignature(voidType, [], type)];
@@ -30,7 +30,7 @@ class ClassExpression extends Expression {
 
   addMember(constness: Constness, name: Identifier, member: ExpressionThunk) {
     const type = this.getType();
-    type.addMember(name.name, new Member(constness, new MetaValue(member.type)));
+    type.addMember(name.name, new Member(constness, member.metaValue));
 
     const superMember = this.superType.getMember(name.name);
     if (superMember && !type.isCastableTo(superMember.getType())) {
@@ -41,7 +41,7 @@ class ClassExpression extends Expression {
     }
 
     if (name.name === "constructor") {
-      type.newSignatures = member.type.get().callSignatures.map(sig => {
+      type.newSignatures = member.metaValue.get().type.callSignatures.map(sig => {
         return new CallSignature(voidType, sig.params, type);
       });
     }

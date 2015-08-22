@@ -1,4 +1,5 @@
 import MetaValue from "./MetaValue";
+import MetaValueThunk from "./thunk/MetaValueThunk";
 
 export
 enum Constness {
@@ -9,9 +10,12 @@ enum Constness {
 
 export default
 class Member {
-  constructor(public constness: Constness, public metaValue: MetaValue) {
+  metaValue: MetaValueThunk;
+
+  constructor(public constness: Constness, metaValue: MetaValue|MetaValueThunk) {
+    this.metaValue = MetaValueThunk.resolve(metaValue);
   }
   getType() {
-    return this.metaValue.type.get();
+    return this.metaValue.get().type;
   }
 }
