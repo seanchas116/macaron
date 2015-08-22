@@ -2,7 +2,6 @@ import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
 import Member, {Constness} from "./Member";
-import TypeThunk from "./thunk/TypeThunk";
 import SourceLocation from "../common/SourceLocation";
 const HashMap = require("hashmap");
 

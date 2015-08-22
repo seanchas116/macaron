@@ -1,5 +1,4 @@
 import Type from "./Type";
-import TypeThunk from "./thunk/TypeThunk";
 import {voidType} from "./nativeTypes";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";

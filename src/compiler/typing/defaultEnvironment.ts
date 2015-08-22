@@ -1,5 +1,4 @@
 import Environment from "./Environment";
-import Identifier from "./Identifier";
 import {
   numberType,
   booleanType,
@@ -8,7 +7,6 @@ import {
   initNativeTypes,
   typeOnlyType,
 } from "./nativeTypes";
-import TypeThunk from "./thunk/TypeThunk";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
 
