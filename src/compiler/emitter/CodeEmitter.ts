@@ -129,8 +129,12 @@ class CodeEmitter {
       .map(member => member.get())
       .map(member => emitter.emitClassMember(member))
       .join("\n");
+    let superclass = "";
+    if (expr.superExpression) {
+      superclass = " extends " + this.emitExpression(expr.superExpression);
+    }
 
-    return `class ${expr.name.name} {\n${body}\n}`;
+    return `class ${expr.name.name}${superclass} {\n${body}\n}`;
   }
 
   emitFunctionCall(expr: FunctionCallExpression) {

@@ -14,20 +14,27 @@ import SourceLocation from "../../common/SourceLocation";
 export default
 class ClassExpression extends Expression {
   members: ExpressionThunk[] = [];
-  superType: Type;
   classType: Type;
+  superType: Type;
   selfType: Type;
 
-  constructor(location: SourceLocation, public name: Identifier) {
+  constructor(location: SourceLocation, public name: Identifier, public superExpression: Expression) {
     super(location);
 
-    // TODO: superclass
-    const superType = this.superType = voidType;
+    let superType: Type;
+    if (superExpression) {
+      superType = superExpression.metaValue.metaType;
+    }
+    else {
+      // TODO: superType must be Object
+      superType = voidType;
+    }
+    this.superType = superType;
 
     const type = this.selfType = new Type(name.name, superType, location, this);
 
     // TODO: class type must inherit Function
-    const classType = this.classType = new Type(`${name.name} class`, voidType);
+    const classType = this.classType = new Type(`${name.name} class`, superType);
     classType.newSignatures = [new CallSignature(voidType, [], type)];
 
     this.metaValue = new MetaValue(classType, null, type);
@@ -37,7 +44,8 @@ class ClassExpression extends Expression {
     const type = this.selfType;
     type.addMember(name.name, new Member(constness, member.metaValue));
 
-    const superMember = this.superType.getMember(name.name);
+    const superType = this.superType;
+    const superMember = superType.getMember(name.name);
     if (superMember && !type.isCastableTo(superMember.getType())) {
       throw CompilationError.typeError(
         `Type of "${name.name}" is not compatible to super types`,

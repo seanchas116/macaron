@@ -47,7 +47,7 @@
         x + y
       }
     }
-    class Bar : Bar {
+    class Bar : Foo {
       bar(x number, y number, z number) {
         x + y + z
       }

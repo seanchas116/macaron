@@ -31,7 +31,7 @@ import ClassExpression from "./expression/ClassExpression";
 import Identifier from "./Identifier";
 import Type from "./Type";
 import ExpressionThunk from "./thunk/ExpressionThunk";
-import {voidType} from "./nativeTypes";
+import {voidType, typeOnlyType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
@@ -237,13 +237,27 @@ class Evaluator {
 
   evaluateClass(ast: ClassAST) {
     const thunk = new ExpressionThunk(ast.location, () => {
-      const expr = new ClassExpression(ast.location, ast.name);
+      let superExpr: Expression;
+      if (ast.superclass) {
+        console.log(ast.superclass);
+        superExpr = this.evaluate(ast.superclass).get();
+        const superValue = superExpr.metaValue;
+        if (superValue.type == typeOnlyType || !superValue.metaType) {
+          throw CompilationError.typeError(
+            `Superclass is not a class`,
+            ast.superclass.location
+          );
+        }
+      }
+
+      const expr = new ClassExpression(ast.location, ast.name, superExpr);
       for (const memberAST of ast.members) {
         const member = this.evaluateFunction(memberAST, expr.selfType);
         expr.addMember(Constness.Constant, memberAST.name, member);
       }
       return expr;
     });
+
     this.context.addVariable(Constness.Constant, ast.name, thunk.metaValue);
     return thunk;
   }
