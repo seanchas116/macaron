@@ -48,12 +48,12 @@
         "./src/compiler/typing/type/UnionType.ts",
         "./src/test/compilerTest.ts",
         "./src/test/support/loadPattern.ts",
-        "./typings/bundle.d.ts",
         "./typings/empower/empower.d.ts",
         "./typings/mocha/mocha.d.ts",
         "./typings/node/node.d.ts",
         "./typings/power-assert-formatter/power-assert-formatter.d.ts",
-        "./typings/power-assert/power-assert.d.ts"
+        "./typings/power-assert/power-assert.d.ts",
+        "./typings/tsd.d.ts"
     ],
     "compileOnSave": true
 }

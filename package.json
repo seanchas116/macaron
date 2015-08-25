@@ -20,7 +20,7 @@
     "mocha": "^2.2.5",
     "pegjs": "^0.8.0",
     "power-assert": "^0.11.0",
-    "typescript": "git://github.com/Microsoft/TypeScript.git#92f152cb8e9f132234727da9882763f08e13ec34"
+    "typescript": "^1.6.0-dev.20150824"
   },
   "dependencies": {
     "hashmap": "^2.0.3",
