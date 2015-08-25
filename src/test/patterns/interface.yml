@@ -1,0 +1,17 @@
+- title: interface OK
+  src: |
+    interface Foo {
+      foo(x number, y number)
+    }
+    class Bar {
+      foo(x number, y number) {
+        x + y
+      }
+      bar(x string, y string) {
+        x + y
+      }
+    }
+    var foo Foo
+    foo = new Bar()
+    foo.foo(1, 2)
+  expected: 3
