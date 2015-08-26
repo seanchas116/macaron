@@ -1,4 +1,4 @@
-import Parser from "../parser/Parser";
+import Parser from "../parser/MacaronParser";
 import defaultEnviromnent from "../typing/defaultEnvironment";
 import Evaluator from "../typing/Evaluator";
 import EvaluationContext from "../typing/EvaluationContext";

@@ -4,7 +4,7 @@ import SourceLocation from "../common/SourceLocation";
 const parser = require("./parserImpl");
 
 export default
-class Parser {
+class MacaronParser {
   constructor(public source: string) {
   }
 
