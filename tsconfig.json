@@ -24,6 +24,7 @@
         "./src/compiler/emitter/CodeEmitter.ts",
         "./src/compiler/parser/AST.ts",
         "./src/compiler/parser/MacaronParser.ts",
+        "./src/compiler/parser/parser/Parser.ts",
         "./src/compiler/typing/CallSignature.ts",
         "./src/compiler/typing/Environment.ts",
         "./src/compiler/typing/EvaluationContext.ts",
