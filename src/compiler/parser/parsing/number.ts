@@ -1,4 +1,4 @@
-import {LiteralAST} from "../../AST";
+import {LiteralAST} from "../AST";
 import {choose, sequence, string, regExp} from "../Parser";
 
 const parseFloatFrac =

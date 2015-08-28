@@ -1,4 +1,4 @@
-import BaseError from "../../common/BaseError";
+import BaseError from "../common/BaseError";
 
 export
 class Position {

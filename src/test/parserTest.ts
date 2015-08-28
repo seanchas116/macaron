@@ -1,4 +1,4 @@
-import parseNumber from "../compiler/parser/parser/literal/parseNumber";
+import parseNumber from "../compiler/parser/parsing/number";
 import assert from "power-assert";
 
 describe("Parser", () => {
