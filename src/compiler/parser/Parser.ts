@@ -229,10 +229,10 @@ function string(text: string): Parser<string> {
 
 // /[0-9a-zA-Z]/
 export
-function regExp(regExp: string): Parser<string> {
+function regExp(regExp: RegExp): Parser<string> {
   return new Parser(state => {
     const substr = state.substring(1);
-    if (substr.match(new RegExp(`[${regExp}]`))) {
+    if (substr.match(regExp)) {
       return new Success(state.proceed(1), substr);
     }
     else {

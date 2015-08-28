@@ -4,17 +4,17 @@ import {choose, sequence, string, regExp} from "../Parser";
 const parseFloatFrac =
   sequence<any>(
     string("."),
-    regExp("0-9").repeat(1)
+    regExp(/[0-9]/).repeat(1)
   );
 
 const parseFloatExp =
   sequence<any>(
-    regExp("eE"),
+    regExp(/[eE]/),
     string("-").mayBe(),
-    regExp("0-9").repeat(1)
+    regExp(/[0-9]/).repeat(1)
   );
 
-const parseDecimalInt = regExp("0-9").repeat(1);
+const parseDecimalInt = regExp(/[0-9]/).repeat(1);
 
 const parseFloat =
   sequence<any>(
@@ -28,7 +28,7 @@ const parseFloat =
 const parseHexInt =
   sequence<any>(
     string("0x"),
-    regExp("0-9a-fA-F").repeat(1)
+    regExp(/[0-9a-fA-F]/).repeat(1)
   )
     .text()
     .map(text => Number.parseInt(text.slice(2), 16));
@@ -36,7 +36,7 @@ const parseHexInt =
 const parseBinaryInt =
   sequence<any>(
     string("0b"),
-    regExp("01").repeat(1)
+    regExp(/[01]/).repeat(1)
   )
     .text()
     .map(text => Number.parseInt(text.slice(2), 2));
