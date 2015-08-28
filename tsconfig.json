@@ -16,6 +16,7 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./src/compiler/common/BaseError.ts",
         "./src/compiler/common/CompilationError.ts",
         "./src/compiler/common/ErrorInfo.ts",
         "./src/compiler/common/ErrorType.ts",
@@ -25,6 +26,7 @@
         "./src/compiler/parser/AST.ts",
         "./src/compiler/parser/MacaronParser.ts",
         "./src/compiler/parser/parser/Parser.ts",
+        "./src/compiler/parser/parser/literal/parseNumber.ts",
         "./src/compiler/typing/CallSignature.ts",
         "./src/compiler/typing/Environment.ts",
         "./src/compiler/typing/EvaluationContext.ts",
@@ -48,6 +50,7 @@
         "./src/compiler/typing/type/TupleType.ts",
         "./src/compiler/typing/type/UnionType.ts",
         "./src/test/compilerTest.ts",
+        "./src/test/parserTest.ts",
         "./src/test/support/loadPattern.ts",
         "./typings/empower/empower.d.ts",
         "./typings/mocha/mocha.d.ts",

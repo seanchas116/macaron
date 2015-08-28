@@ -1,25 +1,17 @@
 import SourceLocation from "./SourceLocation";
 import ErrorInfo from "./ErrorInfo";
 import ErrorType from "./ErrorType";
-import * as util from "util";
+import BaseError from "./BaseError";
 
-// TODO: extends Error
 export default
-class CompilationError implements Error {
+class CompilationError extends BaseError {
   name = "TypeCheckError";
-  message: string;
-  error: Error;
-
-  get stack() {
-    return this.error["stack"];
-  }
 
   constructor(public infos: ErrorInfo[]) {
-    const message = "\n" + infos.map(info => {
+    super();
+    this.message = "\n" + infos.map(info => {
       return `${info.location}: ${info.message}`;
     }).join("\n");
-    this.error = new Error(message);
-    this.message = this.error.message;
   }
 
   static typeError(message: string, location: SourceLocation) {
@@ -34,5 +26,3 @@ class CompilationError implements Error {
     ])
   }
 }
-
-util.inherits(CompilationError, Error);
