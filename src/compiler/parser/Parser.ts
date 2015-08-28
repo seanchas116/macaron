@@ -240,3 +240,14 @@ function regExp(regExp: string): Parser<string> {
     }
   });
 }
+
+export
+const anyChar = new Parser<string>(state => {
+  const substr = state.substring(1);
+  if (substr.length === 1) {
+    return new Success(state.proceed(1), substr);
+  }
+  else {
+    return new Failure(state, ["/./"]);
+  }
+});

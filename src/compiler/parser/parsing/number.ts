@@ -41,9 +41,8 @@ const parseBinaryInt =
     .text()
     .map(text => Number.parseInt(text.slice(2), 2));
 
-const parseNumber =
+export
+const parseNumberAST =
   choose(parseBinaryInt, parseHexInt, parseFloat)
     .withRange()
     .map(([num, range]) => new LiteralAST(range.begin, num));
-
-export default parseNumber;
