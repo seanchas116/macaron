@@ -1,5 +1,6 @@
 import {
   ExpressionAST,
+  NewVariableAST,
   AssignmentAST,
   UnaryAST,
   BinaryAST,
@@ -75,7 +76,9 @@ class Evaluator {
   }
 
   private evaluateImpl(ast: ExpressionAST): Expression|ExpressionThunk {
-    if (ast instanceof AssignmentAST) {
+    if (ast instanceof NewVariableAST) {
+      return this.evaluateNewVariable(ast);
+    } else if (ast instanceof AssignmentAST) {
       return this.evaluateAssignment(ast);
     }
     else if (ast instanceof UnaryAST) {
@@ -114,28 +117,30 @@ class Evaluator {
     return ExpressionThunk.resolve(this.evaluateImpl(ast));
   }
 
+  evaluateNewVariable(ast: NewVariableAST) {
+    const varName = ast.left.name;
+    const right = this.evaluate(ast.right).get();
+
+    const constness = (() => {
+      switch (ast.declaration) {
+      case "let":
+        return Constness.Constant;
+      case "var":
+        return Constness.Variable;
+      default:
+        throw new Error(`not supported declaration: ${ast.declaration}`);
+      }
+    })();
+    this.context.addVariable(constness, ast.left, right.metaValue);
+    return new NewVariableExpression(ast.location, constness, ast.left, right);
+  }
+
   evaluateAssignment(ast: AssignmentAST) {
     const varName = ast.left.name;
     const right = this.evaluate(ast.right).get();
 
-    if (ast.declaration) {
-      const constness = (() => {
-        switch (ast.declaration) {
-        case "let":
-          return Constness.Constant;
-        case "var":
-          return Constness.Variable;
-        default:
-          throw new Error(`not supported declaration: ${ast.declaration}`);
-        }
-      })();
-      this.context.addVariable(constness, ast.left, right.metaValue);
-      return new NewVariableExpression(ast.location, constness, ast.left, right);
-    }
-    else {
-      this.context.assignVariable(ast.left, right.metaValue);
-      return new AssignmentExpression(ast.location, ast.left, right);
-    }
+    this.context.assignVariable(ast.left, right.metaValue);
+    return new AssignmentExpression(ast.location, ast.left, right);
   }
 
   evaluateUnary(ast: UnaryAST) {

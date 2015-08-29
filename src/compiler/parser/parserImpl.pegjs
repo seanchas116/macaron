@@ -114,23 +114,19 @@ BinaryOperator
   = op:(
     "**" / "*" / "/" / "%" / "+" / "-" / "<<" / ">>>" / ">>" /
     "<" / "<=" / ">" / ">=" / "==" / "!=" / "^" / "||" / "&&" / "|" / "&"
-    )
+    ) _
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
 
 UnaryOperator
-  = op:("+" / "-" / "~" / "!")
+  = op:("+" / "-" / "~" / "!") _
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
 
-DeclarationKeyword
-  = "let"
-  / "var"
-
 AssignmentOperator
-  = op:"="
+  = op:"=" _
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
@@ -162,15 +158,22 @@ NewKeyword = "new" _
 FuncKeyword = "func" _
 
 Expression
-  = expr:AssignmentExpression _
+  = expr:NewVariableExpression _
 {
   return expr;
 }
 
-AssignmentExpression
-  = declaration:DeclarationKeyword? _ left:Assignable _ operator:AssignmentOperator _ right:AssignmentExpression
+NewVariableExpression
+  = declaration:("let" / "var") _ left:Assignable "=" _ right:NewVariableExpression
 {
-  return new AST.AssignmentAST(currentLocation(), declaration, left, operator, right);
+  return new AST.NewVariableAST(currentLocation(), declaration, left, right);
+}
+  / AssignmentExpression
+
+AssignmentExpression
+  = left:Assignable operator:AssignmentOperator right:AssignmentExpression
+{
+  return new AST.AssignmentAST(currentLocation(), left, operator, right);
 }
   / BinaryExpression
 
