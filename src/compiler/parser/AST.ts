@@ -99,3 +99,10 @@ class ClassAST extends ExpressionAST {
     super(location);
   }
 }
+
+export
+class InterfaceAST extends ExpressionAST {
+  constructor(location: SourceLocation, public name: IdentifierAST, public superTypes: ExpressionAST[], public members: FunctionAST[]) {
+    super(location);
+  }
+}

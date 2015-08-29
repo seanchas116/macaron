@@ -253,7 +253,7 @@ Parentheses
 }
 
 Literal
-  = NumberLiteral / StringLiteral / Function / NamedFunction / Class
+  = NumberLiteral / StringLiteral / Function / NamedFunction / Class / Interface
 
 // TODO: parse other than integer
 NumberLiteral
@@ -357,7 +357,38 @@ ClassMember
   = ClassMethod
 
 ClassMethod
-  = name:Identifier _ params:ParameterList _ exps:Block _
+  = name:Identifier _ params:ParameterList returnType:Expression? exps:Block
 {
-  return new AST.FunctionAST(currentLocation(), name, params, null, exps);
+  return new AST.FunctionAST(currentLocation(), name, params, returnType, exps);
+}
+
+SuperTypes
+  = ":" _ types:Lines
+{
+  return types;
+}
+
+Interface
+  = "interface" _ name:Identifier superTypes: SuperTypes? __ "{" __ members:MemberDeclarations "}" _
+{
+  return new AST.InterfaceAST(currentLocation(), name, superTypes, members);
+}
+
+MemberDeclarations
+  = first:MemberDeclaration rest:(___ MemberDeclaration)* __
+{
+  if (first) {
+    return [first, ...rest.map(l => l[1])];
+  } else {
+    return [];
+  }
+}
+
+MemberDeclaration =
+  MethodDeclaration
+
+MethodDeclaration
+  = name:Identifier _ params:ParameterList returnType:Expression
+{
+  return new AST.FunctionAST(currentLocation(), name, params, returnType, null);
 }
