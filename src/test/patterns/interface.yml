@@ -11,7 +11,6 @@
         x + y
       }
     }
-    var foo Foo
-    foo = new Bar()
+    let foo Foo = new Bar()
     foo.foo(1, 2)
   expected: 3
