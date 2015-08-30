@@ -164,9 +164,9 @@ Expression
 }
 
 NewVariableExpression
-  = declaration:("let" / "var") _ left:Assignable "=" _ right:NewVariableExpression
+  = declaration:("let" / "var") _ left:Assignable type:BinaryExpression? "=" _ right:NewVariableExpression
 {
-  return new AST.NewVariableAST(currentLocation(), declaration, left, right);
+  return new AST.NewVariableAST(currentLocation(), declaration, type, left, right);
 }
   / AssignmentExpression
 

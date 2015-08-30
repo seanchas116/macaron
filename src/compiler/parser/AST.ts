@@ -19,7 +19,7 @@ class AssignmentAST extends ExpressionAST {
 
 export
 class NewVariableAST extends ExpressionAST {
-  constructor(location: SourceLocation, public declaration: String, public left: IdentifierAST, public right: ExpressionAST) {
+  constructor(location: SourceLocation, public declaration: String, public type: ExpressionAST, public left: IdentifierAST, public right: ExpressionAST) {
     super(location);
   }
 }
