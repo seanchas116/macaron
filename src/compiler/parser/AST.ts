@@ -12,7 +12,14 @@ class ExpressionAST extends AST {
 
 export
 class AssignmentAST extends ExpressionAST {
-  constructor(location: SourceLocation, public declaration: String, public left: IdentifierAST, public operator: OperatorAST, public right: ExpressionAST) {
+  constructor(location: SourceLocation, public left: IdentifierAST, public operator: OperatorAST, public right: ExpressionAST) {
+    super(location);
+  }
+}
+
+export
+class NewVariableAST extends ExpressionAST {
+  constructor(location: SourceLocation, public declaration: String, public type: ExpressionAST, public left: IdentifierAST, public right: ExpressionAST) {
     super(location);
   }
 }
@@ -96,6 +103,13 @@ class UnaryAST extends ExpressionAST {
 export
 class ClassAST extends ExpressionAST {
   constructor(location: SourceLocation, public name: IdentifierAST, public superclass: ExpressionAST, public members: FunctionAST[]) {
+    super(location);
+  }
+}
+
+export
+class InterfaceAST extends ExpressionAST {
+  constructor(location: SourceLocation, public name: IdentifierAST, public superTypes: ExpressionAST[], public members: FunctionAST[]) {
     super(location);
   }
 }

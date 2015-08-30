@@ -114,23 +114,19 @@ BinaryOperator
   = op:(
     "**" / "*" / "/" / "%" / "+" / "-" / "<<" / ">>>" / ">>" /
     "<" / "<=" / ">" / ">=" / "==" / "!=" / "^" / "||" / "&&" / "|" / "&"
-    )
+    ) _
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
 
 UnaryOperator
-  = op:("+" / "-" / "~" / "!")
+  = op:("+" / "-" / "~" / "!") _
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
 
-DeclarationKeyword
-  = "let"
-  / "var"
-
 AssignmentOperator
-  = op:"="
+  = op:"=" _
 {
   return new AST.OperatorAST(currentLocation(), op);
 }
@@ -162,15 +158,22 @@ NewKeyword = "new" _
 FuncKeyword = "func" _
 
 Expression
-  = expr:AssignmentExpression _
+  = expr:NewVariableExpression _
 {
   return expr;
 }
 
-AssignmentExpression
-  = declaration:DeclarationKeyword? _ left:Assignable _ operator:AssignmentOperator _ right:AssignmentExpression
+NewVariableExpression
+  = declaration:("let" / "var") _ left:Assignable type:BinaryExpression? "=" _ right:NewVariableExpression
 {
-  return new AST.AssignmentAST(currentLocation(), declaration, left, operator, right);
+  return new AST.NewVariableAST(currentLocation(), declaration, type, left, right);
+}
+  / AssignmentExpression
+
+AssignmentExpression
+  = left:Assignable operator:AssignmentOperator right:AssignmentExpression
+{
+  return new AST.AssignmentAST(currentLocation(), left, operator, right);
 }
   / BinaryExpression
 
@@ -253,7 +256,7 @@ Parentheses
 }
 
 Literal
-  = NumberLiteral / StringLiteral / Function / NamedFunction / Class
+  = NumberLiteral / StringLiteral / Function / NamedFunction / Class / Interface
 
 // TODO: parse other than integer
 NumberLiteral
@@ -357,7 +360,38 @@ ClassMember
   = ClassMethod
 
 ClassMethod
-  = name:Identifier _ params:ParameterList _ exps:Block _
+  = name:Identifier _ params:ParameterList returnType:Expression? exps:Block
 {
-  return new AST.FunctionAST(currentLocation(), name, params, null, exps);
+  return new AST.FunctionAST(currentLocation(), name, params, returnType, exps);
+}
+
+SuperTypes
+  = ":" _ types:Lines
+{
+  return types;
+}
+
+Interface
+  = "interface" _ name:Identifier superTypes: SuperTypes? __ "{" __ members:MemberDeclarations "}" _
+{
+  return new AST.InterfaceAST(currentLocation(), name, superTypes, members);
+}
+
+MemberDeclarations
+  = first:MemberDeclaration rest:(___ MemberDeclaration)* __
+{
+  if (first) {
+    return [first, ...rest.map(l => l[1])];
+  } else {
+    return [];
+  }
+}
+
+MemberDeclaration =
+  MethodDeclaration
+
+MethodDeclaration
+  = name:Identifier _ params:ParameterList returnType:Expression
+{
+  return new AST.FunctionAST(currentLocation(), name, params, returnType, null);
 }
