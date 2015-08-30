@@ -1,6 +1,7 @@
 import {
   ExpressionAST,
   MemberAccessAST,
+  IdentifierAST
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
@@ -10,10 +11,16 @@ import {parseIdentifier} from "./identifier";
 
 export
 var parseMemberAccess = lazy(() =>
-  sequence(
-    parseValue,
-    keyword(".").thenTake(parseIdentifier)
+  choose(
+    sequence(
+      parseValue,
+      keyword(".").thenTake(parseIdentifier)
+    )
+      .withRange()
+      .map(([[obj, member], range]) => new MemberAccessAST(range.begin, obj, member)),
+    keyword("@").thenTake(parseIdentifier)
+      .withRange()
+      .map(([member, range]) => new MemberAccessAST(range.begin, new IdentifierAST(range.begin, "this"), member)),
+    parseValue
   )
-    .withRange()
-    .map(([[obj, member], range]) => new MemberAccessAST(range.begin, obj, member))
 );
