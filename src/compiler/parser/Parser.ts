@@ -173,6 +173,13 @@ class Parser<T> {
       }
     });
   }
+
+  thenSkip<U>(parser: Parser<U>) {
+    return sequence(this, parser).map(([a, b]) => a);
+  }
+  thenTake<U>(parser: Parser<U>) {
+    return sequence(this, parser).map(([a, b]) => b);
+  }
 }
 
 export function sequence<T0>(p0: Parser<T0>): Parser<[T0]>
@@ -235,27 +242,35 @@ function string(text: string): Parser<string> {
   });
 }
 
-// /[0-9a-zA-Z]/
 export
-function regExp(regExp: RegExp): Parser<string> {
+function testChar(test: (char: string) => boolean, expected: string[]): Parser<string> {
   return new Parser(state => {
     const substr = state.substring(1);
-    if (substr.match(regExp)) {
+    if (test(substr)) {
       return new Success(state.proceed(1), substr);
     }
     else {
-      return new Failure(state, [regExp.toString()]);
+      return new Failure(state, expected);
     }
   });
 }
 
+// /[0-9a-zA-Z]/
 export
-const anyChar = new Parser<string>(state => {
-  const substr = state.substring(1);
-  if (substr.length === 1) {
-    return new Success(state.proceed(1), substr);
-  }
-  else {
-    return new Failure(state, ["/./"]);
-  }
-});
+function regExp(re: RegExp): Parser<string> {
+  return testChar(c => !!c.match(re), [re.toString()]);
+}
+
+export
+const anyChar = testChar((c) => c.length == 1, ["[any character]"]);
+
+export
+function lazy<T>(get: () => Parser<T>) {
+  let parser: Parser<T>;
+  return new Parser(state => {
+    if (!parser) {
+      parser = get();
+    }
+    return parser.parseFrom(state);
+  });
+}

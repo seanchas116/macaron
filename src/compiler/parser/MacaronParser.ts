@@ -1,7 +1,9 @@
 import {ExpressionAST} from "../parser/AST";
 import CompilationError from "../common/CompilationError";
 import SourceLocation from "../common/SourceLocation";
-const parser = require("./parserImpl");
+import {SyntaxError} from "./Parser";
+import {parseLines} from "./parsing/block";
+//const parser = require("./parserImpl");
 
 export default
 class MacaronParser {
@@ -10,13 +12,13 @@ class MacaronParser {
 
   parse() {
     try {
-      return parser.parse(this.source);
+      return parseLines.parse(this.source);
     }
     catch (error) {
-      if (error.name == "SyntaxError") {
+      if (error instanceof SyntaxError) {
         throw CompilationError.syntaxError(
           error.message,
-          new SourceLocation(error.line, error.column, error.offset)
+          error.position
         );
       } else {
         throw error;

@@ -17,7 +17,7 @@ const parseString2 =
   sequence(string('"'), parseString2Char.repeat(), string('"')).text();
 
 export
-const parseStringAST =
+const parseStringLiteral =
   choose(parseString1, parseString2)
     .text()
     .withRange()

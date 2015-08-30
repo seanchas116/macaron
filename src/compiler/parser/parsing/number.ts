@@ -42,7 +42,7 @@ const parseBinaryInt =
     .map(text => Number.parseInt(text.slice(2), 2));
 
 export
-const parseNumberAST =
+const parseNumberLiteral =
   choose(parseBinaryInt, parseHexInt, parseFloat)
     .withRange()
     .map(([num, range]) => new LiteralAST(range.begin, num));
