@@ -2,13 +2,13 @@ import {LiteralAST} from "../AST";
 import {choose, sequence, string, regExp} from "../Parser";
 
 const parseFloatFrac =
-  sequence<any>(
+  sequence(
     string("."),
     regExp(/[0-9]/).repeat(1)
   );
 
 const parseFloatExp =
-  sequence<any>(
+  sequence(
     regExp(/[eE]/),
     string("-").mayBe(),
     regExp(/[0-9]/).repeat(1)
@@ -17,7 +17,7 @@ const parseFloatExp =
 const parseDecimalInt = regExp(/[0-9]/).repeat(1);
 
 const parseFloat =
-  sequence<any>(
+  sequence(
     parseDecimalInt,
     parseFloatFrac.mayBe(),
     parseFloatExp.mayBe()
@@ -26,7 +26,7 @@ const parseFloat =
     .map(Number.parseFloat);
 
 const parseHexInt =
-  sequence<any>(
+  sequence(
     string("0x"),
     regExp(/[0-9a-fA-F]/).repeat(1)
   )
@@ -34,7 +34,7 @@ const parseHexInt =
     .map(text => Number.parseInt(text.slice(2), 16));
 
 const parseBinaryInt =
-  sequence<any>(
+  sequence(
     string("0b"),
     regExp(/[01]/).repeat(1)
   )

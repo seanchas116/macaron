@@ -11,10 +11,10 @@ const parseString2Char =
   choose(parseEscaped, regExp(/[^"]/));
 
 const parseString1 =
-  sequence<any>(string("'"), parseString1Char.repeat(), string("'")).text();
+  sequence(string("'"), parseString1Char.repeat(), string("'")).text();
 
 const parseString2 =
-  sequence<any>(string('"'), parseString2Char.repeat(), string('"')).text();
+  sequence(string('"'), parseString2Char.repeat(), string('"')).text();
 
 export
 const parseStringAST =

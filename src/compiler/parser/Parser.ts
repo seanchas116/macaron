@@ -175,11 +175,19 @@ class Parser<T> {
   }
 }
 
-// parser1 / parser2 / ...
+export function sequence<T0>(p0: Parser<T0>): Parser<[T0]>
+export function sequence<T0, T1>(p0: Parser<T0>, p1: Parser<T1>): Parser<[T0, T1]>
+export function sequence<T0, T1, T2>(p0: Parser<T0>, p1: Parser<T1>, p2: Parser<T2>): Parser<[T0, T1, T2]>
+export function sequence<T0, T1, T2, T3>(p0: Parser<T0>, p1: Parser<T1>, p2: Parser<T2>, p3: Parser<T3>): Parser<[T0, T1, T2, T3]>
+export function sequence<T0, T1, T2, T3, T4>(p0: Parser<T0>, p1: Parser<T1>, p2: Parser<T2>, p3: Parser<T3>, p4: Parser<T4>): Parser<[T0, T1, T2, T3, T4]>
+export function sequence<T0, T1, T2, T3, T4, T5>(p0: Parser<T0>, p1: Parser<T1>, p2: Parser<T2>, p3: Parser<T3>, p4: Parser<T4>, p5: Parser<T5>): Parser<[T0, T1, T2, T3, T4, T5]>
+export function sequence<T0, T1, T2, T3, T4, T5, T6>(p0: Parser<T0>, p1: Parser<T1>, p2: Parser<T2>, p3: Parser<T3>, p4: Parser<T4>, p5: Parser<T5>, p6: Parser<T6>): Parser<[T0, T1, T2, T3, T4, T5, T6]>
+export function sequence<T0, T1, T2, T3, T4, T5, T6, T7>(p0: Parser<T0>, p1: Parser<T1>, p2: Parser<T2>, p3: Parser<T3>, p4: Parser<T4>, p5: Parser<T5>, p6: Parser<T6>, p7: Parser<T7>): Parser<[T0, T1, T2, T3, T4, T5, T6, T7]>
+
 export
-function sequence<T>(...parsers: Parser<T>[]): Parser<T[]> {
+function sequence(...parsers: any[]): Parser<any> {
   return new Parser(state => {
-    const values: T[] = [];
+    const values: any[] = [];
 
     for (const parser of parsers) {
       const result = parser.parseFrom(state);
