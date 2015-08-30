@@ -4,6 +4,9 @@ export
 class Position {
   constructor(public index: number, public line: number, public column: number) {
   }
+  toString() {
+    return `${this.line}:${this.column} [${this.index}]`;
+  }
 }
 
 export
@@ -14,7 +17,7 @@ class Range {
 
 export
 class State {
-  constructor(public text: string, public position: Position) {
+  constructor(public text: string, public position: Position, public trace: boolean) {
   }
 
   substring(length: number) {
@@ -35,7 +38,7 @@ class State {
       this.position.line + proceedLines.length - 1,
       proceedLines[proceedLines.length - 1].length + 1
     );
-    return new State(this.text, newPos);
+    return new State(this.text, newPos, this.trace);
   }
 }
 
@@ -43,11 +46,17 @@ export
 class Success<T> {
   constructor(public state: State, public value: T) {
   }
+  toString() {
+    return `[Success position=${this.state.position} value=${this.value}]`;
+  }
 }
 
 export
 class Failure {
   constructor(public state: State, public expected: string[]) {
+  }
+  toString() {
+    return `[Failure position=${this.state.position} expected=[${this.expected}]`;
   }
 }
 
@@ -65,17 +74,25 @@ class SyntaxError extends BaseError {
 export
 type Result<T> = Success<T> | Failure;
 
+interface ParserOpts {
+
+}
+
 export default
 class Parser<T> {
   constructor(private _parse: (state: State) => Result<T>) {
   }
 
   parseFrom(state: State) {
-    return this._parse(state);
+    const result = this._parse(state);
+    if (state.trace) {
+      console.log(result.toString());
+    }
+    return result;
   }
 
-  parse(text: string) {
-    const state = new State(text, new Position(0, 1, 1));
+  parse(text: string, trace = false) {
+    const state = new State(text, new Position(0, 1, 1), trace);
     const result = this.parseFrom(state);
     if (result instanceof Success) {
       if (result.state.position.index == text.length) {
