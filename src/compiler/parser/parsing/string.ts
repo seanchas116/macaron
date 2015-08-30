@@ -11,14 +11,17 @@ const parseString2Char =
   choose(parseEscaped, regExp(/[^"]/));
 
 const parseString1 =
-  sequence(string("'"), parseString1Char.repeat(), string("'")).text();
+  string("'")
+    .thenTake(parseString1Char.repeat().text())
+    .thenSkip(string("'"));
 
 const parseString2 =
-  sequence(string('"'), parseString2Char.repeat(), string('"')).text();
+  string('"')
+    .thenTake(parseString2Char.repeat().text())
+    .thenSkip(string('"'));
 
 export
 const parseStringLiteral =
   choose(parseString1, parseString2)
-    .text()
     .withRange()
     .map(([str, range]) => new LiteralAST(range.begin, str));
