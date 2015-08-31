@@ -1,5 +1,6 @@
 import {LiteralAST} from "../AST";
 import {choose, sequence, string, regExp, anyChar} from "../Parser";
+import {_} from "./common";
 
 const parseEscaped =
   string("\\").then(() => anyChar);
@@ -23,5 +24,6 @@ const parseString2 =
 export
 const parseStringLiteral =
   choose(parseString1, parseString2)
+    .thenSkip(_)
     .withRange()
     .map(([str, range]) => new LiteralAST(range.begin, str));

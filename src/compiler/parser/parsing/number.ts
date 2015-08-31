@@ -1,5 +1,6 @@
 import {LiteralAST} from "../AST";
 import {choose, sequence, string, regExp} from "../Parser";
+import {_} from "./common";
 
 const parseFloatFrac =
   sequence(
@@ -44,5 +45,6 @@ const parseBinaryInt =
 export
 const parseNumberLiteral =
   choose(parseBinaryInt, parseHexInt, parseFloat)
+    .thenSkip(_)
     .withRange()
     .map(([num, range]) => new LiteralAST(range.begin, num));
