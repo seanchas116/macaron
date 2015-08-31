@@ -23,8 +23,9 @@ const parseIdentifierTail = regExp(/[a-zA-Z$_0-9]/);
 
 export
 var parseIdentifier = lazy(() =>
-  sequence(parseIdentifierHead, parseIdentifierTail.repeat()).thenSkip(_)
+  sequence(parseIdentifierHead, parseIdentifierTail.repeat())
     .text()
     .withRange()
+    .thenSkip(_)
     .map(([text, range]) => new IdentifierAST(range.begin, text))
 );
