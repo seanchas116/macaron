@@ -1,15 +1,17 @@
+import {ExpressionAST} from "../AST";
 import {choose, lazy} from "../Parser";
 import {keyword} from "./common";
 import {parseExpression} from "./expression";
 import {parseIdentifier} from "./identifier";
 import {parseNumberLiteral} from "./number";
 import {parseStringLiteral} from "./string";
+import {parseFunction} from "./function";
 
 var parseLiteral = lazy(() =>
-  choose(
+  choose<ExpressionAST>(
     parseNumberLiteral,
-    parseStringLiteral
-    // TODO
+    parseStringLiteral,
+    parseFunction
   )
 );
 

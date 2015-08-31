@@ -32,6 +32,7 @@
         "./src/compiler/parser/parsing/common.ts",
         "./src/compiler/parser/parsing/control.ts",
         "./src/compiler/parser/parsing/expression.ts",
+        "./src/compiler/parser/parsing/function.ts",
         "./src/compiler/parser/parsing/functionCall.ts",
         "./src/compiler/parser/parsing/identifier.ts",
         "./src/compiler/parser/parsing/memberAccess.ts",

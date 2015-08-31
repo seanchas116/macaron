@@ -3,16 +3,11 @@ import {
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
-import {_, __, ___, keyword} from "./common";
+import {_, __, ___, keyword, separated} from "./common";
 import {parseExpression} from "./expression";
 
 export
-var parseLines =
-  sequence(
-    __.thenTake(parseExpression.mayBe()),
-    ___.thenTake(parseExpression).repeat().thenSkip(__)
-  )
-  .map(([first, rest]) => first ? [first].concat(rest) : []);
+var parseLines = separated(parseExpression);
 
 export
 var parseBlock =
