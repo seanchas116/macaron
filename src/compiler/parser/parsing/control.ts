@@ -14,7 +14,7 @@ var parseIfExpression: Parser<ExpressionAST> = lazy(() =>
     sequence(
       parseExpression,
       parseBlock,
-      parseElse
+      parseElse.mayBe()
     )
       .withRange()
       .map(([[cond, ifTrue, ifFalse], range]) => new IfAST(range.begin, cond, ifTrue, ifFalse || []))
