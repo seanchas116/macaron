@@ -24,7 +24,7 @@ var parseNewVariable: Parser<ExpressionAST> = lazy(() =>
       choose(keyword("let"), keyword("var")),
       parseAssisgnable,
       parseExpression.mayBe(),
-      parseNewVariable
+      keyword("=").thenTake(parseNewVariable)
     )
       .withRange()
       .map(([[declaration, left, type, right], range]) => new NewVariableAST(range.begin, declaration, type, left, right)),
