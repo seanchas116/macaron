@@ -160,7 +160,7 @@ class Parser<T> {
   }
 
   mayBe() {
-    return this.repeat(0, 1);
+    return this.repeat(0, 1).map(xs => xs[0]);
   }
 
   withRange(): Parser<[T, Range]> {

@@ -3,8 +3,8 @@ import {
 } from "../AST";
 
 import Parser, {lazy} from "../Parser";
-import {parseAssignment} from "./assignment";
+import {parseNewVariable} from "./assignment";
 
 export
 const parseExpression: Parser<ExpressionAST> =
-  lazy(() => parseAssignment);
+  lazy(() => parseNewVariable);

@@ -1,17 +1,35 @@
 import {
   ExpressionAST,
-  AssignmentAST
+  AssignmentAST,
+  NewVariableAST
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
+import {parseExpression} from "./expression";
 import {parseOperator, parseBinaryExpression} from "./operator";
 import {parseIdentifier} from "./identifier";
+import {keyword} from "./common";
 
 const parseAssignmentOperator = parseOperator(["="]);
 
 export
 var parseAssisgnable = lazy(() =>
   parseIdentifier
+);
+
+export
+var parseNewVariable: Parser<ExpressionAST> = lazy(() =>
+  choose(
+    sequence(
+      choose(keyword("let"), keyword("var")),
+      parseAssisgnable,
+      parseExpression.mayBe(),
+      parseNewVariable
+    )
+      .withRange()
+      .map(([[declaration, left, type, right], range]) => new NewVariableAST(range.begin, declaration, type, left, right)),
+    parseAssignment
+  )
 );
 
 export

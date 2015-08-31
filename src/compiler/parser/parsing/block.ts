@@ -12,7 +12,7 @@ var parseLines =
     __.thenTake(parseExpression.mayBe()),
     ___.thenTake(parseExpression).repeat().thenSkip(__)
   )
-  .map(([first, rest]) => first.concat(rest));
+  .map(([first, rest]) => first ? [first].concat(rest) : []);
 
 export
 var parseBlock =
