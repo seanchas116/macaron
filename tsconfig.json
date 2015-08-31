@@ -29,6 +29,7 @@
         "./src/compiler/parser/operators.ts",
         "./src/compiler/parser/parsing/assignment.ts",
         "./src/compiler/parser/parsing/block.ts",
+        "./src/compiler/parser/parsing/class.ts",
         "./src/compiler/parser/parsing/common.ts",
         "./src/compiler/parser/parsing/control.ts",
         "./src/compiler/parser/parsing/expression.ts",

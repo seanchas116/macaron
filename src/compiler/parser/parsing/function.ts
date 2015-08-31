@@ -17,6 +17,7 @@ var parseParameter = lazy(() =>
     .map(([[name, type], range]) => new ParameterAST(range.begin, name, type))
 );
 
+export
 var parseParameterList = lazy(() =>
   keyword("(")
     .thenTake(separated(parseParameter))
