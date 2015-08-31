@@ -6,14 +6,15 @@ import {parseIdentifier} from "./identifier";
 import {parseNumberLiteral} from "./number";
 import {parseStringLiteral} from "./string";
 import {parseFunction} from "./function";
-import {parseClass} from "./class";
+import {parseClass, parseInterface} from "./class";
 
 var parseLiteral = lazy(() =>
   choose<ExpressionAST>(
     parseNumberLiteral,
     parseStringLiteral,
     parseFunction,
-    parseClass
+    parseClass,
+    parseInterface
   )
 );
 
