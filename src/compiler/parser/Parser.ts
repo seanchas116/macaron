@@ -32,12 +32,13 @@ class State {
     offset = Math.min(this.text.length - this.position.index, offset);
     const proceedStr = this.substring(offset);
     const proceedLines = proceedStr.split(/\r\n|\n|\r/);
+    const lastLineLength = proceedLines[proceedLines.length - 1].length;
 
-    const newPos = new Position(
-      this.position.index + offset,
-      this.position.line + proceedLines.length - 1,
-      this.position.column + proceedLines[proceedLines.length - 1].length
-    );
+    const newIndex = this.position.index + offset;
+    const newLine = this.position.line + proceedLines.length - 1;
+    const newColumn = (1 < proceedLines.length) ? lastLineLength + 1 : this.position.column + lastLineLength;
+
+    const newPos = new Position(newIndex, newLine, newColumn);
     return new State(this.text, newPos, this.trace);
   }
 }
