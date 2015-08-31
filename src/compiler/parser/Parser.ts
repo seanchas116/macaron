@@ -36,7 +36,7 @@ class State {
     const newPos = new Position(
       this.position.index + offset,
       this.position.line + proceedLines.length - 1,
-      proceedLines[proceedLines.length - 1].length + 1
+      this.position.column + proceedLines[proceedLines.length - 1].length
     );
     return new State(this.text, newPos, this.trace);
   }
