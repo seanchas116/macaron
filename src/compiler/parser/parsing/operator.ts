@@ -10,8 +10,8 @@ import {keyword} from "./common";
 import {binaryOperators, unaryOperators} from "../operators";
 import {parseControlExpression} from "./control";
 
-const binaryOperatorList = binaryOperators.reduce((a, b) => a.concat(b), []);
-const unaryOperatorList = unaryOperators.reduce((a, b) => a.concat(b), []);
+const binaryOperatorList = binaryOperators.reduce((a, b) => a.concat(b), []).sort((a, b) => b.length - a.length);
+const unaryOperatorList = unaryOperators.reduce((a, b) => a.concat(b), []).sort((a, b) => b.length - a.length);
 
 export
 function parseOperator(operatorList: string[]) {
