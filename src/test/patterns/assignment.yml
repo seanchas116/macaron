@@ -2,3 +2,8 @@
   src: |
     a + b
   error: No variable
+
+- title: specify type in new variable
+  src: |
+    let a number = 123
+  expected: 123

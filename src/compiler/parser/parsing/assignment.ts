@@ -23,7 +23,7 @@ var parseNewVariable: Parser<ExpressionAST> = lazy(() =>
     sequence(
       choose(keyword("let"), keyword("var")),
       parseAssisgnable,
-      parseExpression.mayBe(),
+      parseBinaryExpression.mayBe(),
       keyword("=").thenTake(parseNewVariable)
     )
       .withRange()
