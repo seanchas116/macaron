@@ -179,19 +179,11 @@ class CodeEmitter {
   }
 
   emitNewVariable(expr: NewVariableExpression) {
-    // TODO: new variable must be top-level
-
     const value = this.emitExpression(expr.value);
     const name = expr.assignable.name;
 
-    switch (expr.constness) {
-    case Constness.Variable:
-      return `let ${name} = ${value}`;
-    case Constness.Constant:
-      return `const ${name} = ${value}`;
-    default:
-      throw new Error("unsupported constness");
-    }
+    this.prependings.push(`let ${name}`);
+    return `${name} = ${value}`;
   }
 
   emitReturn(expr: ReturnExpression) {
