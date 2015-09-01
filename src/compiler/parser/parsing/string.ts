@@ -3,7 +3,7 @@ import {choose, sequence, string, regExp, anyChar} from "../Parser";
 import {_} from "./common";
 
 const parseEscaped =
-  string("\\").then(() => anyChar);
+  string("\\").thenTake(anyChar);
 
 const parseString1Char =
   choose(parseEscaped, regExp(/[^']/));

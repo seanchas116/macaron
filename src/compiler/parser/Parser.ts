@@ -106,18 +106,6 @@ class Parser<T> {
     }
   }
 
-  then<U>(getNext: (value: T) => Parser<U>): Parser<U> {
-    return new Parser(state => {
-      const result = this.parseFrom(state);
-      if (result instanceof Failure) {
-        return result;
-      }
-      else if (result instanceof Success) {
-        return getNext(result.value).parseFrom(result.state);
-      }
-    });
-  }
-
   map<U>(transform: (value: T) => U): Parser<U> {
     return new Parser(state => {
       const result = this.parseFrom(state);
