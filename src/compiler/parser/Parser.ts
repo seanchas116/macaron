@@ -1,4 +1,5 @@
 import BaseError from "../common/BaseError";
+const HashMap = require("hashmap");
 
 export
 class Position {
@@ -15,9 +16,21 @@ class Range {
   }
 }
 
+class Cache {
+  cache: Map<[any, number], any> = new HashMap();
+
+  set<T>(parser: Parser<T>, index: number, result: Result<T>) {
+    this.cache.set([parser, index], result);
+  }
+  get<T>(parser: Parser<T>, index: number): Result<T> {
+    return this.cache.get([parser, index]);
+  }
+}
+
 export
 class State {
-  constructor(public text: string, public position: Position, public trace: boolean) {
+
+  constructor(public text: string, public position: Position, public trace: boolean, public cache: Cache) {
   }
 
   substring(length: number) {
@@ -39,7 +52,11 @@ class State {
     const newColumn = (1 < proceedLines.length) ? lastLineLength + 1 : this.position.column + lastLineLength;
 
     const newPos = new Position(newIndex, newLine, newColumn);
-    return new State(this.text, newPos, this.trace);
+    return new State(this.text, newPos, this.trace, this.cache);
+  }
+
+  static init(text: string, trace: boolean) {
+    return new State(text, new Position(0, 1, 1), trace, new Cache());
   }
 }
 
@@ -85,7 +102,12 @@ class Parser<T> {
   }
 
   parseFrom(state: State) {
-    const result = this._parse(state);
+    const index = state.position.index;
+    let result = state.cache.get(this, index);
+    if (!result) {
+      result = this._parse(state);
+      state.cache.set(this, index, result);
+    }
     if (state.trace) {
       console.log(result.toString());
     }
@@ -93,7 +115,7 @@ class Parser<T> {
   }
 
   parse(text: string, trace = false) {
-    const state = new State(text, new Position(0, 1, 1), trace);
+    const state = State.init(text, trace);
     const result = this.parseFrom(state);
     if (result instanceof Success) {
       if (result.state.position.index == text.length) {
