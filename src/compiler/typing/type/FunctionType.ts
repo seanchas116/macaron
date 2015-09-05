@@ -6,7 +6,7 @@ export default
 class FunctionType extends Type {
   constructor(public selfType: Type, public params: Type[], public optionalParams: Type[], public returnType: Type, loc: SourceLocation) {
     // TODO: add Function type
-    super("", null, loc);
+    super("", [], loc);
 
     {
       const funcName = (() => {

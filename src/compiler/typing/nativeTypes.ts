@@ -18,13 +18,13 @@ export
 const voidType = anyType;
 
 export
-const numberType = new Type("number", anyType);
+const numberType = new Type("number", [anyType]);
 
 export
-const booleanType = new Type("boolean", anyType);
+const booleanType = new Type("boolean", [anyType]);
 
 export
-const stringType = new Type("string", anyType);
+const stringType = new Type("string", [anyType]);
 
 let initialized = false;
 

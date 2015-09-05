@@ -26,7 +26,7 @@ class Type {
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
 
-  constructor(public name: string, public superType: Type = null, public location: SourceLocation = null, public expression: Expression = null) {
+  constructor(public name: string, public superTypes: Type[] = [], public location: SourceLocation = null, public expression: Expression = null) {
     this.location = location || SourceLocation.empty();
   }
 
@@ -39,8 +39,8 @@ class Type {
   }
 
   getMember(name: string): Member {
-    if (this.superType) {
-      const member = this.superType.getMember(name);
+    for (const superType of this.superTypes) {
+      const member = superType.getMember(name);
       if (member) {
         return member;
       }
@@ -49,24 +49,18 @@ class Type {
   }
 
   getMembers(): Map<string, Member> {
-    if (!this.superType) {
-      return this.selfMembers;
-    }
-    return mergeMap(this.superType.getMembers(), this.selfMembers);
+    return [...this.superTypes.map(t => t.getMembers()), this.selfMembers]
+      .reduce(mergeMap);
   }
 
   getBinaryOperators(): Map<string, Operator> {
-    if (!this.superType) {
-      return this.selfBinaryOperators;
-    }
-    return mergeMap(this.superType.getBinaryOperators(), this.selfBinaryOperators);
+    return [...this.superTypes.map(t => t.getBinaryOperators()), this.selfBinaryOperators]
+      .reduce(mergeMap);
   }
 
   getUnaryOperators(): Map<string , Operator> {
-    if (!this.superType) {
-      return this.selfUnaryOperators;
-    }
-    return mergeMap(this.superType.getUnaryOperators(), this.selfUnaryOperators);
+    return [...this.superTypes.map(t => t.getUnaryOperators()), this.selfUnaryOperators]
+      .reduce(mergeMap);
   }
 
   isCastableTo(other: Type) {

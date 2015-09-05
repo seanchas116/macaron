@@ -74,7 +74,7 @@ class UnionType extends Type {
 
   // TODO: memoize
   constructor(types: Type[], loc: SourceLocation) {
-    super("", null, loc);
+    super("", [], loc);
     const typeSet = new Set();
 
     for (const type of types) {

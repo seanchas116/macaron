@@ -31,10 +31,10 @@ class ClassExpression extends Expression {
     }
     this.superType = superType;
 
-    const type = this.selfType = new Type(name.name, superType, location, this);
+    const type = this.selfType = new Type(name.name, [superType], location, this);
 
     // TODO: class type must inherit Function
-    const classType = this.classType = new Type(`${name.name} class`, superType);
+    const classType = this.classType = new Type(`${name.name} class`, [superType]);
     classType.newSignatures = [new CallSignature(voidType, [], type)];
 
     this.metaValue = new MetaValue(classType, null, type);
