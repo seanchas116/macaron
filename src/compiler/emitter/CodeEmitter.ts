@@ -33,11 +33,14 @@ class CodeEmitter {
       .join("");
   }
 
+  get indentation() {
+    return " ".repeat(this.indentationWidth * this.indentationLevel);
+  }
+
   emitTopLevelExpression(expr: Expression) {
-    const indentation = " ".repeat(this.indentationWidth * this.indentationLevel);
     const line = this.emitExpression(expr, true);
     const result = [...this.prependings, line]
-      .map(line => `${indentation}${line};\n`)
+      .map(line => `${this.indentation}${line};\n`)
       .join("");
     this.prependings = [];
     return result;
@@ -105,6 +108,10 @@ class CodeEmitter {
     return `(${params}) => {\n${body}\n}`;
   }
 
+  emitClassMemberIndented(expr: Expression) {
+    return this.indentation + this.emitClassMember(expr);
+  }
+
   emitClassMember(expr: Expression) {
     if (expr instanceof FunctionExpression) {
       return this.emitClassMethod(expr);
@@ -120,21 +127,21 @@ class CodeEmitter {
 
     const body = this.emitFunctionBody(expr.body);
 
-    return `${expr.name.name}(${params}) {\n${body}\n}`;
+    return `${expr.name.name}(${params}) ${body}`;
   }
 
   emitClass(expr: ClassExpression) {
     const emitter = this.indented();
     const body = expr.members
       .map(member => member.get())
-      .map(member => emitter.emitClassMember(member))
+      .map(member => emitter.emitClassMemberIndented(member))
       .join("\n");
     let superclass = "";
     if (expr.superExpression) {
       superclass = " extends " + this.emitExpression(expr.superExpression);
     }
 
-    return `class ${expr.name.name}${superclass} {\n${body}\n}`;
+    return `class ${expr.name.name}${superclass} {\n${body}\n${this.indentation}}`;
   }
 
   emitFunctionCall(expr: FunctionCallExpression) {
@@ -228,7 +235,7 @@ class CodeEmitter {
 
   emitBlock(exprs: Expression[]) {
     const body = this.indented().emitTopLevelExpressions(exprs);
-    return `{\n${body}\n}`;
+    return `{\n${body}\n${this.indentation}}`;
   }
 
   emitBlockWithAssign(exprs: Expression[], varName: string) {
