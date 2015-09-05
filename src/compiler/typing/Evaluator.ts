@@ -12,6 +12,7 @@ import {
   ClassAST,
   MemberAccessAST,
   IfAST,
+  InterfaceAST,
 } from "../parser/AST";
 
 import Expression, {
@@ -24,6 +25,7 @@ import Expression, {
   MemberAccessExpression,
   OperatorAccessExpression,
   IfExpression,
+  EmptyExpression
 } from "./Expression";
 import FunctionExpression from "./expression/FunctionExpression";
 import FunctionBodyExpression from "./expression/FunctionBodyExpression";
@@ -31,6 +33,7 @@ import ClassExpression from "./expression/ClassExpression";
 
 import Identifier from "./Identifier";
 import Type from "./Type";
+import FunctionType from "./type/FunctionType";
 import ExpressionThunk from "./thunk/ExpressionThunk";
 import {voidType, typeOnlyType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
@@ -107,6 +110,9 @@ class Evaluator {
     }
     else if (ast instanceof IfAST) {
       return this.evaluateIf(ast);
+    }
+    else if (ast instanceof InterfaceAST) {
+      return this.evaluateInterface(ast);
     }
     else {
       throw new Error(`Not supported AST: ${ast.constructor.name}`);
@@ -199,10 +205,7 @@ class Evaluator {
     });
 
     const createType = (returnType: Type) => {
-      const type = new Type("function", voidType);
-      const callSig = new CallSignature(thisType, paramTypes, returnType);
-      type.callSignatures.push(callSig);
-      return type;
+      return new FunctionType(thisType, paramTypes, [], returnType, ast.location);
     }
 
     let metaValueThunk: MetaValueThunk;
@@ -265,6 +268,44 @@ class Evaluator {
 
     this.context.addVariable(Constness.Constant, ast.name, thunk.metaValue);
     return thunk;
+  }
+
+  evaluateDeclarationType(selfType: Type, ast: ExpressionAST) {
+    if (ast instanceof FunctionAST) {
+      return this.evaluateMethodDeclarationType(selfType, ast);
+    } else {
+      throw new Error(`Not supported AST: ${ast.constructor.name}`);
+    }
+  }
+
+  evaluateMethodDeclarationType(selfType: Type, ast: FunctionAST) {
+    const paramTypes: Type[] = [];
+    const subContext = this.context.newChild();
+    const subEvaluator = new Evaluator(subContext);
+
+    for (const {name, type: typeExpr} of ast.parameters) {
+      const type = subEvaluator.evaluateType(typeExpr);
+      subContext.addVariable(Constness.Constant, name, new MetaValue(type));
+      paramTypes.push(type);
+    }
+
+    const returnType = subEvaluator.evaluateType(ast.returnType);
+
+    return new FunctionType(selfType, paramTypes, [], returnType, ast.location);
+  }
+
+  evaluateInterface(ast: InterfaceAST) {
+    // TODO: super types
+    const type = new Type(ast.name.name);
+
+    for (const memberAST of ast.members) {
+      const member = this.evaluateDeclarationType(type, memberAST);
+      type.addMember(memberAST.name.name, new Member(Constness.Constant, new MetaValue(member)));
+    }
+    const metaValue = new MetaValue(typeOnlyType, null, type);
+
+    this.context.addVariable(Constness.Constant, ast.name, metaValue);
+    return new EmptyExpression(ast.location, metaValue);
   }
 
   evaluateIf(ast: IfAST) {

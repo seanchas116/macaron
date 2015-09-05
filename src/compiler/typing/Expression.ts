@@ -161,3 +161,10 @@ class IfExpression extends Expression {
     this.metaValue = new MetaValue(new UnionType([blockType(ifTrue), blockType(ifFalse)], location));
   }
 }
+
+export
+class EmptyExpression extends Expression {
+  constructor(public location: SourceLocation, public metaValue: MetaValue) {
+    super(location);
+  }
+}

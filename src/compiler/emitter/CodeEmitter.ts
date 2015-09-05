@@ -8,6 +8,7 @@ import Expression, {
   MemberAccessExpression,
   OperatorAccessExpression,
   IfExpression,
+  EmptyExpression,
 } from "../typing/Expression";
 
 import {NativeOperator, MethodOperator} from "../typing/Operator";
@@ -79,6 +80,9 @@ class CodeEmitter {
     }
     else if (expr instanceof IfExpression) {
       return this.emitIf(expr, topLevel);
+    }
+    else if (expr instanceof EmptyExpression) {
+      return  "";
     }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
