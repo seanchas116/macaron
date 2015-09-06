@@ -37,6 +37,6 @@
         this
       }
     }
-    let baz Baz = new Bar()
+    let baz Baz = new K()
     baz.baz(baz, baz).foo(1, 2)
   expected: 3
