@@ -1,12 +1,15 @@
 import {
   ExpressionAST,
-  FunctionCallAST
+  FunctionCallAST,
+  MemberAccessAST
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword} from "./common";
 import {parseLines} from "./block";
 import {parseMemberAccess} from "./memberAccess";
+import {parseValue} from "./value";
+import {parseIdentifier} from "./identifier";
 
 var parseArgumentList = lazy(() =>
   keyword("(").thenTake(parseLines).thenSkip(keyword(")"))
@@ -16,25 +19,41 @@ export
 var parseFunctionCall = lazy(() =>
   sequence(
     keyword("new").repeat(),
-    parseMemberAccess,
-    parseArgumentList.repeat()
+    parseValue,
+    parseArgumentList.repeat(),
+    keyword(".").thenTake(
+      sequence(
+        parseIdentifier,
+        parseArgumentList.repeat()
+      )
+    ).repeat()
   )
     .withRange()
-    .map(([[news, func, argLists], range]) => {
-      // Parse expressions like `new new new foo()()` or `new foo()()()`
-      const count = Math.max(news.length, argLists.length);
-      let ast: ExpressionAST = func;
-      for (let i = 0; i < count; ++i) {
-        let args: ExpressionAST[];
-        if (i < argLists.length) {
-          args = argLists[i];
-        } else {
-          args = [];
-        }
+    .map(([[news, first, firstArgLists, rest], range]) => {
+      let newCount = news.length;
+      let ast: ExpressionAST = first;
 
-        const isNewCall = i < news.length;
-        ast = new FunctionCallAST(range.begin, ast, args, isNewCall);
+      function consumeNew() {
+        if (newCount > 0) {
+          --newCount;
+          return true;
+        }
+        return false;
       }
+
+      function applyCalls(argLists: ExpressionAST[][]) {
+        for (const args of argLists) {
+          ast = new FunctionCallAST(range.begin, ast, args, consumeNew());
+        }
+      }
+
+      applyCalls(firstArgLists);
+
+      for (const [ident, argLists] of rest) {
+        ast = new MemberAccessAST(ident.location, ast, ident);
+        applyCalls(argLists);
+      }
+
       return ast;
     })
 );
