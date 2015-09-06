@@ -14,3 +14,29 @@
     let foo Foo = new Bar()
     foo.foo(1, 2)
   expected: 3
+
+- title: interface with inheritance OK
+  src: |
+    interface Foo {
+      foo(x number, y number) number
+    }
+    interface Bar {
+      bar(x string, y string) string
+    }
+    interface Baz : Foo, Bar {
+      baz(x Foo, y Bar) Baz
+    }
+    class K {
+      foo(x number, y number) {
+        x + y
+      }
+      bar(x string, y string) {
+        x + y
+      }
+      baz(x K, y K) {
+        this
+      }
+    }
+    let baz Baz = new Bar()
+    baz.baz(baz, baz).foo(1, 2)
+  expected: 3
