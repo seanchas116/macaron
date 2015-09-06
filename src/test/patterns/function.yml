@@ -20,7 +20,7 @@
       a
     }
     f(1, 2)
-  error: Cannot pass 2 arguments
+  error: Type '(number) => number' cannot be called with [number, number]
 
 - title: function forward reference
   src: |

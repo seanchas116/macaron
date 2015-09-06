@@ -6,6 +6,7 @@ import * as vm from "vm";
 import loadPatterns from "./support/loadPattern";
 const babel = require("babel");
 const lineNumbers = require("line-numbers");
+const escapeStringRegexp = require('escape-string-regexp');
 
 function evalIsolated(code: string) {
   const es5: string = babel.transform(code).code;
@@ -49,7 +50,7 @@ describe("Compiler", () => {
 
     if (error != null) {
       it(`emits error on ${title}`, () => {
-        assert.throws(compile, new RegExp(error));
+        assert.throws(compile, new RegExp(escapeStringRegexp(error)));
       });
     }
   }

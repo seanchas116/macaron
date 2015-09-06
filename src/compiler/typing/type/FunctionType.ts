@@ -1,6 +1,7 @@
 import Type from "../Type";
 import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
+import {voidType} from "../nativeTypes";
 
 export default
 class FunctionType extends Type {
@@ -11,18 +12,18 @@ class FunctionType extends Type {
     {
       const funcName = (() => {
         if (optionalParams.length > 0) {
-          return `(${params.join()}[, ${optionalParams.join()}])=>${returnType}`;
+          return `(${params.join(", ")}[, ${optionalParams.join(", ")}]) => ${returnType}`;
         }
         else {
-          return `(${params.join()})=>${returnType}`
+          return `(${params.join()}) => ${returnType}`
         }
       })();
 
-      if (selfType) {
-        this.name = `(${selfType})${funcName}`;
+      if (selfType == voidType) {
+        this.name = funcName;
       }
       else {
-        this.name = funcName;
+        this.name = `(${selfType})${funcName}`;
       }
     }
 

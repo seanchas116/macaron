@@ -22,6 +22,7 @@
     "typescript": "^1.6.0-dev.20150905"
   },
   "dependencies": {
+    "escape-string-regexp": "^1.0.3",
     "hashmap": "^2.0.3",
     "once": "^1.3.2",
     "source-map": "^0.4.4"

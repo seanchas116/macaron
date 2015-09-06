@@ -70,7 +70,7 @@ class FunctionCallExpression extends Expression {
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes));
     if (!sig) {
       throw CompilationError.typeError(
-        `Type '${funcType}' cannot be called with ['${argTypes.join(",")}']`,
+        `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`,
         location
       );
     }

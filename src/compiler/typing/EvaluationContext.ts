@@ -21,7 +21,7 @@ class EvaluationContext {
     const variable = this.environment.getVariable(name.name);
     if (!variable) {
       throw CompilationError.typeError(
-        `Variable '${name.name}' not in scope`,
+        `Variable '${name.name}' not found`,
         name.location
       );
     }
@@ -30,13 +30,8 @@ class EvaluationContext {
 
   assignVariable(name: Identifier, metaValueOrThunk: MetaValue|MetaValueThunk) {
     const metaValue = MetaValueThunk.resolve(metaValueOrThunk);
-    const variable = this.environment.getVariable(name.name);
-    if (!variable) {
-      throw CompilationError.typeError(
-        `Variable '${name.name}' not in scope`,
-        name.location
-      );
-    }
+    const variable = this.getVariable(name);
+
     if (variable.constness === Constness.Constant) {
       throw CompilationError.typeError(
         `Variable '${name.name}' is constant and cannot be reassigned`,
