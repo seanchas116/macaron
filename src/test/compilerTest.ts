@@ -49,7 +49,7 @@ describe("Compiler", () => {
 
     if (error != null) {
       it(`emits error on ${title}`, () => {
-        assert.throws(compile, error);
+        assert.throws(compile, new RegExp(error));
       });
     }
   }

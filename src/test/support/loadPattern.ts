@@ -7,7 +7,7 @@ interface TestPattern {
   title: string;
   src: string;
   expected?: any;
-  error?: RegExp;
+  error?: string;
 }
 
 export default
