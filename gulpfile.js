@@ -12,9 +12,9 @@ gulp.task("tsc", shell.task([
 
 gulp.task("build", ["tsc"]);
 
-gulp.task("watch", ["build"], function () {
-  gulp.watch(SRC, ["build"]);
-});
+gulp.task("watch", shell.task([
+  "tsc -w"
+]));
 
 gulp.task("test",  shell.task([
   `mocha --require ./babel-hook ${TESTS} ${argv.join(" ")}`
