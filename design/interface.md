@@ -11,7 +11,7 @@ interface Point {
 
   // additional implementation
   dot(other Point) {
-    @x * other.x + @y * other.y
+    x * other.x + y * other.y
   }
 }
 ```

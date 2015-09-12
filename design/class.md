@@ -13,18 +13,19 @@ class Foo : Bar {
   }
 
   // you can introduce new instance properties only in constructor
-  constructor(@x number) {
-    // @x is immutable by default
+  constructor(this.x number) {
+    // this.x is immutable by default
 
-    let @y = @x + 1
-    var @z = @x + 2
+    // you can omit `this.`
+    let this.y = x + 1
+    var this.z = x + 2
 
     // private property
-    private let @w = 1
+    private let this.w = 1
   }
 
   // directly assign properties like in CoffeeScript
-  setZ(@z number) {
+  setZ(this.z number) {
   }
 
   // specify newly added method as operator
@@ -38,7 +39,7 @@ class Foo : Bar {
 
   // getter / setter is like in JavaScript
   get sum() {
-    @x + @y + @z
+    x + y + z
   }
 
   // private method (using Symbols)
