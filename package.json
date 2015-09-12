@@ -17,6 +17,7 @@
     "gulp-shell": "^0.4.2",
     "js-yaml": "^3.3.1",
     "line-numbers": "^0.2.0",
+    "minimist": "^1.2.0",
     "mocha": "^2.2.5",
     "power-assert": "^0.11.0",
     "typescript": "^1.6.0-dev.20150905"
