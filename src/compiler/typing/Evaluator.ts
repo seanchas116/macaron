@@ -260,8 +260,8 @@ class Evaluator {
 
       const expr = new ClassExpression(ast.location, ast.name, superExpr);
       for (const memberAST of ast.members) {
-        const member = this.evaluateFunction(memberAST, expr.selfType);
-        expr.addMember(Constness.Constant, memberAST.name, member);
+        const memberThunk = new ExpressionThunk(memberAST.location, () => this.evaluateFunction(memberAST, expr.selfType).get());
+        expr.addMember(Constness.Constant, memberAST.name, memberThunk);
       }
       return expr;
     });
