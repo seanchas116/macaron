@@ -299,8 +299,11 @@ class Evaluator {
     const type = new Type(ast.name.name);
 
     for (const memberAST of ast.members) {
-      const member = this.evaluateDeclarationType(type, memberAST);
-      type.addMember(memberAST.name.name, new Member(Constness.Constant, new MetaValue(member)));
+      const memberMetaValue = new MetaValueThunk(memberAST.location, () => {
+        const memberType = this.evaluateDeclarationType(type, memberAST)
+        return new MetaValue(memberType);
+      });
+      type.addMember(memberAST.name.name, new Member(Constness.Constant, memberMetaValue));
     }
     const metaValue = new MetaValue(typeOnlyType, null, type);
 
