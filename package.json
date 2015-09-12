@@ -9,23 +9,23 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "babel": "^5.8.21",
-    "babel-core": "^5.8.21",
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.24",
     "babel-plugin-espower": "^1.0.0",
     "glob": "^5.0.14",
     "gulp": "^3.9.0",
-    "gulp-shell": "^0.4.2",
-    "js-yaml": "^3.3.1",
+    "gulp-shell": "^0.4.3",
+    "js-yaml": "^3.4.2",
     "line-numbers": "^0.2.0",
     "minimist": "^1.2.0",
-    "mocha": "^2.2.5",
-    "power-assert": "^0.11.0",
-    "typescript": "^1.6.0-dev.20150905"
+    "mocha": "^2.3.2",
+    "power-assert": "^1.0.0",
+    "typescript": "^1.6.0-dev.20150912"
   },
   "dependencies": {
     "escape-string-regexp": "^1.0.3",
     "hashmap": "^2.0.3",
     "once": "^1.3.2",
-    "source-map": "^0.4.4"
+    "source-map": "^0.5.0"
   }
 }
