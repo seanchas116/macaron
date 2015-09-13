@@ -16,7 +16,7 @@ class Environment {
 
   addTempVariable(baseName: string) {
     const name = this.nonDuplicateVariableName(baseName);
-    this.variables.set(name, new Member(Constness.Constant, new MetaValue(voidType)));
+    this.addVariable(name, new Member(Constness.Constant, new MetaValue(voidType)));
     return name;
   }
 
@@ -29,7 +29,7 @@ class Environment {
     }
   }
 
-  setVariable(name: string, variable: Member) {
+  addVariable(name: string, variable: Member) {
     this.variables.set(name, variable);
   }
 
