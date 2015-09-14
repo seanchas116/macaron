@@ -2,16 +2,15 @@ import Type from "./Type";
 import {voidType} from "./nativeTypes";
 import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
+import CompilationError from "../common/CompilationError";
 
 export default
 class Environment {
-  variables = new Map<string, Member>();
-
   constructor(public parent: Environment = null) {
   }
 
   newChild() {
-    return new Environment(this);
+    return new BlockEnvironment(this);
   }
 
   addTempVariable(baseName: string) {
@@ -29,8 +28,8 @@ class Environment {
     }
   }
 
-  addVariable(name: string, variable: Member) {
-    this.variables.set(name, variable);
+  addVariable(name: string, variable: Member): void {
+    throw new Error("not implemented");
   }
 
   getVariable(name: string): Member {
@@ -42,7 +41,30 @@ class Environment {
     }
     return this.getOwnVariable(name);
   }
+  getOwnVariable(name: string): Member {
+    throw new Error("not implemented");
+  }
+}
+
+export
+class BlockEnvironment extends Environment {
+  variables = new Map<string, Member>();
+
+  addVariable(name: string, variable: Member) {
+    this.variables.set(name, variable);
+  }
   getOwnVariable(name: string) {
     return this.variables.get(name);
+  }
+}
+
+export
+class ThisEnvironment extends Environment {
+  constructor(parent: Environment, public thisType: Type, public isConstructor = false) {
+    super(parent);
+  }
+
+  getOwnVariable(name: string) {
+    return this.thisType.getMember(name);
   }
 }

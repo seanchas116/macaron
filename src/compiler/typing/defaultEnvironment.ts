@@ -1,4 +1,4 @@
-import Environment from "./Environment";
+import {BlockEnvironment} from "./Environment";
 import {
   numberType,
   booleanType,
@@ -14,7 +14,7 @@ export default
 function defaultEnvironment() {
   initNativeTypes();
 
-  const env = new Environment();
+  const env = new BlockEnvironment();
 
   env.addVariable("number", new Member(Constness.Constant, new MetaValue(typeOnlyType, null, numberType)));
   env.addVariable("boolean", new Member(Constness.Constant, new MetaValue(typeOnlyType, null, booleanType)));

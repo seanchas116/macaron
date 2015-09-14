@@ -68,6 +68,6 @@ class EvaluationContext {
         name.location
       );
     }
-    this.environment.variables.set(name.name, new Member(constness, metaValue));
+    this.environment.addVariable(name.name, new Member(constness, metaValue));
   }
 }
