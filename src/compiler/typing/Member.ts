@@ -16,6 +16,6 @@ class Member {
     this.metaValue = MetaValueThunk.resolve(metaValue);
   }
   getType() {
-    return this.metaValue.get().type;
+    return this.metaValue.get().valueType;
   }
 }

@@ -37,7 +37,7 @@ class ClassExpression extends Expression {
     const classType = this.classType = new Type(`${name.name} class`, [superType]);
     classType.newSignatures = [new CallSignature(voidType, [], type)];
 
-    this.metaValue = new MetaValue(classType, null, type);
+    this.metaValue = new MetaValue(classType, type);
   }
 
   addMember(constness: Constness, name: Identifier, member: ExpressionThunk) {
@@ -54,7 +54,7 @@ class ClassExpression extends Expression {
     }
 
     if (name.name === "constructor") {
-      this.classType.newSignatures = member.metaValue.get().type.callSignatures.map(sig => {
+      this.classType.newSignatures = member.metaValue.get().valueType.callSignatures.map(sig => {
         return new CallSignature(voidType, sig.params, type);
       });
     }

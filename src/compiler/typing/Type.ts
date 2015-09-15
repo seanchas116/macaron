@@ -63,7 +63,7 @@ class Type {
       .reduce(mergeMap);
   }
 
-  isCastableTo(other: Type) {
+  isCastableTo(other: Type): boolean {
     if (this === other) {
       return true;
     }

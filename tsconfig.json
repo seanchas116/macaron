@@ -61,6 +61,7 @@
         "./src/compiler/typing/nativeTypes.ts",
         "./src/compiler/typing/thunk/ExpressionThunk.ts",
         "./src/compiler/typing/thunk/MetaValueThunk.ts",
+        "./src/compiler/typing/type/ConstValueType.ts",
         "./src/compiler/typing/type/FunctionType.ts",
         "./src/compiler/typing/type/TupleType.ts",
         "./src/compiler/typing/type/UnionType.ts",

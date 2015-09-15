@@ -17,7 +17,7 @@ class Expression {
   }
 
   getType() {
-    return this.metaValue.type;
+    return this.metaValue.valueType;
   }
 }
 

@@ -168,11 +168,7 @@ class Evaluator {
     const variable = this.context.getVariable(ast);
     const metaValue = variable.metaValue.get();
 
-    let literalValue: any = null;
-    if (variable.constness != Constness.Variable) {
-      literalValue = metaValue.literalValue;
-    }
-    return new IdentifierExpression(ast, new MetaValue(metaValue.type, literalValue, metaValue.metaType));
+    return new IdentifierExpression(ast, metaValue);
   }
 
   evalauteLiteral(ast: LiteralAST) {
@@ -216,14 +212,14 @@ class Evaluator {
     }
     else {
       metaValueThunk = new MetaValueThunk(ast.location, () => {
-        const returnType = bodyThunk.get().metaValue.type;
+        const returnType = bodyThunk.get().metaValue.valueType;
         const type = createType(returnType);
         return new MetaValue(type);
       });
     }
 
     const funcThunk = new ExpressionThunk(location, () => {
-      return new FunctionExpression(location, ast.name, metaValueThunk.get().type, ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
+      return new FunctionExpression(location, ast.name, metaValueThunk.get().valueType, ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
     });
 
     if (ast.addAsVariable) {
@@ -250,7 +246,7 @@ class Evaluator {
         console.log(ast.superclass);
         superExpr = this.evaluate(ast.superclass).get();
         const superValue = superExpr.metaValue;
-        if (superValue.type == typeOnlyType || !superValue.metaType) {
+        if (superValue.valueType == typeOnlyType || !superValue.metaType) {
           throw CompilationError.typeError(
             `Superclass is not a class`,
             ast.superclass.location
@@ -305,7 +301,7 @@ class Evaluator {
       });
       type.addMember(memberAST.name.name, new Member(Constness.Constant, memberMetaValue));
     }
-    const metaValue = new MetaValue(typeOnlyType, null, type);
+    const metaValue = new MetaValue(typeOnlyType, type);
 
     this.context.addVariable(Constness.Constant, ast.name, metaValue);
     return new EmptyExpression(ast.location, metaValue);

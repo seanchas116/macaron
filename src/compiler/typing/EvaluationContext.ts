@@ -44,8 +44,8 @@ class EvaluationContext {
         name.location
       );
     }
-    const type = metaValue.get().type;
-    const variableType = variable.metaValue.get().type;
+    const type = metaValue.get().valueType;
+    const variableType = variable.metaValue.get().valueType;
     if (!type.isCastableTo(variableType)) {
       throw CompilationError.typeError(
         `Cannot assign '${type}' to type '${variableType}'`,
