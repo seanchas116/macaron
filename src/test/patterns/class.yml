@@ -30,7 +30,7 @@
   src: |
     class Foo {
       foo(x number, y number) {
-        @bar(x, y)
+        bar(x, y)
       }
       bar(x number, y number) {
         x + y
