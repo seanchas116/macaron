@@ -1,5 +1,4 @@
 import BaseError from "../common/BaseError";
-const HashMap = require("hashmap");
 
 export
 class Position {
@@ -16,14 +15,18 @@ class Range {
   }
 }
 
+function cacheKey<T>(parser: Parser<T>, index: number) {
+  return `${parser.id} ${index}`;
+}
+
 class Cache {
-  cache: Map<[any, number], any> = new HashMap();
+  cache = new Map<string, any>();
 
   set<T>(parser: Parser<T>, index: number, result: Result<T>) {
-    this.cache.set([parser, index], result);
+    this.cache.set(cacheKey(parser, index), result);
   }
   get<T>(parser: Parser<T>, index: number): Result<T> {
-    return this.cache.get([parser, index]);
+    return this.cache.get(cacheKey(parser, index));
   }
 }
 
@@ -96,8 +99,12 @@ interface ParserOpts {
 
 }
 
+let parserId = 0;
+
 export default
 class Parser<T> {
+  id = parserId++;
+
   constructor(private _parse: (state: State) => Result<T>) {
   }
 
