@@ -164,11 +164,18 @@ class Evaluator {
     return new FunctionCallExpression(ast.location, operatorAccess, [right]);
   }
 
-  evaluateIdentifier(ast: IdentifierAST) {
-    const variable = this.context.getVariable(ast);
-    const metaValue = variable.metaValue.get();
+  evaluateIdentifier(ast: IdentifierAST): Expression {
+    const {member, needsThis} = this.context.getVariable(ast);
+    const metaValue = member.metaValue.get();
 
-    return new IdentifierExpression(ast, metaValue);
+    if (needsThis) {
+      const thisIdentifier = new Identifier("this", ast.location);
+      const {member: thisMember} = this.context.getVariable(thisIdentifier);
+      const thisExpr = new IdentifierExpression(thisIdentifier, thisMember.metaValue.get());
+      return new MemberAccessExpression(ast.location, thisExpr, ast);
+    } else {
+      return new IdentifierExpression(ast, metaValue);
+    }
   }
 
   evalauteLiteral(ast: LiteralAST) {
@@ -184,7 +191,7 @@ class Evaluator {
     const {location} = ast;
 
     const paramTypes: Type[] = [];
-    const subContext = this.context.newChild();
+    const subContext = this.context.newChild(thisType);
     const subEvaluator = new Evaluator(subContext);
 
     for (const {name, type: typeExpr} of ast.parameters) {

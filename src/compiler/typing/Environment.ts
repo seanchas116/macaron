@@ -4,6 +4,12 @@ import Member, {Constness} from "./Member";
 import MetaValue from "./MetaValue";
 import CompilationError from "../common/CompilationError";
 
+export
+interface Variable {
+  member: Member;
+  needsThis: boolean;
+}
+
 export default
 class Environment {
   constructor(public parent: Environment = null) {
@@ -32,7 +38,7 @@ class Environment {
     throw new Error("not implemented");
   }
 
-  getVariable(name: string): Member {
+  getVariable(name: string): Variable {
     if (this.parent) {
       const parentVariable = this.parent.getVariable(name);
       if (parentVariable) {
@@ -41,7 +47,7 @@ class Environment {
     }
     return this.getOwnVariable(name);
   }
-  getOwnVariable(name: string): Member {
+  getOwnVariable(name: string): Variable {
     throw new Error("not implemented");
   }
 }
@@ -54,7 +60,10 @@ class BlockEnvironment extends Environment {
     this.variables.set(name, variable);
   }
   getOwnVariable(name: string) {
-    return this.variables.get(name);
+    const member = this.variables.get(name);
+    if (member) {
+      return {member, needsThis: false};
+    }
   }
 }
 
@@ -65,6 +74,9 @@ class ThisEnvironment extends Environment {
   }
 
   getOwnVariable(name: string) {
-    return this.thisType.getMember(name);
+    const member = this.thisType.getMember(name);
+    if (member) {
+      return {member, needsThis: true};
+    }
   }
 }

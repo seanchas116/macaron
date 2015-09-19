@@ -1,4 +1,4 @@
-import Environment from "./Environment";
+import Environment, {BlockEnvironment, ThisEnvironment} from "./Environment";
 import Type from "./Type";
 import MetaValueThunk from "./thunk/MetaValueThunk";
 import Identifier from "./Identifier";
@@ -13,8 +13,13 @@ class EvaluationContext {
   constructor(public environment: Environment) {
   }
 
-  newChild() {
-    return new EvaluationContext(this.environment.newChild());
+  newChild(thisType: Type = null) {
+    if (thisType) {
+      return new EvaluationContext(new BlockEnvironment(new ThisEnvironment(this.environment, thisType)));
+    }
+    else {
+      return new EvaluationContext(new BlockEnvironment(this.environment));
+    }
   }
 
   getVariable(name: Identifier) {
@@ -30,22 +35,22 @@ class EvaluationContext {
 
   assignVariable(name: Identifier, metaValueOrThunk: MetaValue|MetaValueThunk) {
     const metaValue = MetaValueThunk.resolve(metaValueOrThunk);
-    const variable = this.getVariable(name);
+    const {member} = this.getVariable(name);
 
-    if (variable.constness === Constness.Constant) {
+    if (member.constness === Constness.Constant) {
       throw CompilationError.typeError(
         `Variable '${name.name}' is constant and cannot be reassigned`,
         name.location
       );
     }
-    if (variable.constness === Constness.Builtin) {
+    if (member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
         `Variable '${name.name}' is builtin and cannot be reassigned`,
         name.location
       );
     }
     const type = metaValue.get().valueType;
-    const variableType = variable.metaValue.get().valueType;
+    const variableType = member.metaValue.get().valueType;
     if (!type.isCastableTo(variableType)) {
       throw CompilationError.typeError(
         `Cannot assign '${type}' to type '${variableType}'`,
@@ -56,7 +61,7 @@ class EvaluationContext {
 
   addVariable(constness: Constness, name: Identifier, metaValue: MetaValue|MetaValueThunk) {
     const variable = this.environment.getVariable(name.name);
-    if (variable && variable.constness === Constness.Builtin) {
+    if (variable && variable.member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
         `Variable '${name.name}' is builtin and cannot be redefined`,
         name.location
