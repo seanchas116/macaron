@@ -1,0 +1,7 @@
+- title: "generic function"
+  src: |
+    func foo<T>(a T, b T) {
+      a + b
+    }
+    foo<number>(1, 2)
+  expected: 3
