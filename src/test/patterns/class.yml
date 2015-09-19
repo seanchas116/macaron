@@ -55,3 +55,15 @@
     let bar = new Bar()
     bar.foo(1, 2) + bar.bar(3, 4, 5)
   expected: 15
+
+- title: Assign instance props
+  src: |
+    class Foo {
+      constructor(x number, y number) {
+        let this.x = x
+        let this.y = y
+      }
+    }
+    let foo = new Foo(100, 200)
+    foo.x + foo.y
+  expected: 300
