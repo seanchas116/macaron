@@ -50,7 +50,6 @@
         "./src/compiler/typing/EvaluationContext.ts",
         "./src/compiler/typing/Evaluator.ts",
         "./src/compiler/typing/Expression.ts",
-        "./src/compiler/typing/GenericType.ts",
         "./src/compiler/typing/Identifier.ts",
         "./src/compiler/typing/Member.ts",
         "./src/compiler/typing/MetaValue.ts",
