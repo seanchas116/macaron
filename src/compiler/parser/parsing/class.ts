@@ -22,7 +22,7 @@ var parseMethod = lazy(() =>
   )
     .withRange()
     .map(([[name, parameters, returnType, expressions], range]) =>
-      new FunctionAST(range.begin, name, parameters, returnType, expressions)
+      new FunctionAST(range.begin, name, [], parameters, returnType, expressions)
     )
 );
 
@@ -56,7 +56,7 @@ var parseMethodDeclaration = lazy(() =>
   )
     .withRange()
     .map(([[name, params, returnType], range]) =>
-      new FunctionAST(range.begin, name, params, returnType, null)
+      new FunctionAST(range.begin, name, [], params, returnType, null)
     )
 );
 

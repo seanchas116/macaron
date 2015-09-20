@@ -31,7 +31,7 @@ var parseUnnamedFunction = lazy(() =>
   )
     .withRange()
     .map(([[parameters, expressions], range]) =>
-      new FunctionAST(range.begin, new IdentifierAST(range.begin, ""), parameters, null, expressions)
+      new FunctionAST(range.begin, new IdentifierAST(range.begin, ""), [], parameters, null, expressions)
     )
 );
 
@@ -44,7 +44,7 @@ var parseNamedFunction = lazy(() =>
   )
     .withRange()
     .map(([[name, parameters, returnType, expressions], range]) =>
-      new FunctionAST(range.begin, name, parameters, returnType, expressions, true)
+      new FunctionAST(range.begin, name, [], parameters, returnType, expressions, true)
     )
 );
 
