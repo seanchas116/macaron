@@ -1,4 +1,5 @@
 import BaseError from "../common/BaseError";
+const colors = require("colors/safe");
 
 export
 class Position {
@@ -33,7 +34,7 @@ class Cache {
 export
 class State {
 
-  constructor(public text: string, public position: Position, public trace: boolean, public cache: Cache) {
+  constructor(public text: string, public position: Position, public cache: Cache, public tracer: Tracer) {
   }
 
   substring(length: number) {
@@ -55,11 +56,11 @@ class State {
     const newColumn = (1 < proceedLines.length) ? lastLineLength + 1 : this.position.column + lastLineLength;
 
     const newPos = new Position(newIndex, newLine, newColumn);
-    return new State(this.text, newPos, this.trace, this.cache);
+    return new State(this.text, newPos, this.cache, this.tracer);
   }
 
   static init(text: string, trace: boolean) {
-    return new State(text, new Position(0, 1, 1), trace, new Cache());
+    return new State(text, new Position(0, 1, 1), new Cache(), trace ? new Tracer() : null);
   }
 }
 
@@ -95,6 +96,23 @@ class SyntaxError extends BaseError {
 export
 type Result<T> = Success<T> | Failure;
 
+class Tracer {
+  last = "";
+
+  trace<T>(result: Result<T>) {
+    const message = result.toString();
+    if (message == this.last) {
+      return;
+    }
+    this.last = message;
+    if (result instanceof Failure) {
+      console.log(colors.red(message));
+    } else {
+      console.log(colors.green(message));
+    }
+  }
+}
+
 interface ParserOpts {
 
 }
@@ -115,8 +133,8 @@ class Parser<T> {
       result = this._parse(state);
       state.cache.set(this, index, result);
     }
-    if (state.trace) {
-      console.log(result.toString());
+    if (state.tracer) {
+      state.tracer.trace(result);
     }
     return result;
   }
