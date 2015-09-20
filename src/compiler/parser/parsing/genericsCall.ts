@@ -4,12 +4,12 @@ import {
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
-import {keyword} from "./common";
-import {parseLines} from "./block";
+import {keyword, separated} from "./common";
+import {parsePostfix} from "./postfix";
 
 export
 var parseGenericsArgumentList = lazy(() =>
-  keyword("<").thenTake(parseLines).thenSkip(keyword(">"))
+  keyword("<").thenTake(separated(parsePostfix)).thenSkip(keyword(">"))
 );
 
 export
