@@ -1,6 +1,6 @@
 import {
   ExpressionAST,
-  GenericsCallAST,
+  FunctionCallAST,
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
@@ -15,6 +15,6 @@ var parseArgumentList = lazy(() =>
 export
 var parseFunctionCall: Parser<(value: ExpressionAST) => ExpressionAST> = lazy(() =>
   parseArgumentList.map(args =>
-    (value: ExpressionAST) => new GenericsCallAST(value.location, value, args)
+    (value: ExpressionAST) => new FunctionCallAST(value.location, value, args, false)
   )
 );
