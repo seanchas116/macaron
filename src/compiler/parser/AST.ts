@@ -51,6 +51,16 @@ class FunctionCallAST extends ExpressionAST {
 }
 
 export
+class GenericsCallAST extends ExpressionAST {
+  arguments: ExpressionAST[];
+
+  constructor(location: SourceLocation, public value: ExpressionAST, args: ExpressionAST[]) {
+    super(location);
+    this.arguments = args;
+  }
+}
+
+export
 class IfAST extends ExpressionAST {
   constructor(location: SourceLocation, public condition: ExpressionAST, public ifTrue: ExpressionAST[], public ifFalse: ExpressionAST[]) {
     super(location);
