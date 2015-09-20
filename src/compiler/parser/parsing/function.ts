@@ -24,6 +24,19 @@ var parseParameterList = lazy(() =>
     .thenSkip(keyword(")"))
 );
 
+var parseGenericsParameter = lazy(() =>
+  parseIdentifier
+    .withRange()
+    .map(([name, range]) => new ParameterAST(range.begin, name, new IdentifierAST(range.begin, "void")))
+);
+
+export
+var parseGenericsParameterList = lazy(() =>
+  keyword("<")
+    .thenTake(separated(parseGenericsParameter))
+    .thenSkip(keyword(">"))
+);
+
 var parseUnnamedFunction = lazy(() =>
   sequence(
     parseParameterList,
@@ -38,13 +51,14 @@ var parseUnnamedFunction = lazy(() =>
 var parseNamedFunction = lazy(() =>
   sequence(
     keyword("func").thenTake(parseIdentifier),
+    parseGenericsParameterList.mayBe(),
     parseParameterList,
     parseExpression.mayBe(),
     parseBlock
   )
     .withRange()
-    .map(([[name, parameters, returnType, expressions], range]) =>
-      new FunctionAST(range.begin, name, [], parameters, returnType, expressions, true)
+    .map(([[name, genericsParams, parameters, returnType, expressions], range]) =>
+      new FunctionAST(range.begin, name, genericsParams || [], parameters, returnType, expressions, true)
     )
 );
 
