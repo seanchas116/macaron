@@ -28,15 +28,6 @@ class Foo : Bar {
   setZ(this.z number) {
   }
 
-  // specify newly added method as operator
-  operator +
-  add(other Foo) {
-    ...
-  }
-
-  // or use existing method
-  operator + add
-
   // getter / setter is like in JavaScript
   get sum() {
     x + y + z
