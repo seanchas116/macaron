@@ -7,7 +7,7 @@ import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword} from "./common";
 import {parseExpression} from "./expression";
 import {parseBlock} from "./block";
-import {parseFunctionCall} from "./functionCall";
+import {parsePostfix} from "./postfix";
 
 var parseIfExpression: Parser<ExpressionAST> = lazy(() =>
   keyword("if").thenTake(
@@ -34,6 +34,6 @@ export
 var parseControlExpression = lazy(() =>
   choose(
     parseIfExpression,
-    parseFunctionCall
+    parsePostfix
   )
 );
