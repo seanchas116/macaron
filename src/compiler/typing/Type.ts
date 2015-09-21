@@ -63,7 +63,7 @@ class Type {
       .reduce(mergeMap);
   }
 
-  isCastableTo(other: Type): boolean {
+  isAssignableTo(other: Type): boolean {
     if (this === other) {
       return true;
     }
@@ -73,16 +73,16 @@ class Type {
       return memoizedResult;
     }
     castResults.set([this, other], true); // temporarily set to true to avoid infinite recursion
-    const result = this.isCastableToImpl(other);
+    const result = this.isAssignableToImpl(other);
     castResults.set([this, other], result);
     return result;
   }
 
   equals(other: Type) {
-    return this.isCastableTo(other) && other.isCastableTo(this);
+    return this.isAssignableTo(other) && other.isAssignableTo(this);
   }
 
-  private isCastableToImpl(other: Type) {
+  protected isAssignableToImpl(other: Type) {
     for (const [name, memberOther] of other.getMembers()) {
       const memberThis = this.getMember(name);
       if (!memberThis) {
@@ -96,7 +96,7 @@ class Type {
       }
       else {
         // covariant
-        if (!memberThis.getType().isCastableTo(memberOther.getType())) {
+        if (!memberThis.getType().isAssignableTo(memberOther.getType())) {
           return false;
         }
       }

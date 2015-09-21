@@ -9,11 +9,11 @@ class CallSignature {
     if (this.params.length !== args.length) {
       return false;
     }
-    if (!selfType.isCastableTo(this.selfType)) {
+    if (!selfType.isAssignableTo(this.selfType)) {
       return false;
     }
     for (let i = 0; i < args.length; ++i) {
-      if (!args[i].isCastableTo(this.params[i])) {
+      if (!args[i].isAssignableTo(this.params[i])) {
         return false;
       }
     }
@@ -26,7 +26,7 @@ class CallSignature {
     if (!this.isCallable(other.selfType, other.params)) {
       return false;
     }
-    if (!this.returnType.isCastableTo(other.returnType)) {
+    if (!this.returnType.isAssignableTo(other.returnType)) {
       return false;
     }
     return true;
