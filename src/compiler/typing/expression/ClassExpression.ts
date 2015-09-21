@@ -46,7 +46,7 @@ class ClassExpression extends Expression {
 
     const superType = this.superType;
     const superMember = superType.getMember(name.name);
-    if (superMember && !type.isAssignableTo(superMember.getType())) {
+    if (superMember && !superMember.getType().isAssignable(type)) {
       throw CompilationError.typeError(
         `Type of "${name.name}" is not compatible to super types`,
         name.location

@@ -9,32 +9,30 @@ class CallSignature {
     if (this.params.length !== args.length) {
       return false;
     }
-    if (!selfType.isAssignableTo(this.selfType)) {
+    if (!this.selfType.isAssignable(selfType)) {
       return false;
     }
-    for (let i = 0; i < args.length; ++i) {
-      if (!args[i].isAssignableTo(this.params[i])) {
-        return false;
-      }
+    if (this.params.some((param, i) => !param.isAssignable(args[i]))) {
+      return false;
     }
     return true;
   }
 
-  isCastableTo(other: CallSignature) {
+  isAssignable(other: CallSignature) {
     // OK: (Object)=>Array to (Array)=>Object
     // NG: (Array)=>Object to (Object)=>Array
-    if (!this.isCallable(other.selfType, other.params)) {
+    if (!other.isCallable(this.selfType, this.params)) {
       return false;
     }
-    if (!this.returnType.isAssignableTo(other.returnType)) {
+    if (!this.returnType.isAssignable(other.returnType)) {
       return false;
     }
     return true;
   }
 
-  static isCastableTo(fromSigs: CallSignature[], toSigs: CallSignature[]) {
+  static isAssignable(toSigs: CallSignature[], fromSigs: CallSignature[]) {
     return toSigs.every(toSig => {
-      return fromSigs.some(fromSig => fromSig.isCastableTo(toSig));
+      return fromSigs.some(fromSig => toSig.isAssignable(fromSig));
     });
   }
 }

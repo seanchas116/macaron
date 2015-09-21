@@ -63,7 +63,7 @@ class Type {
       .reduce(mergeMap);
   }
 
-  isAssignableTo(other: Type): boolean {
+  isAssignable(other: Type): boolean {
     if (this === other) {
       return true;
     }
@@ -73,38 +73,38 @@ class Type {
       return memoizedResult;
     }
     castResults.set([this, other], true); // temporarily set to true to avoid infinite recursion
-    const result = this.isAssignableToImpl(other);
+    const result = this.isAssignableImpl(other);
     castResults.set([this, other], result);
     return result;
   }
 
   equals(other: Type) {
-    return this.isAssignableTo(other) && other.isAssignableTo(this);
+    return this.isAssignable(other) && other.isAssignable(this);
   }
 
-  protected isAssignableToImpl(other: Type) {
-    for (const [name, memberOther] of other.getMembers()) {
-      const memberThis = this.getMember(name);
-      if (!memberThis) {
+  protected isAssignableImpl(other: Type) {
+    for (const [name, memberThis] of this.getMembers()) {
+      const memberOther = other.getMember(name);
+      if (!memberOther) {
         return false;
       }
-      if (memberOther.constness == Constness.Variable) {
+      if (memberThis.constness == Constness.Variable) {
         // nonvariant
-        if (!memberThis.getType().equals(memberOther.getType())) {
+        if (!memberOther.getType().equals(memberThis.getType())) {
           return false;
         }
       }
       else {
         // covariant
-        if (!memberThis.getType().isAssignableTo(memberOther.getType())) {
+        if (!memberThis.getType().isAssignable(memberOther.getType())) {
           return false;
         }
       }
     }
-    if (!CallSignature.isCastableTo(this.callSignatures, other.callSignatures)) {
+    if (!CallSignature.isAssignable(this.callSignatures, other.callSignatures)) {
       return false;
     }
-    if (!CallSignature.isCastableTo(this.newSignatures, other.newSignatures)) {
+    if (!CallSignature.isAssignable(this.newSignatures, other.newSignatures)) {
       return false;
     }
     return true;

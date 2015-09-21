@@ -51,7 +51,7 @@ class EvaluationContext {
     }
     const type = metaValue.get().valueType;
     const variableType = member.metaValue.get().valueType;
-    if (!type.isAssignableTo(variableType)) {
+    if (!variableType.isAssignable(type)) {
       throw CompilationError.typeError(
         `Cannot assign '${type}' to type '${variableType}'`,
         name.location

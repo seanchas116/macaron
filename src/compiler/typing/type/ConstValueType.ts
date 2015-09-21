@@ -6,10 +6,10 @@ class ConstValueType extends Type {
     super(`[${constValue}]`, [type]);
   }
 
-  isAssignableTo(other: Type): boolean {
+  isAssignable(other: Type): boolean {
     if (other instanceof ConstValueType) {
       return this.constValue === other.constValue;
     }
-    return super.isAssignableTo(other);
+    return super.isAssignable(other);
   }
 }
