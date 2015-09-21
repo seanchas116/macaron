@@ -65,6 +65,7 @@
         "./src/compiler/typing/thunk/MetaValueThunk.ts",
         "./src/compiler/typing/type/ConstValueType.ts",
         "./src/compiler/typing/type/FunctionType.ts",
+        "./src/compiler/typing/type/GenericsParameterType.ts",
         "./src/compiler/typing/type/TupleType.ts",
         "./src/compiler/typing/type/UnionType.ts",
         "./src/test/compilerTest.ts",
