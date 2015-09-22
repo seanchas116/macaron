@@ -10,30 +10,29 @@ import {parseGenericsCall} from "./genericsCall";
 import {parseMemberAccess} from "./memberAccess";
 
 export
-var parsePostfix = lazy(() =>
-  sequence(
-    parseNew,
-    choose(
-      parseFunctionCall,
-      parseGenericsCall,
-      parseMemberAccess
-    ).repeat()
+function parsePostfixWith(subParser: Parser<ExpressionAST>, postfixParsers: Parser<(value: ExpressionAST) => ExpressionAST>[]) {
+  return sequence(
+    subParser,
+    choose(...postfixParsers).repeat()
   )
     .map(([value, postfixes]) =>
       postfixes.reduce((current, postfix) => postfix(current), value)
-    )
+    );
+}
+
+export
+var parsePostfix = lazy(() =>
+  parsePostfixWith(parseNew, [
+    parseFunctionCall,
+    parseGenericsCall,
+    parseMemberAccess
+  ])
 );
 
 export
 var parsePostfixWithoutFunctionCall = lazy(() =>
-  sequence(
-    parseNew,
-    choose(
-      parseGenericsCall,
-      parseMemberAccess
-    ).repeat()
-  )
-    .map(([value, postfixes]) =>
-      postfixes.reduce((current, postfix) => postfix(current), value)
-    )
+  parsePostfixWith(parseNew, [
+    parseGenericsCall,
+    parseMemberAccess
+  ])
 );
