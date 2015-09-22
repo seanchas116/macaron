@@ -23,8 +23,8 @@ class Type {
   selfMembers = new Map<string, Member>();
   selfBinaryOperators = new Map<string, Operator>();
   selfUnaryOperators = new Map<string, Operator>();
-  callSignatures: CallSignature[] = [];
-  newSignatures: CallSignature[] = [];
+  selfCallSignatures: CallSignature[] = null;
+  selfNewSignatures: CallSignature[] = null;
 
   constructor(public name: string, public superTypes: Type[] = [], public location: SourceLocation = null, public expression: Expression = null) {
     this.location = location || SourceLocation.empty();
@@ -63,6 +63,26 @@ class Type {
       .reduce(mergeMap);
   }
 
+  getCallSignatures(): CallSignature[] {
+    if (this.selfCallSignatures) {
+      return this.selfCallSignatures;
+    } else {
+      return this.superTypes
+        .map(t => t.getCallSignatures())
+        .reduce((a, b) => a.concat(b), []);
+    }
+  }
+
+  getNewSignatures(): CallSignature[] {
+    if (this.selfNewSignatures) {
+      return this.selfNewSignatures;
+    } else {
+      return this.superTypes
+        .map(t => t.getNewSignatures())
+        .reduce((a, b) => a.concat(b), []);
+    }
+  }
+
   isAssignable(other: Type): boolean {
     if (this === other) {
       return true;
@@ -90,21 +110,21 @@ class Type {
       }
       if (memberThis.constness == Constness.Variable) {
         // nonvariant
-        if (!memberOther.getType().equals(memberThis.getType())) {
+        if (!memberOther.type.get().equals(memberThis.type.get())) {
           return false;
         }
       }
       else {
         // covariant
-        if (!memberThis.getType().isAssignable(memberOther.getType())) {
+        if (!memberThis.type.get().isAssignable(memberOther.type.get())) {
           return false;
         }
       }
     }
-    if (!CallSignature.isAssignable(this.callSignatures, other.callSignatures)) {
+    if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures())) {
       return false;
     }
-    if (!CallSignature.isAssignable(this.newSignatures, other.newSignatures)) {
+    if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures())) {
       return false;
     }
     return true;

@@ -3,8 +3,7 @@ import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
 import Member, {Constness} from "../Member";
-import MetaValue from "../MetaValue";
-import MetaValueThunk from "../thunk/MetaValueThunk";
+import TypeThunk from "../thunk/TypeThunk";
 
 function unionMembers(type: UnionType, members1: Map<string, Member>, members2: Map<string, Member>) {
   const ret = new Map<string, Member>();
@@ -15,16 +14,15 @@ function unionMembers(type: UnionType, members1: Map<string, Member>, members2: 
     const member2 = members2.get(name);
     if (member1.constness == Constness.Variable || member2.constness == Constness.Variable) {
       // nonvariant
-      if (member1.getType().equals(member2.getType())) {
-        ret.set(name, new Member(Constness.Variable, new MetaValue(member1.getType())));
+      if (member1.type.get().equals(member2.type.get())) {
+        ret.set(name, new Member(Constness.Variable, member1.type));
       }
     }
 
-    const unionMetaValue = new MetaValueThunk(type.location, () => {
-      const unionType = new UnionType([member1.getType(), member2.getType()], type.location);
-      return new MetaValue(unionType);
+    const unionType = new TypeThunk(type.location, () => {
+      return new UnionType([member1.type.get(), member2.type.get()], type.location);
     });
-    ret.set(name, new Member(Constness.Constant, unionMetaValue));
+    ret.set(name, new Member(Constness.Constant, unionType));
   }
   return ret;
 }
@@ -102,8 +100,8 @@ class UnionType extends Type {
       return unionOperators(this, operators, type.getBinaryOperators());
     }, new Map<string, Operator>());
 
-    this.callSignatures = types.reduce((sigs, type) => {
-      return unionCallSignatures(this, sigs, type.callSignatures);
+    this.selfCallSignatures = types.reduce((sigs, type) => {
+      return unionCallSignatures(this, sigs, type.getCallSignatures());
     }, []);
   }
 }

@@ -1,5 +1,4 @@
-import MetaValue from "./MetaValue";
-import MetaValueThunk from "./thunk/MetaValueThunk";
+import TypeThunk from "./thunk/TypeThunk";
 import Type from "./Type";
 
 export
@@ -11,17 +10,13 @@ enum Constness {
 
 export default
 class Member {
-  metaValue: MetaValueThunk;
+  type: TypeThunk;
 
-  constructor(public constness: Constness, metaValue: MetaValue|MetaValueThunk) {
-    this.metaValue = MetaValueThunk.resolve(metaValue);
-  }
-
-  getType() {
-    return this.metaValue.get().valueType;
+  constructor(public constness: Constness, type: Type|TypeThunk) {
+    this.type = TypeThunk.resolve(type);
   }
 
   mapType(f: (type: Type) => Type) {
-    return new Member(this.constness, this.metaValue.get().mapType(f));
+    return new Member(this.constness, this.type.map(f));
   }
 }

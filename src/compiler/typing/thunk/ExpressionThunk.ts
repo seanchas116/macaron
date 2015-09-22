@@ -1,19 +1,19 @@
 import Thunk from "../Thunk";
+import Type from "../Type";
+import TypeThunk from "./TypeThunk";
 import Expression from "../Expression";
-import MetaValue from "../MetaValue";
-import MetaValueThunk from "./MetaValueThunk";
 import SourceLocation from "../../common/SourceLocation";
 
 export default
 class ExpressionThunk extends Thunk<Expression> {
-  public metaValue: MetaValueThunk;
+  public type: TypeThunk;
 
-  constructor(location: SourceLocation, getter: () => Expression, metaValue: MetaValue = null) {
+  constructor(location: SourceLocation, getter: () => Expression, type: Type = null) {
     super(location, getter);
-    if (metaValue) {
-      this.metaValue = MetaValueThunk.resolve(metaValue);
+    if (type) {
+      this.type= TypeThunk.resolve(type);
     } else {
-      this.metaValue = new MetaValueThunk(location, () => this.get().metaValue);
+      this.type= new TypeThunk(location, () => this.get().type);
     }
   }
 

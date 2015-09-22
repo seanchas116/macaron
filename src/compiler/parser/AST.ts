@@ -72,6 +72,9 @@ class IdentifierAST extends ExpressionAST {
   constructor(location: SourceLocation, public name: string) {
     super(location);
   }
+  toString() {
+    return this.name;
+  }
 }
 
 export

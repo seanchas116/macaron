@@ -1,7 +1,6 @@
 import Type from "./Type";
 import {voidType} from "./nativeTypes";
 import Member, {Constness} from "./Member";
-import MetaValue from "./MetaValue";
 import CompilationError from "../common/CompilationError";
 
 export
@@ -21,7 +20,7 @@ class Environment {
 
   addTempVariable(baseName: string) {
     const name = this.nonDuplicateVariableName(baseName);
-    this.addVariable(name, new Member(Constness.Constant, new MetaValue(voidType)));
+    this.addVariable(name, new Member(Constness.Constant, voidType));
     return name;
   }
 

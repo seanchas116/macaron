@@ -1,11 +1,10 @@
 import Environment, {BlockEnvironment, ThisEnvironment} from "./Environment";
 import Type from "./Type";
-import MetaValueThunk from "./thunk/MetaValueThunk";
 import Identifier from "./Identifier";
-import CompilationError from "../common/CompilationError";
+import TypeThunk from "./thunk/TypeThunk";
 import Member, {Constness} from "./Member";
-import MetaValue from "./MetaValue";
 import {typeOnlyType} from "./nativeTypes";
+import CompilationError from "../common/CompilationError";
 
 export default
 class EvaluationContext {
@@ -33,8 +32,8 @@ class EvaluationContext {
     return variable;
   }
 
-  assignVariable(name: Identifier, metaValueOrThunk: MetaValue|MetaValueThunk) {
-    const metaValue = MetaValueThunk.resolve(metaValueOrThunk);
+  assignVariable(name: Identifier, typeOrOrThunk: Type|TypeThunk) {
+    const type = TypeThunk.resolve(typeOrOrThunk);
     const {member} = this.getVariable(name);
 
     if (member.constness === Constness.Constant) {
@@ -49,17 +48,15 @@ class EvaluationContext {
         name.location
       );
     }
-    const type = metaValue.get().valueType;
-    const variableType = member.metaValue.get().valueType;
-    if (!variableType.isAssignable(type)) {
+    if (!member.type.get().isAssignable(type.get())) {
       throw CompilationError.typeError(
-        `Cannot assign '${type}' to type '${variableType}'`,
+        `Cannot assign '${type.get()}' to type '${member.type.get()}'`,
         name.location
       );
     }
   }
 
-  addVariable(constness: Constness, name: Identifier, metaValue: MetaValue|MetaValueThunk) {
+  addVariable(constness: Constness, name: Identifier, type: Type|TypeThunk) {
     const variable = this.environment.getVariable(name.name);
     if (variable && variable.member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
@@ -73,6 +70,6 @@ class EvaluationContext {
         name.location
       );
     }
-    this.environment.addVariable(name.name, new Member(constness, metaValue));
+    this.environment.addVariable(name.name, new Member(constness, type));
   }
 }

@@ -3,7 +3,6 @@ import Type from "./Type";
 import UnionType from "./type/UnionType";
 import Identifier from "./Identifier";
 import Operator from "./Operator";
-import MetaValue from "./MetaValue";
 import {Constness} from "./Member";
 
 import SourceLocation from "../common/SourceLocation";
@@ -11,19 +10,15 @@ import CompilationError from "../common/CompilationError";
 
 export default
 class Expression {
-  metaValue = new MetaValue(voidType);
+  type = voidType;
 
   constructor(public location: SourceLocation) {
-  }
-
-  getType() {
-    return this.metaValue.valueType;
   }
 }
 
 export
 class IdentifierExpression extends Expression {
-  constructor(public name: Identifier, public metaValue: MetaValue) {
+  constructor(public name: Identifier, public type: Type) {
     super(name.location);
   }
 }
@@ -57,16 +52,16 @@ class FunctionCallExpression extends Expression {
     let selfType = voidType;
     if (!isNewCall) {
       if (func instanceof MemberAccessExpression) {
-        selfType = func.object.getType();
+        selfType = func.object.type;
       }
       if (func instanceof OperatorAccessExpression) {
-        selfType = func.object.getType();
+        selfType = func.object.type;
       }
     }
 
-    const funcType = func.getType();
-    const sigs = isNewCall ? funcType.newSignatures : funcType.callSignatures;
-    const argTypes = args.map(a => a.getType());
+    const funcType = func.type;
+    const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
+    const argTypes = args.map(a => a.type);
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes));
     if (!sig) {
       throw CompilationError.typeError(
@@ -74,7 +69,7 @@ class FunctionCallExpression extends Expression {
         location
       );
     }
-    this.metaValue = new MetaValue(sig.returnType);
+    this.type = sig.returnType;
   }
 }
 
@@ -94,7 +89,7 @@ class LiteralExpression extends Expression {
           return voidType;
       }
     })();
-    this.metaValue = new MetaValue(type);
+    this.type = type;
   }
 }
 
@@ -102,7 +97,7 @@ export
 class ReturnExpression extends Expression {
   constructor(location: SourceLocation, public expression: Expression) {
     super(location);
-    this.metaValue = expression.metaValue;
+    this.type = expression.type;
   }
 }
 
@@ -110,7 +105,7 @@ export
 class MemberAccessExpression extends Expression {
   constructor(location: SourceLocation, public object: Expression , public member: Identifier) {
     super(location);
-    const objectType = object.getType();
+    const objectType = object.type;
 
     if (!objectType.getMember(member.name)) {
       throw CompilationError.typeError(
@@ -118,7 +113,7 @@ class MemberAccessExpression extends Expression {
         location
       );
     }
-    this.metaValue = objectType.getMember(member.name).metaValue.get();
+    this.type = objectType.getMember(member.name).type.get();
   }
 }
 
@@ -128,7 +123,7 @@ class OperatorAccessExpression extends Expression {
 
   constructor(location: SourceLocation, public object: Expression, operatorName: Identifier, arity: number) {
     super(location);
-    const objectType = object.getType();
+    const objectType = object.type;
     if (arity === 1) {
       this.operator = objectType.getUnaryOperators().get(operatorName.name);
     } else if (arity === 2) {
@@ -142,13 +137,13 @@ class OperatorAccessExpression extends Expression {
         operatorName.location
       );
     }
-    this.metaValue = new MetaValue(this.operator.type);
+    this.type = this.operator.type;
   }
 }
 
 function blockType(block: Expression[]) {
   if (block.length > 0) {
-    return block[block.length - 1].getType();
+    return block[block.length - 1].type;
   } else {
     return voidType;
   }
@@ -158,13 +153,13 @@ export
 class IfExpression extends Expression {
   constructor(location: SourceLocation, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
     super(location);
-    this.metaValue = new MetaValue(new UnionType([blockType(ifTrue), blockType(ifFalse)], location));
+    this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], location);
   }
 }
 
 export
 class EmptyExpression extends Expression {
-  constructor(public location: SourceLocation, public metaValue: MetaValue) {
+  constructor(public location: SourceLocation, public type: Type) {
     super(location);
   }
 }

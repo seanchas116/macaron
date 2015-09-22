@@ -32,13 +32,13 @@ export
 const initNativeTypes: () => void = once(() => {
   function addNativeBinaryOp(type: Type, name: string, ret: Type = type, nativeName = name) {
     const opType = new Type(`${type} operator ${name}`);
-    opType.callSignatures.push(new CallSignature(type, [type], ret));
+    opType.selfCallSignatures = [new CallSignature(type, [type], ret)];
     type.selfBinaryOperators.set(name, new NativeOperator(nativeName, opType));
   }
 
   function addNativeUnaryOp(type: Type, name: string, ret: Type = type) {
     const opType = new Type(`${type} operator ${name}`);
-    opType.callSignatures.push(new CallSignature(type, [], ret));
+    opType.selfCallSignatures = [new CallSignature(type, [], ret)];
     type.selfUnaryOperators.set(name, new NativeOperator(name, opType));
   }
 

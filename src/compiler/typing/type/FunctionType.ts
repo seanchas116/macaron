@@ -26,11 +26,12 @@ class FunctionType extends Type {
         this.name = `(${selfType})${funcName}`;
       }
     }
+    this.selfCallSignatures = [];
 
     for (let i = 0; i <= optionalParams.length; ++i) {
       const signatureParams = params.concat(optionalParams.slice(0, optionalParams.length - i));
       const signature = new CallSignature(selfType, signatureParams, returnType);
-      this.callSignatures.push(signature);
+      this.selfCallSignatures.push(signature);
     }
   }
 }

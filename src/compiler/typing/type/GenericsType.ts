@@ -26,8 +26,12 @@ function replaceGenericsArgs(type: Type, args: Map<GenericsParameterType, Type>)
   }
   // TODO: operators
 
-  newType.callSignatures = type.callSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
-  newType.newSignatures = type.newSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
+  if (type.selfCallSignatures) {
+    newType.selfCallSignatures = type.selfCallSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
+  }
+  if (type.selfNewSignatures) {
+    newType.selfNewSignatures = type.selfNewSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
+  }
 
   return newType;
 }

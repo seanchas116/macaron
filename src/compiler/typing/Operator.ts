@@ -19,7 +19,7 @@ class MethodOperator extends Operator {
 
   constructor(objType: Type, public methodName: string) {
     super();
-    this.type = objType.getMember(methodName).getType();
+    this.type = objType.getMember(methodName).type.get();
     if (!this.type) {
       throw new Error("no method found");
     }
