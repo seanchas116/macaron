@@ -25,6 +25,13 @@ class NewVariableAST extends ExpressionAST {
 }
 
 export
+class TypeAliasAST extends ExpressionAST {
+  constructor(location: SourceLocation, public left: IdentifierAST, public right: ExpressionAST) {
+    super(location);
+  }
+}
+
+export
 class BinaryAST extends ExpressionAST {
   constructor(location: SourceLocation, public left: ExpressionAST, public operator: OperatorAST, public right: ExpressionAST) {
     super(location);

@@ -44,6 +44,8 @@
         "./src/compiler/parser/parsing/operator.ts",
         "./src/compiler/parser/parsing/postfix.ts",
         "./src/compiler/parser/parsing/string.ts",
+        "./src/compiler/parser/parsing/typeAlias.ts",
+        "./src/compiler/parser/parsing/typeExpression.ts",
         "./src/compiler/parser/parsing/value.ts",
         "./src/compiler/typing/CallSignature.ts",
         "./src/compiler/typing/Environment.ts",

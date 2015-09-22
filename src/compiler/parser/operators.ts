@@ -17,3 +17,9 @@ export
 const unaryOperators = [
   ["+", "-", "~", "!"]
 ];
+
+export
+const typeBinaryOperators = [
+  ["&"],
+  ["|"],
+];
