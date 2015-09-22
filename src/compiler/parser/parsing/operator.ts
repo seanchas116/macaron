@@ -5,13 +5,14 @@ import {
   BinaryAST,
 } from "../AST";
 
-import {choose, sequence, lazy} from "../Parser";
+import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword} from "./common";
 import {binaryOperators, unaryOperators} from "../operators";
 import {parseControlExpression} from "./control";
 
-const binaryOperatorList = binaryOperators.reduce((a, b) => a.concat(b), []).sort((a, b) => b.length - a.length);
-const unaryOperatorList = unaryOperators.reduce((a, b) => a.concat(b), []).sort((a, b) => b.length - a.length);
+function flattenSort(operators: string[][]) {
+  return operators.reduce((a, b) => a.concat(b), []).sort((a, b) => b.length - a.length);
+}
 
 export
 function parseOperator(operatorList: string[]) {
@@ -20,10 +21,7 @@ function parseOperator(operatorList: string[]) {
     .map(([op, range]) => new OperatorAST(range.begin, op));
 }
 
-const parseBinaryOperator = parseOperator(binaryOperatorList);
-const parseUnaryOperator = parseOperator(unaryOperatorList);
-
-function buildBinaryExpression(first: ExpressionAST, rest: [OperatorAST, ExpressionAST][]): ExpressionAST {
+function buildBinaryExpression(binaryOperators: string[][], first: ExpressionAST, rest: [OperatorAST, ExpressionAST][]): ExpressionAST {
   let operands = [first, ...rest.map(t => t[1])];
   let operators = rest.map(t => t[0]);
 
@@ -41,23 +39,30 @@ function buildBinaryExpression(first: ExpressionAST, rest: [OperatorAST, Express
 }
 
 export
-var parseUnaryExpression = lazy(() =>
-  choose(
-    parseControlExpression,
+function parseUnaryExpressionWith(subParser: Parser<ExpressionAST>, operators: string[][]) {
+  return choose(
+    subParser,
     sequence(
-      parseUnaryOperator,
-      parseControlExpression
+      parseOperator(flattenSort(operators)),
+      subParser
     )
       .withRange()
       .map(([[operator, operand], range]) => new UnaryAST(range.begin, operator, operand))
-  )
-);
+  );
+}
 
 export
-var parseBinaryExpression = lazy(() =>
-  sequence(
-    parseUnaryExpression,
-    sequence(parseBinaryOperator, parseUnaryExpression).repeat()
+function parseBinaryExpressionWith(subParser: Parser<ExpressionAST>, operators: string[][]) {
+  const operatorList = flattenSort(operators);
+  return sequence(
+    subParser,
+    sequence(parseOperator(flattenSort(operators)), subParser).repeat()
   )
-    .map(([first, rest]) => buildBinaryExpression(first, rest))
-);
+    .map(([first, rest]) => buildBinaryExpression(operators, first, rest));
+}
+
+export
+var parseUnaryExpression = lazy(() => parseUnaryExpressionWith(parseControlExpression, unaryOperators));
+
+export
+var parseBinaryExpression = lazy(() => parseBinaryExpressionWith(parseUnaryExpression, binaryOperators));
