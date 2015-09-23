@@ -8,7 +8,7 @@ import {
 
 import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword, separated} from "./common";
-import {parseExpression} from "./expression";
+import {parseTypeExpression} from "./typeExpression";
 import {parseIdentifier} from "./identifier";
 import {parseBlock} from "./block";
 import {parseParameterList} from "./function";
@@ -17,7 +17,7 @@ var parseMethod = lazy(() =>
   sequence(
     parseIdentifier,
     parseParameterList,
-    parseExpression.mayBe(),
+    parseTypeExpression.mayBe(),
     parseBlock
   )
     .withRange()
@@ -30,7 +30,7 @@ var parseMethod = lazy(() =>
 var parseMember = parseMethod;
 
 var parseSuperType = lazy(() =>
-  keyword(":").thenTake(parseExpression)
+  keyword(":").thenTake(parseTypeExpression)
 );
 
 export
@@ -52,7 +52,7 @@ var parseMethodDeclaration = lazy(() =>
   sequence(
     parseIdentifier,
     parseParameterList,
-    parseExpression
+    parseTypeExpression
   )
     .withRange()
     .map(([[name, params, returnType], range]) =>
@@ -63,7 +63,7 @@ var parseMethodDeclaration = lazy(() =>
 var parseMemberDeclaration = parseMethodDeclaration;
 
 var parseSuperTypes = lazy(() =>
-  keyword(":").thenTake(separated(parseExpression))
+  keyword(":").thenTake(separated(parseTypeExpression))
 );
 
 export

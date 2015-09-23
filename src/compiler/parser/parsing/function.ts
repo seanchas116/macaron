@@ -7,12 +7,12 @@ import {
 
 import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword, separated} from "./common";
-import {parseExpression} from "./expression";
+import {parseTypeExpression} from "./typeExpression";
 import {parseIdentifier} from "./identifier";
 import {parseBlock} from "./block";
 
 var parseParameter = lazy(() =>
-  sequence(parseIdentifier, parseExpression)
+  sequence(parseIdentifier, parseTypeExpression)
     .withRange()
     .map(([[name, type], range]) => new ParameterAST(range.begin, name, type))
 );
@@ -53,7 +53,7 @@ var parseNamedFunction = lazy(() =>
     keyword("func").thenTake(parseIdentifier),
     parseGenericsParameterList.mayBe(),
     parseParameterList,
-    parseExpression.mayBe(),
+    parseTypeExpression.mayBe(),
     parseBlock
   )
     .withRange()
