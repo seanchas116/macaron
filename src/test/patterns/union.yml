@@ -17,3 +17,24 @@
     let foobar FooBar = new Hoge()
     foobar.foo(100, 200)
   expected: 20000
+
+- title: intersection type OK
+  src: |
+    interface Foo {
+      foo(x number, y number) number
+    }
+    interface Bar {
+      bar(x number, y number, z number) number
+    }
+    class Hoge {
+      foo(x number, y number) {
+        x * y
+      }
+      bar(x number, y number, z number) {
+        x * y * z
+      }
+    }
+    type FooBar = Foo & Bar
+    let foobar FooBar = new Hoge()
+    foobar.foo(100, 200) + foobar.bar(2,3,4)
+  expected: 20024
