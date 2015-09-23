@@ -68,6 +68,7 @@
         "./src/compiler/typing/type/FunctionType.ts",
         "./src/compiler/typing/type/GenericsParameterType.ts",
         "./src/compiler/typing/type/GenericsType.ts",
+        "./src/compiler/typing/type/IntersectionType.ts",
         "./src/compiler/typing/type/MetaType.ts",
         "./src/compiler/typing/type/TupleType.ts",
         "./src/compiler/typing/type/UnionType.ts",
