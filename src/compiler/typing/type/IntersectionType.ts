@@ -55,7 +55,7 @@ class IntersectionType extends Type {
       }
     }
     types = this.types = Array.from(typeSet);
-    this.name = types.join("|");
+    this.name = types.join(" & ");
 
     this.selfMembers = types.reduce((members, type) => {
       return intersectionMembers(loc, members, type.getMembers());
