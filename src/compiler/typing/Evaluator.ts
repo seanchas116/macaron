@@ -13,6 +13,7 @@ import {
   MemberAccessAST,
   IfAST,
   InterfaceAST,
+  TypeAliasAST,
 } from "../parser/AST";
 
 import Expression, {
@@ -115,6 +116,9 @@ class Evaluator {
     }
     else if (ast instanceof InterfaceAST) {
       return this.evaluateInterface(ast);
+    }
+    else if (ast instanceof TypeAliasAST) {
+      return this.evaluateTypeAlias(ast);
     }
     else {
       throw new Error(`Not supported AST: ${ast.constructor.name}`);
@@ -326,6 +330,15 @@ class Evaluator {
     const ifFalse = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
     return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
+  }
+
+  evaluateTypeAlias(ast: TypeAliasAST) {
+    const type = this.evaluateType(ast.right);
+    const varType = MetaType.typeOnly(type);
+
+    this.context.addVariable(Constness.Constant, ast.left, varType);
+
+    return new EmptyExpression(ast.location, varType);
   }
 
   evaluateType(ast: ExpressionAST): Type {
