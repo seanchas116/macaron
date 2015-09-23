@@ -1,4 +1,5 @@
 import Type from "../Type";
+import IntersectionType from "./IntersectionType";
 import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
@@ -29,20 +30,17 @@ function unionMembers(location: SourceLocation, members1: Map<string, Member>, m
   return ret;
 }
 
-function deepEqual<T>(xs: T[], ys: T[]) {
-  return xs.every((x, i) => x === ys[i]);
-}
-
-function unionCallSignatures(type: UnionType, signatures1: CallSignature[], signatures2: CallSignature[]) {
+function unionCallSignatures(location: SourceLocation, signatures1: CallSignature[], signatures2: CallSignature[]) {
   const signatures: CallSignature[] = [];
 
   for (const sig1 of signatures1) {
-    for (const sig2 of signatures2) {
-      // TODO: intersection type
-      if (deepEqual(sig1.params, sig2.params) && sig1.selfType === sig2.selfType) {
-        const returnType = new UnionType([sig1.returnType, sig2.returnType], type.location);
-        signatures.push(new CallSignature(sig1.selfType, sig1.params, returnType));
-      }
+    const sigs2 = signatures2.filter(s => s.params.length == sig1.params.length);
+    for (const sig2 of sigs2) {
+      signatures.push(new CallSignature(
+        new IntersectionType([sig1.selfType, sig2.selfType], location),
+        sig1.params.map((p, i) => new IntersectionType([p, sig2.params[i]], location)),
+        new UnionType([sig1.returnType, sig2.returnType], location)
+      ));
     }
   }
   return signatures;
@@ -75,7 +73,7 @@ class UnionType extends Type {
     }, new Map<string, Member>());
 
     this.selfCallSignatures = types.reduce((sigs, type) => {
-      return unionCallSignatures(this, sigs, type.getCallSignatures());
+      return unionCallSignatures(loc, sigs, type.getCallSignatures());
     }, []);
   }
 }
