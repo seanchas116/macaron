@@ -35,6 +35,8 @@ import Identifier from "./Identifier";
 import Type from "./Type";
 import FunctionType from "./type/FunctionType";
 import MetaType from "./type/MetaType";
+import UnionType from "./type/UnionType";
+import IntersectionType from "./type/IntersectionType";
 import ExpressionThunk from "./thunk/ExpressionThunk";
 import {voidType, typeOnlyType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
@@ -326,8 +328,19 @@ class Evaluator {
     return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
   }
 
-  evaluateType(ast: ExpressionAST) {
-    const type = this.evaluate(ast).get().type;
+  evaluateType(ast: ExpressionAST): Type {
+    if (ast instanceof IdentifierAST) {
+      return this.evaluateTypeIdentifier(ast);
+    } else if (ast instanceof BinaryAST) {
+      return this.evaluateTypeBinary(ast);
+    } else {
+      throw new Error(`Not supported AST: ${ast.constructor.name}`);
+    }
+  }
+
+  evaluateTypeIdentifier(ast: IdentifierAST): Type {
+    const {member} = this.context.getVariable(ast);
+    const type = member.type.get();
     if (type instanceof MetaType) {
       return type.metaType;
     }
@@ -335,5 +348,22 @@ class Evaluator {
       `Expression does not represent type`,
       ast.location
     );
+  }
+
+  evaluateTypeBinary(ast: BinaryAST): Type {
+    const left = this.evaluateType(ast.left);
+    const right = this.evaluateType(ast.left);
+
+    switch (ast.operator.name) {
+      case "&": {
+        return new IntersectionType([left, right], ast.location);
+      }
+      case "|": {
+        return new UnionType([left, right], ast.location);
+      }
+      default: {
+        throw new Error(`Unsupported type operator: ${ast.operator.name}`);
+      }
+    }
   }
 }
