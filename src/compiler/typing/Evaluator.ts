@@ -131,7 +131,13 @@ class Evaluator {
 
   evaluateNewVariable(ast: NewVariableAST) {
     const varName = ast.left.name;
-    const right = this.evaluate(ast.right).get();
+    const right = this.evaluate(ast.right);
+    let type: TypeThunk;
+    if (ast.type) {
+      type = TypeThunk.resolve(this.evaluateType(ast.type));
+    } else {
+      type = right.type;
+    }
 
     const constness = (() => {
       switch (ast.declaration) {
@@ -143,8 +149,9 @@ class Evaluator {
         throw new Error(`not supported declaration: ${ast.declaration}`);
       }
     })();
-    this.context.addVariable(constness, ast.left, right.type);
-    return new NewVariableExpression(ast.location, constness, ast.left, right);
+    this.context.addVariable(constness, ast.left, type);
+    this.context.assignVariable(ast.left, right.type, true);
+    return new NewVariableExpression(ast.location, constness, ast.left, right.get());
   }
 
   evaluateAssignment(ast: AssignmentAST) {

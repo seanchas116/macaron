@@ -32,11 +32,11 @@ class EvaluationContext {
     return variable;
   }
 
-  assignVariable(name: Identifier, typeOrOrThunk: Type|TypeThunk) {
+  assignVariable(name: Identifier, typeOrOrThunk: Type|TypeThunk, firstAssign = false) {
     const type = TypeThunk.resolve(typeOrOrThunk);
     const {member} = this.getVariable(name);
 
-    if (member.constness === Constness.Constant) {
+    if (member.constness === Constness.Constant && !firstAssign) {
       throw CompilationError.typeError(
         `Variable '${name.name}' is constant and cannot be reassigned`,
         name.location
