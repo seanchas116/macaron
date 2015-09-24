@@ -16,7 +16,13 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   return ret;
 }
 
-const castResults: Map<[Type, Type], boolean> = new HashMap();
+export
+interface Assignability {
+  result: boolean;
+  reason?: string;
+}
+
+const assignabilityResults: Map<[Type, Type], Assignability> = new HashMap();
 
 export default
 class Type {
@@ -83,50 +89,71 @@ class Type {
     }
   }
 
-  isAssignable(other: Type): boolean {
+  checkAssignable(other: Type): Assignability {
     if (this === other) {
-      return true;
+      return {result: true};
     }
 
-    const memoizedResult = castResults.get([this, other]);
+    const memoizedResult = assignabilityResults.get([this, other]);
     if (memoizedResult != null) {
       return memoizedResult;
     }
-    castResults.set([this, other], true); // temporarily set to true to avoid infinite recursion
-    const result = this.isAssignableImpl(other);
-    castResults.set([this, other], result);
+    assignabilityResults.set([this, other], {result: true}); // temporarily set to true to avoid infinite recursion
+    const result = this.checkAssignableUncached(other);
+    assignabilityResults.set([this, other], result);
     return result;
+  }
+
+  isAssignable(other: Type) {
+    return this.checkAssignable(other).result;
   }
 
   equals(other: Type) {
     return this.isAssignable(other) && other.isAssignable(this);
   }
 
-  protected isAssignableImpl(other: Type) {
+  checkAssignableUncached(other: Type): Assignability {
     for (const [name, memberThis] of this.getMembers()) {
       const memberOther = other.getMember(name);
       if (!memberOther) {
-        return false;
+        return {
+          result: false,
+          reason: `Type '${other}' do not have member '${name}'`
+        };
       }
+      const typeThis = memberThis.type.get();
+      const typeOther = memberOther.type.get();
       if (memberThis.constness == Constness.Variable) {
         // nonvariant
-        if (!memberOther.type.get().equals(memberThis.type.get())) {
-          return false;
+        if (!typeOther.equals(typeThis)) {
+          return {
+            result: false,
+            reason: `Mutable member '${name} ${typeOther}' is not equal to '${typeThis}'`
+          };
         }
       }
       else {
         // covariant
         if (!memberThis.type.get().isAssignable(memberOther.type.get())) {
-          return false;
+          return {
+            result: false,
+            reason: `Member '${name} ${typeOther}' is not assignable to '${typeThis}'`
+          };
         }
       }
     }
     if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures())) {
-      return false;
+      return {
+        result: false,
+        reason: `Cannot call '${other}' with signatures of '${this}'`
+      };
     }
     if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures())) {
-      return false;
+      return {
+        result: false,
+        reason: `Cannot call '${other}' as constructor with signatures of '${this}'`
+      };
     }
-    return true;
+    return {result: true};
   }
 }

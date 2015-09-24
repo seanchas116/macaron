@@ -1,4 +1,4 @@
-import Type from "../Type";
+import Type, {Assignability} from "../Type";
 
 export default
 class ConstValueType extends Type {
@@ -6,10 +6,23 @@ class ConstValueType extends Type {
     super(`[${constValue}]`, [type]);
   }
 
-  isAssignable(other: Type): boolean {
+  checkAssignableUncached(other: Type): Assignability {
     if (other instanceof ConstValueType) {
-      return this.constValue === other.constValue && this.type.isAssignable(other.type);
+      const result = this.type.checkAssignable(other.type);
+      if (!result.result) {
+        return result;
+      }
+      if (this.constValue !== other.constValue) {
+        return {
+          result: false,
+          reason: `Constant value '${other.constValue}' is not equal to '${this.constValue}'`
+        };
+      }
+      return {result: true};
     }
-    return false;
+    return {
+      result: false,
+      reason: `Type '${other}' does not represent a constant value`
+    };
   }
 }
