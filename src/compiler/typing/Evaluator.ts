@@ -365,7 +365,7 @@ class Evaluator {
 
   evaluateTypeBinary(ast: BinaryAST): Type {
     const left = this.evaluateType(ast.left);
-    const right = this.evaluateType(ast.left);
+    const right = this.evaluateType(ast.right);
 
     switch (ast.operator.name) {
       case "&": {
