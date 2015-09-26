@@ -17,7 +17,7 @@ gulp.task("watch", shell.task([
 ]));
 
 gulp.task("test",  shell.task([
-  `mocha --require ./babel-hook ${TESTS} ${argv.join(" ")}`
+  `mocha --colors --require ./babel-hook ${TESTS} ${argv.join(" ")}`
 ]));
 
 gulp.task("test:debug", shell.task([
