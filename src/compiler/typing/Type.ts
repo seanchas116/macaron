@@ -128,7 +128,7 @@ class Type {
         if (!typeOther.equals(typeThis)) {
           return {
             result: false,
-            reason: `Mutable member '${name} ${typeOther}' is not equal to '${typeThis}'`
+            reason: `Member '${name}': '${typeOther}' is not equal to '${typeThis}'`
           };
         }
       }
@@ -137,7 +137,7 @@ class Type {
         if (!memberThis.type.get().isAssignable(memberOther.type.get())) {
           return {
             result: false,
-            reason: `Member '${name} ${typeOther}' is not assignable to '${typeThis}'`
+            reason: `Member '${name}': '${typeOther}' is not assignable to '${typeThis}'`
           };
         }
       }
