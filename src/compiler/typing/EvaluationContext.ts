@@ -51,7 +51,7 @@ class EvaluationContext {
     const assignability = member.type.get().checkAssignable(type.get());
     if (!assignability.result) {
       throw CompilationError.typeError(
-        `Cannot assign '${type.get()}' to type '${member.type.get()}': ${assignability.reason}`,
+        `Cannot assign '${type.get()}' to type '${member.type.get()}':\n  ${assignability.reason}`,
         name.location
       );
     }
