@@ -5,34 +5,34 @@ class CallSignature {
   constructor(public selfType: Type, public params: Type[], public returnType: Type) {
   }
 
-  isCallable(selfType: Type, args: Type[]) {
+  isCallable(selfType: Type, args: Type[], reasons: string[]) {
     if (this.params.length !== args.length) {
       return false;
     }
-    if (!this.selfType.isAssignable(selfType)) {
+    if (!this.selfType.isAssignable(selfType, reasons)) {
       return false;
     }
-    if (this.params.some((param, i) => !param.isAssignable(args[i]))) {
+    if (this.params.some((param, i) => !param.isAssignable(args[i], reasons))) {
       return false;
     }
     return true;
   }
 
-  isAssignable(other: CallSignature) {
+  isAssignable(other: CallSignature, reasons: string[]) {
     // OK: (Object)=>Array to (Array)=>Object
     // NG: (Array)=>Object to (Object)=>Array
-    if (!other.isCallable(this.selfType, this.params)) {
+    if (!other.isCallable(this.selfType, this.params, reasons)) {
       return false;
     }
-    if (!this.returnType.isAssignable(other.returnType)) {
+    if (!this.returnType.isAssignable(other.returnType, reasons)) {
       return false;
     }
     return true;
   }
 
-  static isAssignable(toSigs: CallSignature[], fromSigs: CallSignature[]) {
+  static isAssignable(toSigs: CallSignature[], fromSigs: CallSignature[], reasons: string[]) {
     return toSigs.every(toSig => {
-      return fromSigs.some(fromSig => toSig.isAssignable(fromSig));
+      return fromSigs.some(fromSig => toSig.isAssignable(fromSig, reasons));
     });
   }
 }

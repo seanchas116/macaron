@@ -19,7 +19,7 @@ function unionMembers(location: SourceLocation, members1: Map<string, Member>, m
 
     if (member1.constness == Constness.Variable || member2.constness == Constness.Variable) {
       // nonvariant
-      if (member1Type.equals(member2Type)) {
+      if (member1Type.equals(member2Type, [])) {
         ret.set(name, new Member(Constness.Variable, member1Type));
       }
     }

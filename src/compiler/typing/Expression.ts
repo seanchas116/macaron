@@ -62,11 +62,13 @@ class FunctionCallExpression extends Expression {
     const funcType = func.type;
     const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
     const argTypes = args.map(a => a.type);
-    const sig = sigs.find(sig => sig.isCallable(selfType, argTypes));
+    const reasons: string[] = [];
+    const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons));
     if (!sig) {
       throw CompilationError.typeError(
         location,
-        `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`
+        `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`,
+        ...reasons
       );
     }
     this.type = sig.returnType;

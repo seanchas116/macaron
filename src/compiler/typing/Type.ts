@@ -89,7 +89,7 @@ class Type {
     }
   }
 
-  isAssignable(other: Type, reasons: string[] = []) {
+  isAssignable(other: Type, reasons: string[]) {
     if (this === other) {
       return true;
     }
@@ -113,8 +113,8 @@ class Type {
     return assignable;
   }
 
-  equals(other: Type) {
-    return this.isAssignable(other) && other.isAssignable(this);
+  equals(other: Type, reasons: string[]) {
+    return this.isAssignable(other, reasons) && other.isAssignable(this, reasons);
   }
 
   isAssignableUncached(other: Type, reasons: string[]): boolean {
@@ -128,24 +128,24 @@ class Type {
       const typeOther = memberOther.type.get();
       if (memberThis.constness == Constness.Variable) {
         // nonvariant
-        if (!typeOther.equals(typeThis)) {
+        if (!typeOther.equals(typeThis, reasons)) {
           reasons.push(`Member '${name}': '${typeOther}' is not equal to '${typeThis}'`);
           return false;
         }
       }
       else {
         // covariant
-        if (!memberThis.type.get().isAssignable(memberOther.type.get())) {
+        if (!memberThis.type.get().isAssignable(memberOther.type.get(), reasons)) {
           reasons.push(`Member '${name}': '${typeOther}' is not assignable to '${typeThis}'`);
           return false;
         }
       }
     }
-    if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures())) {
+    if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures(), reasons)) {
       reasons.push(`Cannot call '${other}' with signatures of '${this}'`);
       return false;
     }
-    if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures())) {
+    if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures(), reasons)) {
       reasons.push(`Cannot call '${other}' as constructor with signatures of '${this}'`);
       return false;
     }

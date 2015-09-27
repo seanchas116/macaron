@@ -53,7 +53,8 @@ class EvaluationContext {
     if (!assignable) {
       throw CompilationError.typeError(
         name.location,
-        `Cannot assign '${type.get()}' to type '${member.type.get()}':\n  ${reasons}`
+        `Cannot assign '${type.get()}' to type '${member.type.get()}'`,
+        ...reasons
       );
     }
   }

@@ -51,7 +51,7 @@ class GenericsType extends Type {
     for (const [i, arg] of args.entries()) {
       const param = this.parameters[i];
       const {restriction} = param;
-      if (restriction.isAssignable(arg)) {
+      if (restriction.isAssignable(arg, [])) {
         throw new Error(`Genrics argument '${arg}' is not compatible to '${restriction}'`);
       }
       argMap.set(param, arg);
