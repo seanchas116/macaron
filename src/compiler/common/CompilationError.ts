@@ -9,20 +9,20 @@ class CompilationError extends BaseError {
 
   constructor(public infos: ErrorInfo[]) {
     super();
-    this.message = "\n" + infos.map(({location, messages})=> {
-      return `${location}:\n  ${messages.join("\n  ")}`;
+    this.message = "\n" + infos.map(({location, summary, descriptions})=> {
+      return `${location}: ${summary}\n  ${descriptions.join("\n  ")}`;
     }).join("\n");
   }
 
-  static typeError(location: SourceLocation, ...messages: string[]) {
+  static typeError(location: SourceLocation, summary: string, ...descriptions: string[]) {
     return new CompilationError([
-      new ErrorInfo(ErrorType.TypeError, messages, location)
+      new ErrorInfo(ErrorType.TypeError, summary, descriptions, location)
     ]);
   }
 
-  static syntaxError(location: SourceLocation, ...messages: string[]) {
+  static syntaxError(location: SourceLocation, summary: string, ...descriptions: string[]) {
     return new CompilationError([
-      new ErrorInfo(ErrorType.SyntaxError, messages, location)
+      new ErrorInfo(ErrorType.SyntaxError, summary, descriptions, location)
     ]);
   }
 }
