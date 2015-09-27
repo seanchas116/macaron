@@ -24,7 +24,7 @@
       bar(x string, y string) string
     }
     interface Baz : Foo, Bar {
-      baz(x Foo, y Bar) Baz
+      baz(x K, y K) Foo
     }
     class K {
       foo(x number, y number) {
@@ -38,5 +38,5 @@
       }
     }
     let baz Baz = new K()
-    baz.baz(baz, baz).foo(1, 2)
+    baz.baz(new K(), new K()).foo(1, 2)
   expected: 3
