@@ -6,23 +6,18 @@ class ConstValueType extends Type {
     super(`[${constValue}]`, [type]);
   }
 
-  checkAssignableUncached(other: Type): Assignability {
+  isAssignableUncached(other: Type, reasons: string[]): boolean {
     if (other instanceof ConstValueType) {
-      const result = this.type.checkAssignable(other.type);
-      if (!result.result) {
-        return result;
+      if(!this.type.isAssignable(other.type, reasons)) {
+        return false;
       }
       if (this.constValue !== other.constValue) {
-        return {
-          result: false,
-          reason: `Constant value '${other.constValue}' is not equal to '${this.constValue}'`
-        };
+        reasons.push(`Constant value '${other.constValue}' is not equal to '${this.constValue}'`);
+        return false;
       }
-      return {result: true};
+      return true;
     }
-    return {
-      result: false,
-      reason: `Type '${other}' does not represent a constant value`
-    };
+    reasons.push(`Type '${other}' does not represent a constant value`);
+    return false;
   }
 }

@@ -48,10 +48,11 @@ class EvaluationContext {
         name.location
       );
     }
-    const assignability = member.type.get().checkAssignable(type.get());
-    if (!assignability.result) {
+    const reasons: string[] = [];
+    const assignable = member.type.get().isAssignable(type.get(), reasons);
+    if (!assignable) {
       throw CompilationError.typeError(
-        `Cannot assign '${type.get()}' to type '${member.type.get()}':\n  ${assignability.reason}`,
+        `Cannot assign '${type.get()}' to type '${member.type.get()}':\n  ${reasons}`,
         name.location
       );
     }

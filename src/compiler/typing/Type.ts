@@ -18,8 +18,8 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
 
 export
 interface Assignability {
-  result: boolean;
-  reason?: string;
+  assignable: boolean;
+  reasons: string[];
 }
 
 const assignabilityResults: Map<[Type, Type], Assignability> = new HashMap();
@@ -89,71 +89,66 @@ class Type {
     }
   }
 
-  checkAssignable(other: Type): Assignability {
+  isAssignable(other: Type, reasons: string[] = []) {
     if (this === other) {
-      return {result: true};
+      return true;
     }
 
-    const memoizedResult = assignabilityResults.get([this, other]);
-    if (memoizedResult != null) {
-      return memoizedResult;
+    const memoized = assignabilityResults.get([this, other]);
+    if (memoized != null) {
+      reasons.push(...memoized.reasons);
+      return memoized.assignable;
     }
-    assignabilityResults.set([this, other], {result: true}); // temporarily set to true to avoid infinite recursion
-    const result = this.checkAssignableUncached(other);
-    assignabilityResults.set([this, other], result);
-    return result;
-  }
+    assignabilityResults.set([this, other], {
+      assignable: true,
+      reasons: []
+    }); // temporarily set to true to avoid infinite recursion
 
-  isAssignable(other: Type) {
-    return this.checkAssignable(other).result;
+    const assignable = this.isAssignableUncached(other, reasons);
+
+    assignabilityResults.set([this, other], {
+      assignable: assignable,
+      reasons: Array.from(reasons)
+    });
+    return assignable;
   }
 
   equals(other: Type) {
     return this.isAssignable(other) && other.isAssignable(this);
   }
 
-  checkAssignableUncached(other: Type): Assignability {
+  isAssignableUncached(other: Type, reasons: string[]): boolean {
     for (const [name, memberThis] of this.getMembers()) {
       const memberOther = other.getMember(name);
       if (!memberOther) {
-        return {
-          result: false,
-          reason: `Type '${other}' do not have member '${name}'`
-        };
+        reasons.push(`Type '${other}' do not have member '${name}'`);
+        return false;
       }
       const typeThis = memberThis.type.get();
       const typeOther = memberOther.type.get();
       if (memberThis.constness == Constness.Variable) {
         // nonvariant
         if (!typeOther.equals(typeThis)) {
-          return {
-            result: false,
-            reason: `Member '${name}': '${typeOther}' is not equal to '${typeThis}'`
-          };
+          reasons.push(`Member '${name}': '${typeOther}' is not equal to '${typeThis}'`);
+          return false;
         }
       }
       else {
         // covariant
         if (!memberThis.type.get().isAssignable(memberOther.type.get())) {
-          return {
-            result: false,
-            reason: `Member '${name}': '${typeOther}' is not assignable to '${typeThis}'`
-          };
+          reasons.push(`Member '${name}': '${typeOther}' is not assignable to '${typeThis}'`);
+          return false;
         }
       }
     }
     if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures())) {
-      return {
-        result: false,
-        reason: `Cannot call '${other}' with signatures of '${this}'`
-      };
+      reasons.push(`Cannot call '${other}' with signatures of '${this}'`);
+      return false;
     }
     if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures())) {
-      return {
-        result: false,
-        reason: `Cannot call '${other}' as constructor with signatures of '${this}'`
-      };
+      reasons.push(`Cannot call '${other}' as constructor with signatures of '${this}'`);
+      return false;
     }
-    return {result: true};
+    return true;
   }
 }
