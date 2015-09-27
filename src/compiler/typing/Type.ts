@@ -89,7 +89,7 @@ class Type {
     }
   }
 
-  isAssignable(other: Type, reasons: string[]) {
+  isAssignable(other: Type, reasons: string[], ignoreThis = false) {
     if (this === other) {
       return true;
     }
@@ -104,7 +104,7 @@ class Type {
       reasons: []
     }); // temporarily set to true to avoid infinite recursion
 
-    const assignable = this.isAssignableUncached(other, reasons);
+    const assignable = this.isAssignableUncached(other, reasons, ignoreThis);
 
     assignabilityResults.set([this, other], {
       assignable: assignable,
@@ -113,11 +113,11 @@ class Type {
     return assignable;
   }
 
-  equals(other: Type, reasons: string[]) {
-    return this.isAssignable(other, reasons) && other.isAssignable(this, reasons);
+  equals(other: Type, reasons: string[], ignoreThis = false) {
+    return this.isAssignable(other, reasons, ignoreThis) && other.isAssignable(this, reasons, ignoreThis);
   }
 
-  isAssignableUncached(other: Type, reasons: string[]): boolean {
+  isAssignableUncached(other: Type, reasons: string[], ignoreThis: boolean): boolean {
     for (const [name, memberThis] of this.getMembers()) {
       const memberOther = other.getMember(name);
       if (!memberOther) {
@@ -128,24 +128,24 @@ class Type {
       const typeOther = memberOther.type.get();
       if (memberThis.constness == Constness.Variable) {
         // nonvariant
-        if (!typeOther.equals(typeThis, reasons)) {
+        if (!typeOther.equals(typeThis, reasons, true)) {
           reasons.push(`Member '${name}': '${typeOther}' is not equal to '${typeThis}'`);
           return false;
         }
       }
       else {
         // covariant
-        if (!memberThis.type.get().isAssignable(memberOther.type.get(), reasons)) {
+        if (!memberThis.type.get().isAssignable(memberOther.type.get(), reasons, true)) {
           reasons.push(`Member '${name}': '${typeOther}' is not assignable to '${typeThis}'`);
           return false;
         }
       }
     }
-    if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures(), reasons)) {
+    if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures(), reasons, ignoreThis)) {
       reasons.push(`Cannot call '${other}' with signatures of '${this}'`);
       return false;
     }
-    if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures(), reasons)) {
+    if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures(), reasons, ignoreThis)) {
       reasons.push(`Cannot call '${other}' as constructor with signatures of '${this}'`);
       return false;
     }
