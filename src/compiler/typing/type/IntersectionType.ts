@@ -40,8 +40,8 @@ function intersectionMembers(location: SourceLocation, members1: Map<string, Mem
         ret.set(name, new Member(Constness.Variable, member1Type));
       } else {
         throw CompilationError.typeError(
-          `Cannot make mutable intersection of ${member1Type} and {member2Type}`,
-          location
+          location,
+          `Cannot make mutable intersection of ${member1Type} and {member2Type}`
         );
       }
     }

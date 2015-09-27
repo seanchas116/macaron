@@ -16,8 +16,8 @@ class MacaronParser {
     catch (error) {
       if (error instanceof SyntaxError) {
         throw CompilationError.syntaxError(
-          error.message,
-          error.position
+          error.position,
+          error.message
         );
       } else {
         throw error;

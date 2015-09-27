@@ -269,8 +269,8 @@ class Evaluator {
         let ok = superType instanceof MetaType && superType.valueType !== typeOnlyType;
         if (!ok) {
           throw CompilationError.typeError(
-            `Superclass is not a class`,
-            ast.superclass.location
+            ast.superclass.location,
+            `Superclass is not a class`
           );
         }
       }
@@ -365,8 +365,8 @@ class Evaluator {
       return type.metaType;
     }
     throw CompilationError.typeError(
-      `Expression does not represent type`,
-      ast.location
+      ast.location,
+      `Expression does not represent type`
     );
   }
 

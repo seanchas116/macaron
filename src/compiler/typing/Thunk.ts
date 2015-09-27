@@ -12,8 +12,8 @@ class Thunk<T> {
   get() {
     if (this.getting) {
       throw CompilationError.typeError(
-        `Recursion detected while resolving type`,
-        this.location
+        this.location,
+        `Recursion detected while resolving type`
       );
     }
     if (!this.value) {

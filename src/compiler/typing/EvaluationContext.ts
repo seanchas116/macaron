@@ -25,8 +25,8 @@ class EvaluationContext {
     const variable = this.environment.getVariable(name.name);
     if (!variable) {
       throw CompilationError.typeError(
-        `Variable '${name.name}' not found`,
-        name.location
+        name.location,
+        `Variable '${name.name}' not found`
       );
     }
     return variable;
@@ -38,22 +38,22 @@ class EvaluationContext {
 
     if (member.constness === Constness.Constant && !firstAssign) {
       throw CompilationError.typeError(
-        `Variable '${name.name}' is constant and cannot be reassigned`,
-        name.location
+        name.location,
+        `Variable '${name.name}' is constant and cannot be reassigned`
       );
     }
     if (member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
-        `Variable '${name.name}' is builtin and cannot be reassigned`,
-        name.location
+        name.location,
+        `Variable '${name.name}' is builtin and cannot be reassigned`
       );
     }
     const reasons: string[] = [];
     const assignable = member.type.get().isAssignable(type.get(), reasons);
     if (!assignable) {
       throw CompilationError.typeError(
-        `Cannot assign '${type.get()}' to type '${member.type.get()}':\n  ${reasons}`,
-        name.location
+        name.location,
+        `Cannot assign '${type.get()}' to type '${member.type.get()}':\n  ${reasons}`
       );
     }
   }
@@ -62,14 +62,14 @@ class EvaluationContext {
     const variable = this.environment.getVariable(name.name);
     if (variable && variable.member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
-        `Variable '${name.name}' is builtin and cannot be redefined`,
-        name.location
+        name.location,
+        `Variable '${name.name}' is builtin and cannot be redefined`
       );
     }
     if (this.environment.getOwnVariable(name.name)) {
       throw CompilationError.typeError(
-        `Variable '${name.name}' already defined`,
-        name.location
+        name.location,
+        `Variable '${name.name}' already defined`
       );
     }
     this.environment.addVariable(name.name, new Member(constness, type));

@@ -65,8 +65,8 @@ class FunctionCallExpression extends Expression {
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes));
     if (!sig) {
       throw CompilationError.typeError(
-        `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`,
-        location
+        location,
+        `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`
       );
     }
     this.type = sig.returnType;
@@ -109,8 +109,8 @@ class MemberAccessExpression extends Expression {
 
     if (!objectType.getMember(member.name)) {
       throw CompilationError.typeError(
-        `Type '${objectType}' don't have member '${member.name}'`,
-        location
+        location,
+        `Type '${objectType}' don't have member '${member.name}'`
       );
     }
     this.type = objectType.getMember(member.name).type.get();
@@ -133,8 +133,8 @@ class OperatorAccessExpression extends Expression {
     }
     if (!this.operator) {
       throw CompilationError.typeError(
-        `No operator '${operatorName.name}' for type '${objectType}'`,
-        operatorName.location
+        operatorName.location,
+        `No operator '${operatorName.name}' for type '${objectType}'`
       );
     }
     this.type = this.operator.type;
