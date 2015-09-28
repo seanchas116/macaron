@@ -49,7 +49,7 @@ class EvaluationContext {
       );
     }
     const reasons: string[] = [];
-    const assignable = member.type.get().isAssignable(type.get(), reasons);
+    const assignable = member.settingType.get().isAssignable(type.get(), reasons);
     if (!assignable) {
       throw CompilationError.typeError(
         name.location,
