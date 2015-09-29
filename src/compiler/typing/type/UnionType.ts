@@ -55,8 +55,6 @@ function buildMembers(location: SourceLocation, types: Type[]) {
     .reduce(intersection);
   for (const name of names) {
     const members = types.map(t => t.getMember(name));
-    console.log(names);
-    console.log(members);
     const memberTypes = members.map(m => m.type.get());
     const type = new UnionType(memberTypes, location);
     if (members.some(m => m.constness === Constness.Variable)) {
