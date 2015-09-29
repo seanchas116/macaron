@@ -31,23 +31,4 @@
     type FooBar = Foo | Bar
     let foobar FooBar = new Hoge()
     foobar.foo(100, 200)
-  error: Type 'Hoge' is neither 'Foo' nor 'Bar'
-
-- title: union type no member error
-  src: |
-    interface Foo {
-      foo(x number, y number) number
-      baz(x string) number
-    }
-    interface Bar {
-      foo(x number, y number) number
-      bar(x string, y string) number
-    }
-    class Hoge {
-      fooo(x number, y number) {
-        x * y
-      }
-    }
-    type FooBar = Foo | Bar
-    let foobar FooBar = new Hoge()
-  error: do not have member
+  error: Type 'Hoge' is not one of 'Foo | Bar'

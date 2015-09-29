@@ -36,6 +36,16 @@ class UnionType extends Type {
     this.selfMembers = buildMembers(this.location, this.types);
     this.selfCallSignatures = buildCallSignatures(this.location, this.types);
   }
+
+  isAssignableUncached(other: Type, reasons: string[]): boolean {
+    for (const type of this.types) {
+      if (type.isAssignable(other, reasons)) {
+        return true;
+      }
+    }
+    reasons.push(`Type '${other}' is not one of '${this}'`);
+    return false;
+  }
 }
 
 function intersection<T>(xs: Set<T>, ys: Set<T>) {
