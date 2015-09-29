@@ -87,7 +87,7 @@ class SyntaxError extends BaseError {
   constructor(public position: Position, public expected: string[], public found: string) {
     super();
     this.name = "SyntaxError";
-    this.message = `${position.line}:${position.column}: Expected ${
+    this.message = `Expected ${
       expected.map(e => `'${e}'`).join(", ")
     }; found ${found}`;
   }

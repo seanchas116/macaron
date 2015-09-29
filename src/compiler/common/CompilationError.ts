@@ -10,7 +10,7 @@ class CompilationError extends BaseError {
   constructor(public infos: ErrorInfo[]) {
     super();
     this.message = "\n" + infos.map(({location, summary, descriptions})=> {
-      return `${location}: ${summary}\n  ${descriptions.join("\n  ")}`;
+      return `[${location.line}:${location.column}] ${summary}\n  ${descriptions.join("\n  ")}`;
     }).join("\n");
   }
 
