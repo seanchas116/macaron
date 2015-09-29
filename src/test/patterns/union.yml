@@ -1,4 +1,19 @@
-- title: union type OK
+- title: union type
+  src: |
+    class Foo {
+      foo(x number, y number) { x * y }
+      baz(x string) { 123 }
+    }
+    class Bar {
+      foo(x number, y number) { x + y }
+      bar(x string, y string) { x + y }
+    }
+    type FooBar = Foo | Bar
+    let foobar FooBar = new Foo()
+    foobar.foo(100, 200)
+  expected: 20000
+
+- title: union type error
   src: |
     interface Foo {
       foo(x number, y number) number
@@ -16,9 +31,9 @@
     type FooBar = Foo | Bar
     let foobar FooBar = new Hoge()
     foobar.foo(100, 200)
-  expected: 20000
+  error: Type 'Hoge' is neither 'Foo' nor 'Bar'
 
-- title: union type NG
+- title: union type no member error
   src: |
     interface Foo {
       foo(x number, y number) number
