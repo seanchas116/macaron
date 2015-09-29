@@ -50,12 +50,15 @@ class FunctionCallExpression extends Expression {
     this.arguments = args;
 
     let selfType = voidType;
+    let hasSelf = false;
     if (!isNewCall) {
       if (func instanceof MemberAccessExpression) {
         selfType = func.object.type;
+        hasSelf = true;
       }
       if (func instanceof OperatorAccessExpression) {
         selfType = func.object.type;
+        hasSelf = true;
       }
     }
 
@@ -63,7 +66,7 @@ class FunctionCallExpression extends Expression {
     const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
     const argTypes = args.map(a => a.type);
     const reasons: string[] = [];
-    const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons));
+    const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call
     if (!sig) {
       throw CompilationError.typeError(
         location,
