@@ -121,7 +121,7 @@ class Type {
     for (const [name, memberThis] of this.getMembers()) {
       const memberOther = other.getMember(name);
       if (!memberOther) {
-        reasons.push(`Type '${other}' do not have member '${name}'`);
+        reasons.unshift(`Type '${other}' do not have member '${name}'`);
         return false;
       }
       const typeThis = memberThis.type.get();
@@ -129,24 +129,24 @@ class Type {
       if (memberThis.constness == Constness.Variable) {
         // nonvariant
         if (!typeOther.equals(typeThis, reasons, true)) {
-          reasons.push(`Member '${name}': '${typeOther}' is not equal to '${typeThis}'`);
+          reasons.unshift(`Member '${name}': '${typeOther}' is not equal to '${typeThis}'`);
           return false;
         }
       }
       else {
         // covariant
         if (!memberThis.type.get().isAssignable(memberOther.type.get(), reasons, true)) {
-          reasons.push(`Member '${name}': '${typeOther}' is not assignable to '${typeThis}'`);
+          reasons.unshift(`Member '${name}': '${typeOther}' is not assignable to '${typeThis}'`);
           return false;
         }
       }
     }
     if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures(), reasons, ignoreThis)) {
-      reasons.push(`Cannot call '${other}' with signatures of '${this}'`);
+      reasons.unshift(`Cannot call '${other}' with signatures of '${this}'`);
       return false;
     }
     if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures(), reasons, ignoreThis)) {
-      reasons.push(`Cannot call '${other}' as constructor with signatures of '${this}'`);
+      reasons.unshift(`Cannot call '${other}' as constructor with signatures of '${this}'`);
       return false;
     }
     return true;

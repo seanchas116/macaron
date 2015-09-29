@@ -12,12 +12,12 @@ class ConstValueType extends Type {
         return false;
       }
       if (this.constValue !== other.constValue) {
-        reasons.push(`Constant value '${other.constValue}' is not equal to '${this.constValue}'`);
+        reasons.unshift(`Constant value '${other.constValue}' is not equal to '${this.constValue}'`);
         return false;
       }
       return true;
     }
-    reasons.push(`Type '${other}' does not represent a constant value`);
+    reasons.unshift(`Type '${other}' does not represent a constant value`);
     return false;
   }
 }

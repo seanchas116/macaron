@@ -43,7 +43,7 @@ class UnionType extends Type {
         return true;
       }
     }
-    reasons.push(`Type '${other}' is not one of '${this}'`);
+    reasons.unshift(`Type '${other}' is not one of '${this}'`);
     return false;
   }
 }
