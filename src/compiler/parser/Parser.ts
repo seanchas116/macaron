@@ -31,10 +31,23 @@ class Cache {
   }
 }
 
+class FurthestFailure {
+  failure: Failure;
+
+  add(failure: Failure) {
+    if (!this.failure) {
+      this.failure = failure;
+    }
+    else if (this.failure.state.position.index < failure.state.position.index) {
+      this.failure = failure;
+    }
+  }
+}
+
 export
 class State {
 
-  constructor(public text: string, public position: Position, public cache: Cache, public tracer: Tracer) {
+  constructor(public text: string, public position: Position, public cache: Cache, public furthestFailure: FurthestFailure, public tracer: Tracer) {
   }
 
   substring(length: number) {
@@ -56,11 +69,11 @@ class State {
     const newColumn = (1 < proceedLines.length) ? lastLineLength + 1 : this.position.column + lastLineLength;
 
     const newPos = new Position(newIndex, newLine, newColumn);
-    return new State(this.text, newPos, this.cache, this.tracer);
+    return new State(this.text, newPos, this.cache, this.furthestFailure, this.tracer);
   }
 
   static init(text: string, trace: boolean) {
-    return new State(text, new Position(0, 1, 1), new Cache(), trace ? new Tracer() : null);
+    return new State(text, new Position(0, 1, 1), new Cache(), new FurthestFailure(), trace ? new Tracer() : null);
   }
 }
 
@@ -136,21 +149,20 @@ class Parser<T> {
     if (state.tracer) {
       state.tracer.trace(result);
     }
+    if (result instanceof Failure) {
+      state.furthestFailure.add(result);
+    }
     return result;
   }
 
   parse(text: string, trace = false) {
     const state = State.init(text, trace);
     const result = this.parseFrom(state);
-    if (result instanceof Success) {
-      if (result.state.position.index == text.length) {
-        return result.value;
-      } else {
-        throw new SyntaxError(result.state.position, ["EOF"], result.state.currentChar());
-      }
-    } else if (result instanceof Failure) {
-      throw new SyntaxError(result.state.position, result.expected, result.state.currentChar());
+    if (result instanceof Success && result.state.position.index == text.length) {
+      return result.value;
     }
+    const furthestFailure = state.furthestFailure.failure;
+    throw new SyntaxError(furthestFailure.state.position, furthestFailure.expected, furthestFailure.state.currentChar());
   }
 
   map<U>(transform: (value: T) => U): Parser<U> {
