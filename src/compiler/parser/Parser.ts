@@ -1,4 +1,5 @@
 import BaseError from "../common/BaseError";
+import {union} from "../util/set";
 const colors = require("colors/safe");
 
 export
@@ -32,14 +33,19 @@ class Cache {
 }
 
 class FurthestFailure {
-  failure: Failure;
+  furthest: Failure;
 
   add(failure: Failure) {
-    if (!this.failure) {
-      this.failure = failure;
+    if (!this.furthest) {
+      this.furthest = failure;
     }
-    else if (this.failure.state.position.index < failure.state.position.index) {
-      this.failure = failure;
+    const {index} = failure.state.position;
+    const {index: furthestIndex} = this.furthest.state.position;
+    if (furthestIndex == index) {
+      this.furthest = new Failure(this.furthest.state, union(this.furthest.expected, failure.expected));
+    }
+    else if (furthestIndex < index) {
+      this.furthest = failure;
     }
   }
 }
@@ -88,10 +94,10 @@ class Success<T> {
 
 export
 class Failure {
-  constructor(public state: State, public expected: string[]) {
+  constructor(public state: State, public expected: Set<string>) {
   }
   toString() {
-    return `[Failure position=${this.state.position} expected=[${this.expected}]`;
+    return `[Failure position=${this.state.position} expected=[${[...this.expected]}]`;
   }
 }
 
@@ -161,8 +167,8 @@ class Parser<T> {
     if (result instanceof Success && result.state.position.index == text.length) {
       return result.value;
     }
-    const furthestFailure = state.furthestFailure.failure;
-    throw new SyntaxError(furthestFailure.state.position, furthestFailure.expected, furthestFailure.state.currentChar());
+    const furthestFailure = state.furthestFailure.furthest;
+    throw new SyntaxError(furthestFailure.state.position, [...furthestFailure.expected], furthestFailure.state.currentChar());
   }
 
   map<U>(transform: (value: T) => U): Parser<U> {
@@ -278,18 +284,20 @@ function sequence(...parsers: any[]): Parser<any> {
 export
 function choose<T>(...parsers: Parser<T>[]): Parser<T> {
   return new Parser(state => {
-    const expected: string[] = [];
+    const expecteds = new Set<string>();
 
     for (const parser of parsers) {
       const result = parser.parseFrom(state);
       if (result instanceof Success) {
         return result;
       } else if (result instanceof Failure) {
-        expected.push(...result.expected);
+        for (const expected of result.expected) {
+          expecteds.add(expected);
+        }
       }
     }
 
-    return new Failure(state, expected);
+    return new Failure(state, expecteds);
   });
 }
 
@@ -302,13 +310,13 @@ function string(text: string): Parser<string> {
       return new Success(state.proceed(text.length), text);
     }
     else {
-      return new Failure(state, [text]);
+      return new Failure(state, new Set([text]));
     }
   });
 }
 
 export
-function testChar(test: (char: string) => boolean, expected: string[]): Parser<string> {
+function testChar(test: (char: string) => boolean, expected: Set<string>): Parser<string> {
   return new Parser(state => {
     const substr = state.substring(1);
     if (test(substr)) {
@@ -323,11 +331,11 @@ function testChar(test: (char: string) => boolean, expected: string[]): Parser<s
 // /[0-9a-zA-Z]/
 export
 function regExp(re: RegExp): Parser<string> {
-  return testChar(c => !!c.match(re), [re.toString()]);
+  return testChar(c => !!c.match(re), new Set([re.toString()]));
 }
 
 export
-const anyChar = testChar((c) => c.length == 1, ["[any character]"]);
+const anyChar = testChar((c) => c.length == 1, new Set(["[any character]"]));
 
 export
 function lazy<T>(get: () => Parser<T>) {
