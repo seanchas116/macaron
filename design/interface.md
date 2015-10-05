@@ -8,23 +8,7 @@ interface Point {
 
   // required method
   length() number
-
-  // additional implementation
-  dot(other Point) {
-    x * other.x + y * other.y
-  }
 }
-```
-
-Compiles into like this:
-
-```js
-const Point = {
-  dot(self, other) {
-    return self.x * other.x + self.y * other.y;
-  }
-};
-
 ```
 
 ## Use interface as extension
