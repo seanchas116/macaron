@@ -58,6 +58,9 @@ fooMethod.call(1, 1) //=> 2
 ## Trailing closure (block)
 
 ```
+// Kotlin-like `it`?
+xs.map { it * 2 }
+
 xs.map { x, i =>
 }
 
