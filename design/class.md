@@ -1,31 +1,23 @@
 # Class
 
 ```
-// `extends` is too hard to type
-class Foo : Bar {
-  // prototype properties (same as ES7 class properties)
-  foo = 123
+// constructor parameters here
+class Foo(let x number) : Bar {
+  let y = x + 1
+  var z = x + 2
 
-  // prototype properties as methods
+  // private property
+  private let w = 1
+
+  // run on initialization
+  init {
+    console.log("Foo initialized")
+  }
+
+  // prototype methods
   // Foo.method is a (this Foo)(x number, y number) => number
   method(x number, y number) {
     x + y
-  }
-
-  // you can introduce new instance properties only in constructor
-  constructor(this.x number) {
-    // this.x is immutable by default
-
-    // you can omit `this.`
-    let this.y = x + 1
-    var this.z = x + 2
-
-    // private property
-    private let this.w = 1
-  }
-
-  // directly assign properties like in CoffeeScript
-  setZ(this.z number) {
   }
 
   // getter / setter is like in JavaScript
@@ -37,5 +29,17 @@ class Foo : Bar {
   private hoge() {
 
   }
+
+  // static method
+  static hoge() {
+    // calling superclass's hoge
+    super.hoge()
+  }
+
+  // static property
+  static poyo = "poyo"
+
+  // prototype property
+  shared poyopoyo = "poyopoyo"
 }
 ```
