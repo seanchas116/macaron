@@ -72,6 +72,7 @@
         "./src/compiler/typing/type/MetaType.ts",
         "./src/compiler/typing/type/TupleType.ts",
         "./src/compiler/typing/type/UnionType.ts",
+        "./src/compiler/util/set.ts",
         "./src/test/compilerTest.ts",
         "./src/test/parserTest.ts",
         "./src/test/support/loadPattern.ts",

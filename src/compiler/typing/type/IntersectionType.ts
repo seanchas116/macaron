@@ -5,18 +5,11 @@ import SourceLocation from "../../common/SourceLocation";
 import CompilationError from "../../common/CompilationError";
 import Member, {Constness} from "../Member";
 import TypeThunk from "../thunk/TypeThunk";
-
-function union<T>(xs: Iterable<T>, ys: Iterable<T>) {
-  const ret = new Set<T>(xs);
-  for (const y of ys) {
-    ret.add(y);
-  }
-  return ret;
-}
+import {union} from "../../util/set";
 
 function intersectionMembers(location: SourceLocation, members1: Map<string, Member>, members2: Map<string, Member>) {
   const ret = new Map<string, Member>();
-  const names = union(members1.keys(), members2.keys());
+  const names = union(new Set(members1.keys()), new Set(members2.keys()));
 
   for (const name of names) {
     const member1 = members1.get(name);

@@ -5,6 +5,7 @@ import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
 import Member, {Constness} from "../Member";
 import TypeThunk from "../thunk/TypeThunk";
+import {intersection} from "../../util/set";
 
 export default
 class UnionType extends Type {
@@ -46,16 +47,6 @@ class UnionType extends Type {
     reasons.unshift(`Type '${other}' is not one of '${this}'`);
     return false;
   }
-}
-
-function intersection<T>(xs: Set<T>, ys: Set<T>) {
-  const ret = new Set<T>();
-  for (const y of ys) {
-    if (xs.has(y)) {
-      ret.add(y);
-    }
-  }
-  return ret;
 }
 
 function buildMembers(location: SourceLocation, types: Type[]) {
