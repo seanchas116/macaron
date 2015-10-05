@@ -56,7 +56,7 @@
     bar.foo(1, 2) + bar.bar(3, 4, 5)
   expected: 15
 
-- title: Assign instance props
+- title: assign instance props
   src: |
     class Foo {
       constructor(x number, y number) {
