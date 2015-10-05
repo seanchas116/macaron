@@ -40,3 +40,11 @@ class Point {
   operator + add
 }
 ```
+
+## Infix method call
+
+```
+// equal
+xs.concat(ys)
+xs concat ys
+```
