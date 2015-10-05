@@ -42,7 +42,7 @@ class FurthestFailure {
     const {index} = failure.state.position;
     const {index: furthestIndex} = this.furthest.state.position;
     if (furthestIndex == index) {
-      this.furthest = new Failure(this.furthest.state, union(this.furthest.expected, failure.expected));
+      this.furthest = new Failure(this.furthest.state, union(this.furthest.expecteds, failure.expecteds));
     }
     else if (furthestIndex < index) {
       this.furthest = failure;
@@ -94,10 +94,10 @@ class Success<T> {
 
 export
 class Failure {
-  constructor(public state: State, public expected: Set<string>) {
+  constructor(public state: State, public expecteds: Set<string>) {
   }
   toString() {
-    return `[Failure position=${this.state.position} expected=[${[...this.expected]}]`;
+    return `[Failure position=${this.state.position} expected=[${[...this.expecteds]}]`;
   }
 }
 
@@ -168,7 +168,7 @@ class Parser<T> {
       return result.value;
     }
     const furthestFailure = state.furthestFailure.furthest;
-    throw new SyntaxError(furthestFailure.state.position, [...furthestFailure.expected], furthestFailure.state.currentChar());
+    throw new SyntaxError(furthestFailure.state.position, [...furthestFailure.expecteds], furthestFailure.state.currentChar());
   }
 
   map<U>(transform: (value: T) => U): Parser<U> {
@@ -291,7 +291,7 @@ function choose<T>(...parsers: Parser<T>[]): Parser<T> {
       if (result instanceof Success) {
         return result;
       } else if (result instanceof Failure) {
-        for (const expected of result.expected) {
+        for (const expected of result.expecteds) {
           expecteds.add(expected);
         }
       }
