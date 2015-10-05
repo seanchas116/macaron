@@ -28,6 +28,7 @@ extension IterableExtension<T> : Iterable<T> {
 ```
 import "./extensions" {IterableExtension}
 
-xs = new Set([1,2,3])
-xs.map(x => String(x)) concat ["foo", "bar"] //=> ["1", "2", "3", "foo", "bar"]
+xs = new Set([1,2,3,1])
+xs.map(x => String(x)) concat ["foo", "bar"]
+//=> ["1", "2", "3", "foo", "bar"]
 ```
