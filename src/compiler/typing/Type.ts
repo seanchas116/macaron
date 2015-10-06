@@ -16,6 +16,10 @@ function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
   return ret;
 }
 
+function mergeMaps<TKey, TValue>(maps: Map<TKey, TValue>[]) {
+  return maps.reduce(mergeMap);
+}
+
 export
 interface Assignability {
   assignable: boolean;
@@ -26,67 +30,25 @@ const assignabilityResults: Map<[Type, Type], Assignability> = new HashMap();
 
 export default
 class Type {
-  selfMembers = new Map<string, Member>();
-  selfBinaryOperators = new Map<string, Operator>();
-  selfUnaryOperators = new Map<string, Operator>();
-  selfCallSignatures: CallSignature[] = null;
-  selfNewSignatures: CallSignature[] = null;
+  members = new Map<string, Member>();
+  binaryOperators = new Map<string, Operator>();
+  unaryOperators = new Map<string, Operator>();
+  callSignatures: CallSignature[] = [];
+  newSignatures: CallSignature[] = [];
 
-  constructor(public name: string, public superTypes: Type[] = [], public location: SourceLocation = null, public expression: Expression = null) {
+  constructor(public name: string, public location: SourceLocation = null, public expression: Expression = null) {
     this.location = location || SourceLocation.empty();
+  }
+
+  inherit(...superTypes: Type[]) {
+    this.members = mergeMaps([...superTypes, this].map(t => t.members));
+    this.binaryOperators = mergeMaps([...superTypes, this].map(t => t.binaryOperators));
+    this.unaryOperators = mergeMaps([...superTypes, this].map(t => t.unaryOperators));
+    // call signatures are not inherited
   }
 
   toString() {
     return this.name;
-  }
-
-  addMember(name: string, member: Member) {
-    this.selfMembers.set(name, member);
-  }
-
-  getMember(name: string): Member {
-    for (const superType of this.superTypes) {
-      const member = superType.getMember(name);
-      if (member) {
-        return member;
-      }
-    }
-    return this.selfMembers.get(name);
-  }
-
-  getMembers(): Map<string, Member> {
-    return [...this.superTypes.map(t => t.getMembers()), this.selfMembers]
-      .reduce(mergeMap);
-  }
-
-  getBinaryOperators(): Map<string, Operator> {
-    return [...this.superTypes.map(t => t.getBinaryOperators()), this.selfBinaryOperators]
-      .reduce(mergeMap);
-  }
-
-  getUnaryOperators(): Map<string , Operator> {
-    return [...this.superTypes.map(t => t.getUnaryOperators()), this.selfUnaryOperators]
-      .reduce(mergeMap);
-  }
-
-  getCallSignatures(): CallSignature[] {
-    if (this.selfCallSignatures) {
-      return this.selfCallSignatures;
-    } else {
-      return this.superTypes
-        .map(t => t.getCallSignatures())
-        .reduce((a, b) => a.concat(b), []);
-    }
-  }
-
-  getNewSignatures(): CallSignature[] {
-    if (this.selfNewSignatures) {
-      return this.selfNewSignatures;
-    } else {
-      return this.superTypes
-        .map(t => t.getNewSignatures())
-        .reduce((a, b) => a.concat(b), []);
-    }
   }
 
   isAssignable(other: Type, reasons: string[], ignoreThis = false) {
@@ -118,8 +80,8 @@ class Type {
   }
 
   isAssignableUncached(other: Type, reasons: string[], ignoreThis: boolean): boolean {
-    for (const [name, memberThis] of this.getMembers()) {
-      const memberOther = other.getMember(name);
+    for (const [name, memberThis] of this.members) {
+      const memberOther = other.members.get(name);
       if (!memberOther) {
         reasons.unshift(`Type '${other}' do not have member '${name}'`);
         return false;
@@ -141,11 +103,11 @@ class Type {
         }
       }
     }
-    if (!CallSignature.isAssignable(this.getCallSignatures(), other.getCallSignatures(), reasons, ignoreThis)) {
+    if (!CallSignature.isAssignable(this.callSignatures, other.callSignatures, reasons, ignoreThis)) {
       reasons.unshift(`Cannot call '${other}' with signatures of '${this}'`);
       return false;
     }
-    if (!CallSignature.isAssignable(this.getNewSignatures(), other.getNewSignatures(), reasons, ignoreThis)) {
+    if (!CallSignature.isAssignable(this.newSignatures, other.newSignatures, reasons, ignoreThis)) {
       reasons.unshift(`Cannot call '${other}' as constructor with signatures of '${this}'`);
       return false;
     }

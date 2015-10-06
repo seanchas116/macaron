@@ -14,7 +14,6 @@ import SourceLocation from "../../common/SourceLocation";
 export default
 class ClassExpression extends Expression {
   members: ExpressionThunk[] = [];
-  classType: Type;
   superType: Type;
   selfType: Type;
 
@@ -36,21 +35,20 @@ class ClassExpression extends Expression {
     }
     this.superType = superType;
 
-    const type = this.selfType = new Type(name.name, [superType], location, this);
+    const type = this.selfType = new Type(name.name, location, this);
+    type.inherit(superType);
 
     // TODO: class type must inherit Function
-    const classType = this.classType = new Type(`${name.name} class`, [superType]);
-    classType.selfNewSignatures = [new CallSignature(voidType, [], type)];
-
-    this.type = new MetaType(`[class ${name}]`, type, classType);
+    const classType = this.type = new MetaType(`class ${name.name}`, type);
+    classType.newSignatures = [new CallSignature(voidType, [], type)];
   }
 
   addMember(constness: Constness, name: Identifier, member: ExpressionThunk) {
     const type = this.selfType;
-    type.addMember(name.name, new Member(constness, member.type));
+    type.members.set(name.name, new Member(constness, member.type));
 
     const superType = this.superType;
-    const superMember = superType.getMember(name.name);
+    const superMember = superType.members.get(name.name);
     const errors: string[] = [];
     if (superMember && !superMember.type.get().isAssignable(member.type.get(), errors)) {
       throw CompilationError.typeError(
@@ -61,7 +59,7 @@ class ClassExpression extends Expression {
     }
 
     if (name.name === "constructor") {
-      this.classType.selfNewSignatures = member.type.get().getCallSignatures().map(sig => {
+      this.type.newSignatures = member.type.get().callSignatures.map(sig => {
         return new CallSignature(voidType, sig.params, type);
       });
     }

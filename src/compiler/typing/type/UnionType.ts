@@ -13,7 +13,7 @@ class UnionType extends Type {
 
   // TODO: memoize
   constructor(types: Type[], loc: SourceLocation) {
-    super("", [], loc);
+    super("", loc);
 
     if (types.length === 0) {
       throw new Error("cannot create union with no type");
@@ -34,8 +34,8 @@ class UnionType extends Type {
     types = this.types = Array.from(typeSet);
     this.name = types.join(" | ");
 
-    this.selfMembers = buildMembers(this.location, this.types);
-    this.selfCallSignatures = buildCallSignatures(this.location, this.types);
+    this.members = buildMembers(this.location, this.types);
+    this.callSignatures = buildCallSignatures(this.location, this.types);
   }
 
   isAssignableUncached(other: Type, reasons: string[]): boolean {
@@ -52,10 +52,10 @@ class UnionType extends Type {
 function buildMembers(location: SourceLocation, types: Type[]) {
   const resultMembers = new Map<string, Member>();
   const names = types
-    .map(t => new Set(t.getMembers().keys()))
+    .map(t => new Set(t.members.keys()))
     .reduce(intersection);
   for (const name of names) {
-    const members = types.map(t => t.getMember(name));
+    const members = types.map(t => t.members.get(name));
     const memberTypes = members.map(m => m.type.get());
     const type = new UnionType(memberTypes, location);
     if (members.some(m => m.constness === Constness.Variable)) {
@@ -70,7 +70,7 @@ function buildMembers(location: SourceLocation, types: Type[]) {
 
 function buildCallSignatures(location: SourceLocation, types: Type[]) {
   return types
-    .map(t => t.getCallSignatures())
+    .map(t => t.callSignatures)
     .reduce((a, b) => unionCallSignatures(location, a, b));
 }
 

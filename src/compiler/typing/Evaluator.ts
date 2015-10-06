@@ -266,7 +266,7 @@ class Evaluator {
         superExpr = this.evaluate(ast.superclass).get();
         const superType = superExpr.type;
 
-        let ok = superType instanceof MetaType && superType.valueType !== typeOnlyType;
+        let ok = superType instanceof MetaType && !superType.typeOnly;
         if (!ok) {
           throw CompilationError.typeError(
             ast.superclass.location,
@@ -319,7 +319,7 @@ class Evaluator {
       const memberType = new TypeThunk(memberAST.location, () => {
         return this.evaluateDeclarationType(type, memberAST)
       });
-      type.addMember(memberAST.name.name, new Member(Constness.Constant, memberType));
+      type.members.set(memberAST.name.name, new Member(Constness.Constant, memberType));
     }
     const varType = MetaType.typeOnly(type);
 

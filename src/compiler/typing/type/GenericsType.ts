@@ -18,20 +18,15 @@ function replaceGenericsArgs(type: Type, args: Map<GenericsParameterType, Type>)
     }
   }
 
-  const superTypes = type.superTypes.map(t => replaceGenericsArgs(t, args));
-  const newType = new Type(type.name, superTypes, type.location, type.expression);
+  const newType = new Type(type.name, type.location, type.expression);
 
-  for (const [name, member] of type.selfMembers) {
-    newType.addMember(name, member.mapType(t => replaceGenericsArgs(t, args)));
+  for (const [name, member] of type.members) {
+    newType.members.set(name, member.mapType(t => replaceGenericsArgs(t, args)));
   }
   // TODO: operators
 
-  if (type.selfCallSignatures) {
-    newType.selfCallSignatures = type.selfCallSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
-  }
-  if (type.selfNewSignatures) {
-    newType.selfNewSignatures = type.selfNewSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
-  }
+  newType.callSignatures = type.callSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
+  newType.newSignatures = type.newSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
 
   return newType;
 }

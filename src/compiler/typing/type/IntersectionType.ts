@@ -51,7 +51,7 @@ class IntersectionType extends Type {
 
   // TODO: memoize
   constructor(types: Type[], loc: SourceLocation) {
-    super("", [], loc);
+    super("", loc);
     const typeSet = new Set();
 
     for (const type of types) {
@@ -67,10 +67,10 @@ class IntersectionType extends Type {
     types = this.types = Array.from(typeSet);
     this.name = types.join(" & ");
 
-    this.selfMembers = types.reduce((members, type) => {
-      return intersectionMembers(loc, members, type.getMembers());
+    this.members = types.reduce((members, type) => {
+      return intersectionMembers(loc, members, type.members);
     }, new Map<string, Member>());
 
-    this.selfCallSignatures = types.reduce((sigs, type) => sigs.concat(type.getCallSignatures()), []);
+    this.callSignatures = types.reduce((sigs, type) => sigs.concat(type.callSignatures), []);
   }
 }

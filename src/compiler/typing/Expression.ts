@@ -63,7 +63,7 @@ class FunctionCallExpression extends Expression {
     }
 
     const funcType = func.type;
-    const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
+    const sigs = isNewCall ? funcType.newSignatures : funcType.callSignatures;
     const argTypes = args.map(a => a.type);
     const reasons: string[] = [];
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call
@@ -112,13 +112,13 @@ class MemberAccessExpression extends Expression {
     super(location);
     const objectType = object.type;
 
-    if (!objectType.getMember(member.name)) {
+    if (!objectType.members.get(member.name)) {
       throw CompilationError.typeError(
         location,
         `Type '${objectType}' don't have member '${member.name}'`
       );
     }
-    this.type = objectType.getMember(member.name).type.get();
+    this.type = objectType.members.get(member.name).type.get();
   }
 }
 
@@ -130,9 +130,9 @@ class OperatorAccessExpression extends Expression {
     super(location);
     const objectType = object.type;
     if (arity === 1) {
-      this.operator = objectType.getUnaryOperators().get(operatorName.name);
+      this.operator = objectType.unaryOperators.get(operatorName.name);
     } else if (arity === 2) {
-      this.operator = objectType.getBinaryOperators().get(operatorName.name);
+      this.operator = objectType.binaryOperators.get(operatorName.name);
     } else {
       throw new Error("unsupported arity");
     }

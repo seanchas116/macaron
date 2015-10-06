@@ -6,8 +6,8 @@ import {voidType} from "../nativeTypes";
 export default
 class FunctionType extends Type {
   constructor(public selfType: Type, public params: Type[], public optionalParams: Type[], public returnType: Type, loc: SourceLocation) {
-    // TODO: add Function type
-    super("", [], loc);
+    // TODO: inherit Function type
+    super("", loc);
 
     {
       const funcName = (() => {
@@ -26,12 +26,10 @@ class FunctionType extends Type {
         this.name = `(${selfType})${funcName}`;
       }
     }
-    this.selfCallSignatures = [];
-
     for (let i = 0; i <= optionalParams.length; ++i) {
       const signatureParams = params.concat(optionalParams.slice(0, optionalParams.length - i));
       const signature = new CallSignature(selfType, signatureParams, returnType);
-      this.selfCallSignatures.push(signature);
+      this.callSignatures.push(signature);
     }
   }
 }
