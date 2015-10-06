@@ -108,7 +108,7 @@ class SyntaxError extends BaseError {
     this.name = "SyntaxError";
     this.message = `Expected ${
       expected.map(e => `'${e}'`).join(", ")
-    }; found ${found}`;
+    }; found '${found}'`;
   }
 }
 
