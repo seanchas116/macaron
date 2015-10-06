@@ -3,7 +3,6 @@ import Type from "./Type";
 import Identifier from "./Identifier";
 import TypeThunk from "./thunk/TypeThunk";
 import Member, {Constness} from "./Member";
-import {typeOnlyType} from "./nativeTypes";
 import CompilationError from "../common/CompilationError";
 
 export default

@@ -39,7 +39,7 @@ import MetaType from "./type/MetaType";
 import UnionType from "./type/UnionType";
 import IntersectionType from "./type/IntersectionType";
 import ExpressionThunk from "./thunk/ExpressionThunk";
-import {voidType, typeOnlyType} from "./nativeTypes";
+import {voidType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
 import TypeThunk from "./thunk/TypeThunk";

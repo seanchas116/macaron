@@ -5,7 +5,6 @@ import {
   stringType,
   voidType,
   initNativeTypes,
-  typeOnlyType,
 } from "./nativeTypes";
 import Member, {Constness} from "./Member";
 import MetaType from "./type/MetaType";

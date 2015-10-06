@@ -1,5 +1,4 @@
 import Type from "../Type";
-import {typeOnlyType} from "../nativeTypes";
 
 export default
 class MetaType extends Type {
