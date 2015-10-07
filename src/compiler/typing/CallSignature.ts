@@ -30,6 +30,14 @@ class CallSignature {
     return true;
   }
 
+  replaceTypes(types: Map<Type, Type>) {
+    return new CallSignature(
+      this.selfType.replaceTypes(types),
+      this.params.map(p => p.replaceTypes(types)),
+      this.returnType.replaceTypes(types)
+    );
+  }
+
   static isAssignable(toSigs: CallSignature[], fromSigs: CallSignature[], reasons: string[], ignoreThis = false) {
     return toSigs.every(toSig => {
       return fromSigs.some(fromSig => toSig.isAssignable(fromSig, reasons, ignoreThis));

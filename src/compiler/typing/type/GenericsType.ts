@@ -2,35 +2,6 @@ import Type from "../Type";
 import GenericsParameterType from "./GenericsParameterType";
 import CallSignature from "../CallSignature";
 
-function replaceGenericsArgsCallSignature(sig: CallSignature, args: Map<GenericsParameterType, Type>) {
-  return new CallSignature(
-    replaceGenericsArgs(sig.selfType, args),
-    sig.params.map(p => replaceGenericsArgs(p, args)),
-    replaceGenericsArgs(sig.returnType, args)
-  );
-}
-
-function replaceGenericsArgs(type: Type, args: Map<GenericsParameterType, Type>): Type {
-  if (type instanceof GenericsParameterType) {
-    const arg = args.get(type);
-    if (arg) {
-      return arg;
-    }
-  }
-
-  const newType = new Type(type.name, type.location, type.expression);
-
-  for (const [name, member] of type.members) {
-    newType.members.set(name, member.mapType(t => replaceGenericsArgs(t, args)));
-  }
-  // TODO: operators
-
-  newType.callSignatures = type.callSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
-  newType.newSignatures = type.newSignatures.map(sig => replaceGenericsArgsCallSignature(sig, args));
-
-  return newType;
-}
-
 export default
 class GenericsType extends Type {
   constructor(name: string, public parameters: GenericsParameterType[], public template: Type) {
@@ -52,6 +23,6 @@ class GenericsType extends Type {
       argMap.set(param, arg);
     }
 
-    return replaceGenericsArgs(this.template, argMap);
+    return this.template.replaceTypes(argMap);
   }
 }

@@ -113,4 +113,26 @@ class Type {
     }
     return true;
   }
+
+  replaceTypes(types: Map<Type, Type>) {
+    const type = types.get(this);
+    if (type) {
+      return type;
+    }
+    return this.createReplacedType(types);
+  }
+
+  createReplacedType(types: Map<Type, Type>) {
+    const newType = new Type(this.name, this.location, this.expression);
+
+    for (const [name, member] of this.members) {
+      newType.members.set(name, member.mapType(t => t.replaceTypes(types)));
+    }
+    // TODO: operators
+
+    newType.callSignatures = this.callSignatures.map(sig => sig.replaceTypes(types));
+    newType.newSignatures = this.newSignatures.map(sig => sig.replaceTypes(types));
+
+    return newType;
+  }
 }
