@@ -1,7 +1,9 @@
 import Type from "./Type";
+import GenericsParameterType from "./type/GenericsParameterType";
 import {voidType} from "./nativeTypes";
 import Member, {Constness} from "./Member";
 import CompilationError from "../common/CompilationError";
+import {union} from "../util/set";
 
 export
 interface Variable {
@@ -49,11 +51,23 @@ class Environment {
   getOwnVariable(name: string): Variable {
     throw new Error("not implemented");
   }
+
+  getGenericsPlaceholders() {
+    if (this.parent) {
+      return union(this.getOwnGenericsPlaceholders(), this.parent.getOwnGenericsPlaceholders());
+    } else {
+      return this.getOwnGenericsPlaceholders();
+    }
+  }
+  getOwnGenericsPlaceholders(): Set<GenericsParameterType> {
+    throw new Error("not implemented");
+  }
 }
 
 export
 class BlockEnvironment extends Environment {
-  variables = new Map<string, Member>();
+  private variables = new Map<string, Member>();
+  private genericsPlaceholders = new Set<GenericsParameterType>();
 
   addVariable(name: string, variable: Member) {
     this.variables.set(name, variable);
@@ -63,6 +77,12 @@ class BlockEnvironment extends Environment {
     if (member) {
       return {member, needsThis: false};
     }
+  }
+  getOwnGenericsPlaceholders() {
+    return this.genericsPlaceholders;
+  }
+  addGenericsPlaceholder(placeholder: GenericsParameterType) {
+    this.genericsPlaceholders.add(placeholder);
   }
 }
 
@@ -77,5 +97,8 @@ class ThisEnvironment extends Environment {
     if (member) {
       return {member, needsThis: true};
     }
+  }
+  getOwnGenericsPlaceholders() {
+    return new Set();
   }
 }

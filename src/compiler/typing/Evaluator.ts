@@ -9,6 +9,7 @@ import {
   ParameterAST,
   FunctionAST,
   FunctionCallAST,
+  GenericsCallAST,
   ClassAST,
   MemberAccessAST,
   IfAST,
@@ -22,6 +23,7 @@ import Expression, {
   AssignmentExpression,
   NewVariableExpression,
   FunctionCallExpression,
+  GenericsCallExpression,
   ReturnExpression,
   MemberAccessExpression,
   OperatorAccessExpression,
@@ -104,6 +106,9 @@ class Evaluator {
     }
     else if (ast instanceof FunctionCallAST) {
       return this.evaluateFunctionCall(ast);
+    }
+    else if (ast instanceof GenericsCallAST) {
+      return this.evaluateGenericsCall(ast);
     }
     else if (ast instanceof ClassAST) {
       return this.evaluateClass(ast);
@@ -256,6 +261,12 @@ class Evaluator {
     const func = this.evaluate(ast.function).get();
     const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
     return new FunctionCallExpression(ast.location, func, args, ast.isNewCall);
+  }
+
+  evaluateGenericsCall(ast: GenericsCallAST) {
+    const value = this.evaluate(ast.value).get();
+    const args = ast.arguments.map(a => this.evaluateType(a));
+    return new GenericsCallExpression(ast.location, value, args);
   }
 
   evaluateClass(ast: ClassAST) {

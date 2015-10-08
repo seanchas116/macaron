@@ -1,6 +1,8 @@
 import {voidType, numberType, booleanType, stringType} from "./nativeTypes";
 import Type from "./Type";
 import UnionType from "./type/UnionType";
+import GenericsType from "./type/GenericsType";
+import GenericsParameterType from "./type/GenericsParameterType";
 import Identifier from "./Identifier";
 import Operator from "./Operator";
 import {Constness} from "./Member";
@@ -75,6 +77,47 @@ class FunctionCallExpression extends Expression {
       );
     }
     this.type = sig.returnType;
+  }
+}
+
+export
+class GenericsCallExpression extends Expression {
+  arguments: Type[];
+
+  constructor(location: SourceLocation, public value: Expression, args: Type[]) {
+    super(location);
+    this.arguments = args;
+
+    const genericsType = this.value.type;
+    if (genericsType instanceof GenericsType) {
+      const paramLength = genericsType.parameters.length
+      if (paramLength !== args.length) {
+        throw CompilationError.typeError(
+          args[0].location,
+          `Number of generics arguments wrong (${args.length} for ${paramLength})`
+        );
+      }
+
+      const types = new Map<GenericsParameterType, Type>();
+      for (const [i, {placeholder, constraint}] of genericsType.parameters.entries()) {
+        const reasons: string[] = [];
+        if (!constraint.isAssignable(args[i], reasons)) {
+          throw CompilationError.typeError(
+            args[i].location,
+            `Cannot assign '${args[i]}' to type '${constraint}'`,
+            ...reasons
+          );
+        }
+        types.set(placeholder, args[i]);
+      }
+
+      this.type = genericsType.resolveGenerics(types);
+    } else {
+      throw CompilationError.typeError(
+        this.value.location,
+        `The value is not generic`
+      );
+    }
   }
 }
 
