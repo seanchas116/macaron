@@ -73,4 +73,8 @@ class IntersectionType extends Type {
 
     this.callSignatures = types.reduce((sigs, type) => sigs.concat(type.callSignatures), []);
   }
+
+  mapTypes(mapper: (type: Type) => Type) {
+    return new IntersectionType(this.types.map(mapper), this.location);
+  }
 }

@@ -47,6 +47,10 @@ class UnionType extends Type {
     reasons.unshift(`Type '${other}' is not one of '${this}'`);
     return false;
   }
+
+  mapTypes(mapper: (type: Type) => Type) {
+    return new UnionType(this.types.map(mapper), this.location);
+  }
 }
 
 function buildMembers(location: SourceLocation, types: Type[]) {

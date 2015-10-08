@@ -3,6 +3,8 @@ import Expression from "./Expression";
 import Operator from "./Operator";
 import Member, {Constness} from "./Member";
 import SourceLocation from "../common/SourceLocation";
+import GenericsParameterType from "./type/GenericsParameterType";
+import {intersection} from "../util/set";
 const HashMap = require("hashmap");
 
 function mergeMap<TKey, TValue>(a: Map<TKey, TValue>, b: Map<TKey, TValue>) {
@@ -35,6 +37,7 @@ class Type {
   unaryOperators = new Map<string, Operator>();
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
+  genericsPlaceholders = new Set<GenericsParameterType>();
 
   constructor(public name: string, public location: SourceLocation = null, public expression: Expression = null) {
     this.location = location || SourceLocation.empty();
@@ -114,24 +117,23 @@ class Type {
     return true;
   }
 
-  replaceTypes(types: Map<Type, Type>) {
-    const type = types.get(this);
-    if (type) {
-      return type;
+  resolveGenerics(types: Map<GenericsParameterType, Type>): Type {
+    if (intersection(new Set(types.keys()), this.genericsPlaceholders).size == 0) {
+      return this;
     }
-    return this.createReplacedType(types);
+    return this.mapTypes(t => t.resolveGenerics(types));
   }
 
-  createReplacedType(types: Map<Type, Type>) {
+  mapTypes(mapper: (type: Type) => Type) {
     const newType = new Type(this.name, this.location, this.expression);
 
     for (const [name, member] of this.members) {
-      newType.members.set(name, member.mapType(t => t.replaceTypes(types)));
+      newType.members.set(name, member.mapType(mapper));
     }
     // TODO: operators
 
-    newType.callSignatures = this.callSignatures.map(sig => sig.replaceTypes(types));
-    newType.newSignatures = this.newSignatures.map(sig => sig.replaceTypes(types));
+    newType.callSignatures = this.callSignatures.map(sig => sig.mapTypes(mapper));
+    newType.newSignatures = this.newSignatures.map(sig => sig.mapTypes(mapper));
 
     return newType;
   }

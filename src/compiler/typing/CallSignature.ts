@@ -1,4 +1,5 @@
 import Type from "./Type";
+import GenericsParameterType from "./type/GenericsParameterType";
 
 export default
 class CallSignature {
@@ -30,11 +31,11 @@ class CallSignature {
     return true;
   }
 
-  replaceTypes(types: Map<Type, Type>) {
+  mapTypes(mapper: (type: Type) => Type) {
     return new CallSignature(
-      this.selfType.replaceTypes(types),
-      this.params.map(p => p.replaceTypes(types)),
-      this.returnType.replaceTypes(types)
+      mapper(this.selfType),
+      this.params.map(mapper),
+      mapper(this.returnType)
     );
   }
 

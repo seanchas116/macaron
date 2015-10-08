@@ -6,6 +6,10 @@ class MetaType extends Type {
     super(name);
   }
 
+  mapTypes(mapper: (type: Type) => Type) {
+    return new MetaType(this.name, mapper(this.metaType), this.typeOnly);
+  }
+
   static typeOnly(type: Type) {
     return new MetaType(`[type ${type.name}]`, type, true);
   }

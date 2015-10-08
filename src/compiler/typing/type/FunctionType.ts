@@ -32,4 +32,14 @@ class FunctionType extends Type {
       this.callSignatures.push(signature);
     }
   }
+
+  mapTypes(mapper: (type: Type) => Type) {
+    return new FunctionType(
+      mapper(this.selfType),
+      this.params.map(mapper),
+      this.optionalParams.map(mapper),
+      mapper(this.returnType),
+      this.location
+    );
+  }
 }

@@ -10,4 +10,8 @@ class GenericsParameterType extends Type {
   isAssignable(other: Type): boolean {
     return other === this;
   }
+
+  resolveGenerics(types: Map<GenericsParameterType, Type>): Type {
+    return types.get(this) || this;
+  }
 }

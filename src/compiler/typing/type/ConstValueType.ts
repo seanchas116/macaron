@@ -21,4 +21,8 @@ class ConstValueType extends Type {
     reasons.unshift(`Type '${other}' does not represent a constant value`);
     return false;
   }
+
+  mapTypes(mapper: (type: Type) => Type) {
+    return new ConstValueType(mapper(this.type), this.constValue);
+  }
 }
