@@ -5,3 +5,24 @@
     }
     foo<number>(1, 2)
   expected: 3
+- title: "generic function with type constraint"
+  src: |
+    interface Foo {
+      foo() number
+    }
+    interface Bar: Foo {
+      bar() string
+    }
+    class Hoge {
+      foo() { 100 }
+      bar() { "hoge" }
+    }
+    class Piyo {
+      foo() { 200 }
+      bar() { "piyo" }
+    }
+    func foo<T: Bar>(a T, b T) {
+      a.foo() + b.foo()
+    }
+    foo<Bar>(new Hoge(), new Piyo())
+  expected: 300
