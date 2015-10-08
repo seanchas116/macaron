@@ -8,13 +8,17 @@ export default
 class ExpressionThunk extends Thunk<Expression> {
   public type: TypeThunk;
 
-  constructor(location: SourceLocation, getter: () => Expression, type: Type = null) {
+  constructor(location: SourceLocation, getter: () => Expression, type: Type|TypeThunk = null) {
     super(location, getter);
     if (type) {
-      this.type= TypeThunk.resolve(type);
+      this.type = TypeThunk.resolve(type);
     } else {
-      this.type= new TypeThunk(location, () => this.get().type);
+      this.type = new TypeThunk(location, () => this.get().type);
     }
+  }
+
+  map(transformExpr: (expr: Expression) => Expression, transformType: (type: Type) => Type = null) {
+    return new ExpressionThunk(this.location, () => transformExpr(this.get()), this.type.map(transformType));
   }
 
   static resolve(expr: Expression|ExpressionThunk) {

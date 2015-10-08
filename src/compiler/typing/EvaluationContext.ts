@@ -8,7 +8,7 @@ import CompilationError from "../common/CompilationError";
 export default
 class EvaluationContext {
 
-  constructor(public environment: Environment) {
+  constructor(public environment: BlockEnvironment) {
   }
 
   newChild(thisType: Type = null) {

@@ -24,6 +24,7 @@ import Expression, {
   NewVariableExpression,
   FunctionCallExpression,
   GenericsCallExpression,
+  GenericsExpression,
   ReturnExpression,
   MemberAccessExpression,
   OperatorAccessExpression,
@@ -40,6 +41,8 @@ import FunctionType from "./type/FunctionType";
 import MetaType from "./type/MetaType";
 import UnionType from "./type/UnionType";
 import IntersectionType from "./type/IntersectionType";
+import GenericsType from "./type/GenericsType";
+import GenericsParameterType from "./type/GenericsParameterType";
 import ExpressionThunk from "./thunk/ExpressionThunk";
 import {voidType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
@@ -205,6 +208,26 @@ class Evaluator {
   }
 
   evaluateFunction(ast: FunctionAST, thisType = voidType): ExpressionThunk {
+    if (ast.genericsParameters && ast.genericsParameters.length > 0) {
+      const subContext = this.context.newChild();
+      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, voidType));
+      for (const [i, p] of params.entries()) {
+        subContext.environment.addGenericsPlaceholder(p);
+        subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
+      }
+      const funcThunk = new Evaluator(subContext).evaluateFunctionWithoutGenerics(ast, thisType);
+      const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template));
+      return new ExpressionThunk(
+        ast.location,
+        () => new GenericsExpression(ast.location, typeThunk.get() as GenericsType, funcThunk.get()),
+        typeThunk
+      );
+    } else {
+      return this.evaluateFunctionWithoutGenerics(ast, thisType);
+    }
+  }
+
+  evaluateFunctionWithoutGenerics(ast: FunctionAST, thisType = voidType): ExpressionThunk {
     const {location} = ast;
 
     const paramTypes: Type[] = [];

@@ -81,6 +81,14 @@ class FunctionCallExpression extends Expression {
 }
 
 export
+class GenericsExpression extends Expression {
+  constructor(location: SourceLocation, public genericsType: GenericsType, public expression: Expression) {
+    super(location);
+    this.type = genericsType;
+  }
+}
+
+export
 class GenericsCallExpression extends Expression {
   arguments: Type[];
 
@@ -99,8 +107,9 @@ class GenericsCallExpression extends Expression {
       }
 
       const types = new Map<GenericsParameterType, Type>();
-      for (const [i, {placeholder, constraint}] of genericsType.parameters.entries()) {
+      for (const [i, placeholder] of genericsType.parameters.entries()) {
         const reasons: string[] = [];
+        const {constraint} = placeholder;
         if (!constraint.isAssignable(args[i], reasons)) {
           throw CompilationError.typeError(
             args[i].location,

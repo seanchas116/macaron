@@ -2,9 +2,9 @@ import Type from "../Type";
 
 export default
 class GenericsParameterType extends Type {
-  constructor(name: string, public genericsType: Type, public genericsIndex: number, public restriction: Type) {
+  constructor(name: string, public constraint: Type) {
     super(name);
-    this.inherit(restriction);
+    this.inherit(constraint);
   }
 
   isAssignable(other: Type): boolean {
