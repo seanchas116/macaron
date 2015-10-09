@@ -207,7 +207,20 @@ class Evaluator {
     return new MemberAccessExpression(ast.location, obj, ast.member)
   }
 
-  evaluateFunction(ast: FunctionAST, thisType = voidType): ExpressionThunk {
+  evaluateFunction(ast: FunctionAST, thisType = voidType) {
+    const funcThunk = this.evaluateFunctionGenerics(ast, thisType);
+    if (ast.addAsVariable) {
+      const thunk = new ExpressionThunk(ast.location, () => {
+        return new NewVariableExpression(ast.location, Constness.Constant, ast.name, funcThunk.get());
+      });
+      this.context.addVariable(Constness.Constant, ast.name, funcThunk.type);
+      return thunk;
+    } else {
+      return funcThunk;
+    }
+  }
+
+  evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
       const subContext = this.context.newChild();
       const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, voidType));
@@ -215,7 +228,7 @@ class Evaluator {
         subContext.environment.addGenericsPlaceholder(p);
         subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
       }
-      const funcThunk = new Evaluator(subContext).evaluateFunctionWithoutGenerics(ast, thisType);
+      const funcThunk = new Evaluator(subContext).evaluateFunctionMain(ast, thisType);
       const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template));
       return new ExpressionThunk(
         ast.location,
@@ -223,11 +236,11 @@ class Evaluator {
         typeThunk
       );
     } else {
-      return this.evaluateFunctionWithoutGenerics(ast, thisType);
+      return this.evaluateFunctionMain(ast, thisType);
     }
   }
 
-  evaluateFunctionWithoutGenerics(ast: FunctionAST, thisType = voidType): ExpressionThunk {
+  evaluateFunctionMain(ast: FunctionAST, thisType: Type) {
     const {location} = ast;
 
     const paramTypes: Type[] = [];
@@ -265,19 +278,9 @@ class Evaluator {
       });
     }
 
-    const funcThunk = new ExpressionThunk(location, () => {
+    return new ExpressionThunk(location, () => {
       return new FunctionExpression(location, ast.name, typeThunk.get(), ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
-    });
-
-    if (ast.addAsVariable) {
-      const thunk = new ExpressionThunk(location, () => {
-        return new NewVariableExpression(location, Constness.Constant, ast.name, funcThunk.get());
-      });
-      this.context.addVariable(Constness.Constant, ast.name, typeThunk);
-      return thunk;
-    } else {
-      return funcThunk;
-    }
+    }, typeThunk);
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
