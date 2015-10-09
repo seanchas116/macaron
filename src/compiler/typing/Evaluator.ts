@@ -267,14 +267,12 @@ class Evaluator {
     let typeThunk: TypeThunk;
     if (ast.returnType) {
       const returnType = subEvaluator.evaluateType(ast.returnType);
-      const type = createType(returnType);
-      typeThunk = TypeThunk.resolve(type);
+      typeThunk = TypeThunk.resolve(createType(returnType));
     }
     else {
       typeThunk = new TypeThunk(ast.location, () => {
         const returnType = bodyThunk.get().type;
-        const type = createType(returnType);
-        return type;
+        return createType(returnType);
       });
     }
 
