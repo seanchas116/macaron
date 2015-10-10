@@ -165,13 +165,13 @@ class MemberAccessExpression extends Expression {
     super(location);
     const objectType = object.type;
 
-    if (!objectType.members.get(member.name)) {
+    if (!objectType.getMember(member.name)) {
       throw CompilationError.typeError(
         location,
         `Type '${objectType}' don't have member '${member.name}'`
       );
     }
-    this.type = objectType.members.get(member.name).type.get();
+    this.type = objectType.getMember(member.name).type.get();
   }
 }
 
@@ -183,9 +183,9 @@ class OperatorAccessExpression extends Expression {
     super(location);
     const objectType = object.type;
     if (arity === 1) {
-      this.operator = objectType.unaryOperators.get(operatorName.name);
+      this.operator = objectType.getUnaryOperators().get(operatorName.name);
     } else if (arity === 2) {
-      this.operator = objectType.binaryOperators.get(operatorName.name);
+      this.operator = objectType.getBinaryOperators().get(operatorName.name);
     } else {
       throw new Error("unsupported arity");
     }

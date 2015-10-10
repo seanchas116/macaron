@@ -3,8 +3,7 @@ import Type, {Assignability} from "../Type";
 export default
 class ConstValueType extends Type {
   constructor(public type: Type, public constValue: any) {
-    super(`[${constValue}]`);
-    this.inherit(type);
+    super(`[${constValue}]`, [type]);
   }
 
   isAssignableUncached(other: Type, reasons: string[]): boolean {

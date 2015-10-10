@@ -9,34 +9,34 @@ import {
 import CallSignature from "./CallSignature";
 
 export
-const anyType = new Type("any");
+const anyType = new Type("any", []);
 
 export
 const voidType = anyType;
 
 export
-const numberType = new Type("number");
+const numberType = new Type("number", [voidType]);
 
 export
-const booleanType = new Type("boolean");
+const booleanType = new Type("boolean", [voidType]);
 
 export
-const stringType = new Type("string");
+const stringType = new Type("string", [voidType]);
 
 let initialized = false;
 
 export
 const initNativeTypes: () => void = once(() => {
   function addNativeBinaryOp(type: Type, name: string, ret: Type = type, nativeName = name) {
-    const opType = new Type(`${type} operator ${name}`);
+    const opType = new Type(`${type} operator ${name}`, []);
     opType.callSignatures = [new CallSignature(type, [type], ret)];
-    type.binaryOperators.set(name, new NativeOperator(nativeName, opType));
+    type.selfBinaryOperators.set(name, new NativeOperator(nativeName, opType));
   }
 
   function addNativeUnaryOp(type: Type, name: string, ret: Type = type) {
-    const opType = new Type(`${type} operator ${name}`);
+    const opType = new Type(`${type} operator ${name}`, []);
     opType.callSignatures = [new CallSignature(type, [], ret)];
-    type.unaryOperators.set(name, new NativeOperator(name, opType));
+    type.selfUnaryOperators.set(name, new NativeOperator(name, opType));
   }
 
   addNativeBinaryOp(anyType, "==", booleanType, "===");
@@ -70,9 +70,4 @@ const initNativeTypes: () => void = once(() => {
   addNativeUnaryOp(booleanType, "!");
 
   addNativeBinaryOp(stringType, "+");
-
-  // TODO: add equality operator without inheriting anyType
-  numberType.inherit(anyType);
-  booleanType.inherit(anyType);
-  stringType.inherit(anyType);
 });

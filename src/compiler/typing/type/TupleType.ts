@@ -5,9 +5,10 @@ import SourceLocation from "../../common/SourceLocation";
 export default
 class TupleType extends Type {
   constructor(public types: Type[], loc: SourceLocation) {
-    super("", loc);
+    // TODO: inherit Array
+    super("", [], loc);
     types.forEach((type, i) => {
-      this.members.set(i.toString(), new Member(Constness.Constant, type));
+      this.selfMembers.set(i.toString(), new Member(Constness.Constant, type));
     });
   }
 

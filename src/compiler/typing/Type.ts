@@ -32,26 +32,41 @@ const assignabilityResults: Map<[Type, Type], Assignability> = new HashMap();
 
 export default
 class Type {
-  members = new Map<string, Member>();
-  binaryOperators = new Map<string, Operator>();
-  unaryOperators = new Map<string, Operator>();
+  selfMembers = new Map<string, Member>();
+  selfBinaryOperators = new Map<string, Operator>();
+  selfUnaryOperators = new Map<string, Operator>();
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
   genericsPlaceholders = new Set<GenericsParameterType>();
 
-  constructor(public name: string, public location: SourceLocation = null, public expression: Expression = null) {
+  constructor(public name: string, public superTypes: Type[], public location: SourceLocation = null, public expression: Expression = null) {
     this.location = location || SourceLocation.empty();
-  }
-
-  inherit(...superTypes: Type[]) {
-    this.members = mergeMaps([...superTypes, this].map(t => t.members));
-    this.binaryOperators = mergeMaps([...superTypes, this].map(t => t.binaryOperators));
-    this.unaryOperators = mergeMaps([...superTypes, this].map(t => t.unaryOperators));
-    // call signatures are not inherited
   }
 
   toString() {
     return this.name;
+  }
+
+  getMembers(): Map<string, Member> {
+    return mergeMaps([...this.superTypes.map(t => t.getMembers()), this.selfMembers]);
+  }
+
+  getMember(name: string): Member {
+    for (const superType of this.superTypes) {
+      const member = superType.getMember(name);
+      if (member) {
+        return member;
+      }
+    }
+    return this.selfMembers.get(name);
+  }
+
+  getBinaryOperators(): Map<string, Operator> {
+    return mergeMaps([...this.superTypes.map(t => t.getBinaryOperators()), this.selfBinaryOperators]);
+  }
+
+  getUnaryOperators(): Map<string, Operator> {
+    return mergeMaps([...this.superTypes.map(t => t.getUnaryOperators()), this.selfUnaryOperators]);
   }
 
   isAssignable(other: Type, reasons: string[], ignoreThis = false) {
@@ -83,8 +98,8 @@ class Type {
   }
 
   isAssignableUncached(other: Type, reasons: string[], ignoreThis: boolean): boolean {
-    for (const [name, memberThis] of this.members) {
-      const memberOther = other.members.get(name);
+    for (const [name, memberThis] of this.selfMembers) {
+      const memberOther = other.getMember(name);
       if (!memberOther) {
         reasons.unshift(`Type '${other}' do not have member '${name}'`);
         return false;
@@ -125,10 +140,10 @@ class Type {
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    const newType = new Type(this.name, this.location, this.expression);
+    const newType = new Type(this.name, this.superTypes, this.location, this.expression);
 
-    for (const [name, member] of this.members) {
-      newType.members.set(name, member.mapType(mapper));
+    for (const [name, member] of this.selfMembers) {
+      newType.selfMembers.set(name, member.mapType(mapper));
     }
     // TODO: operators
 

@@ -3,7 +3,7 @@ import Type from "../Type";
 export default
 class MetaType extends Type {
   constructor(public name: string, public metaType: Type, public typeOnly = false) {
-    super(name);
+    super(name, []);
   }
 
   mapTypes(mapper: (type: Type) => Type) {

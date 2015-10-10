@@ -26,10 +26,7 @@ class InterfaceExpression extends TypeExpression {
       }
     });
 
-    const type = this.selfType = new Type(name.name, location, this);
-    for (const superType of superTypes) {
-      type.inherit(superType);
-    }
+    const type = this.selfType = new Type(name.name, superTypes, location, this);
     this.setMetaType(type);
   }
 
@@ -37,10 +34,10 @@ class InterfaceExpression extends TypeExpression {
     const memberThunk = ExpressionThunk.resolve(member);
 
     const type = this.selfType;
-    type.members.set(name.name, new Member(constness, member.type));
+    type.selfMembers.set(name.name, new Member(constness, member.type));
 
     for (const superType of this.superTypes) {
-      const superMember = superType.members.get(name.name);
+      const superMember = superType.getMember(name.name);
       const errors: string[] = [];
       if (superMember && !superMember.type.get().isAssignable(memberThunk.type.get(), errors)) {
         throw CompilationError.typeError(

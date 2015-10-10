@@ -93,7 +93,7 @@ class ThisEnvironment extends Environment {
   }
 
   getOwnVariable(name: string) {
-    const member = this.thisType.members.get(name);
+    const member = this.thisType.getMember(name);
     if (member) {
       return {member, needsThis: true};
     }

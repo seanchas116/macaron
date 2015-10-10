@@ -3,8 +3,7 @@ import Type from "../Type";
 export default
 class GenericsParameterType extends Type {
   constructor(name: string, public constraint: Type) {
-    super(name);
-    this.inherit(constraint);
+    super(name, [constraint]);
   }
 
   isAssignable(other: Type): boolean {
