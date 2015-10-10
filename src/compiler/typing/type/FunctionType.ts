@@ -19,7 +19,7 @@ class FunctionType extends Type {
         }
       })();
 
-      if (selfType == voidType) {
+      if (selfType == voidType()) {
         this.name = funcName;
       }
       else {

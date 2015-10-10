@@ -13,7 +13,7 @@ import CompilationError from "../common/CompilationError";
 
 export default
 class Expression {
-  type = voidType;
+  type = voidType();
 
   constructor(public location: SourceLocation) {
   }
@@ -52,7 +52,7 @@ class FunctionCallExpression extends Expression {
     this.function = func;
     this.arguments = args;
 
-    let selfType = voidType;
+    let selfType = voidType();
     let hasSelf = false;
     if (!isNewCall) {
       if (func instanceof MemberAccessExpression) {
@@ -138,13 +138,13 @@ class LiteralExpression extends Expression {
     const type = (() => {
       switch (typeof value) {
         case "number":
-          return numberType;
+          return numberType();
         case "string":
-          return stringType;
+          return stringType();
         case "boolean":
-          return booleanType;
+          return booleanType();
         default:
-          return voidType;
+          return voidType();
       }
     })();
     this.type = type;
@@ -203,7 +203,7 @@ function blockType(block: Expression[]) {
   if (block.length > 0) {
     return block[block.length - 1].type;
   } else {
-    return voidType;
+    return voidType();
   }
 }
 

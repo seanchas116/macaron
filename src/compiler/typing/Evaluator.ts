@@ -54,10 +54,10 @@ import IntersectionType from "./type/IntersectionType";
 import GenericsType from "./type/GenericsType";
 import GenericsParameterType from "./type/GenericsParameterType";
 import ExpressionThunk from "./thunk/ExpressionThunk";
-import {voidType} from "./nativeTypes";
 import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
 import TypeThunk from "./thunk/TypeThunk";
+import {voidType} from "./nativeTypes";
 
 import CompilationError from "../common/CompilationError";
 import SourceLocation from "../common/SourceLocation";
@@ -217,7 +217,7 @@ class Evaluator {
     return new MemberAccessExpression(ast.location, obj, ast.member)
   }
 
-  evaluateFunction(ast: FunctionAST, thisType = voidType) {
+  evaluateFunction(ast: FunctionAST, thisType = voidType()) {
     const funcThunk = this.evaluateFunctionGenerics(ast, thisType);
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(ast.location, () => {
@@ -233,7 +233,7 @@ class Evaluator {
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
       const subContext = this.context.newChild();
-      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, voidType));
+      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, voidType()));
       for (const [i, p] of params.entries()) {
         subContext.environment.addGenericsPlaceholder(p);
         subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));

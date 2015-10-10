@@ -47,7 +47,7 @@
         "src/compiler/parser/parsing/typeExpression.ts",
         "src/compiler/parser/parsing/value.ts",
         "src/compiler/typing/CallSignature.ts",
-        "src/compiler/typing/defaultEnvironment.ts",
+        "src/compiler/typing/DefaultEnvironment.ts",
         "src/compiler/typing/Environment.ts",
         "src/compiler/typing/EvaluationContext.ts",
         "src/compiler/typing/Evaluator.ts",

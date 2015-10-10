@@ -13,11 +13,11 @@ export default
 class ClassExpression extends InterfaceExpression {
   constructor(location: SourceLocation, public name: Identifier, public superExpression: Expression) {
     // TODO: inherit Object by default
-    super(location, name, [superExpression || new EmptyTypeExpression(voidType)]);
+    super(location, name, [superExpression || new EmptyTypeExpression(voidType())]);
 
     const classType = new MetaType(`class ${name.name}`, this.selfType);
     this.type = classType;
-    classType.newSignatures = [new CallSignature(voidType, [], this.selfType)];
+    classType.newSignatures = [new CallSignature(voidType(), [], this.selfType)];
   }
 
   addMember(constness: Constness, name: Identifier, member: Expression|ExpressionThunk) {
@@ -26,7 +26,7 @@ class ClassExpression extends InterfaceExpression {
     if (name.name === "constructor") {
       const memberThunk = ExpressionThunk.resolve(member);
       this.type.newSignatures = memberThunk.type.get().callSignatures.map(sig => {
-        return new CallSignature(voidType, sig.params, this.selfType);
+        return new CallSignature(voidType(), sig.params, this.selfType);
       });
     }
   }

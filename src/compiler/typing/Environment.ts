@@ -22,7 +22,7 @@ class Environment {
 
   addTempVariable(baseName: string) {
     const name = this.nonDuplicateVariableName(baseName);
-    this.addVariable(name, new Member(Constness.Constant, voidType));
+    this.addVariable(name, new Member(Constness.Constant, voidType()));
     return name;
   }
 

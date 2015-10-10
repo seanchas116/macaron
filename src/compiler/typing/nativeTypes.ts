@@ -1,73 +1,21 @@
-import Type from "./Type";
-import SourceLocation from "../common/SourceLocation";
-const once = require("once");
-
-import {
-  NativeOperator
-} from "./Operator";
-
-import CallSignature from "./CallSignature";
+import DefaultEnvironment from "./DefaultEnvironment";
 
 export
-const anyType = new Type("any", []);
+function voidType() {
+  return DefaultEnvironment.instance.voidType;
+}
 
 export
-const voidType = anyType;
+function numberType() {
+  return DefaultEnvironment.instance.numberType;
+}
 
 export
-const numberType = new Type("number", [voidType]);
+function booleanType() {
+  return DefaultEnvironment.instance.booleanType;
+}
 
 export
-const booleanType = new Type("boolean", [voidType]);
-
-export
-const stringType = new Type("string", [voidType]);
-
-let initialized = false;
-
-export
-const initNativeTypes: () => void = once(() => {
-  function addNativeBinaryOp(type: Type, name: string, ret: Type = type, nativeName = name) {
-    const opType = new Type(`${type} operator ${name}`, []);
-    opType.callSignatures = [new CallSignature(type, [type], ret)];
-    type.selfBinaryOperators.set(name, new NativeOperator(nativeName, opType));
-  }
-
-  function addNativeUnaryOp(type: Type, name: string, ret: Type = type) {
-    const opType = new Type(`${type} operator ${name}`, []);
-    opType.callSignatures = [new CallSignature(type, [], ret)];
-    type.selfUnaryOperators.set(name, new NativeOperator(name, opType));
-  }
-
-  addNativeBinaryOp(anyType, "==", booleanType, "===");
-  addNativeBinaryOp(anyType, "!=", booleanType, "!==");
-
-  addNativeBinaryOp(numberType, "<", booleanType);
-  addNativeBinaryOp(numberType, "<=", booleanType);
-  addNativeBinaryOp(numberType, ">", booleanType);
-  addNativeBinaryOp(numberType, ">=", booleanType);
-
-  addNativeBinaryOp(numberType, "+");
-  addNativeBinaryOp(numberType, "-");
-  addNativeBinaryOp(numberType, "*");
-  addNativeBinaryOp(numberType, "/");
-  addNativeBinaryOp(numberType, "%");
-  addNativeBinaryOp(numberType, "**");
-
-  addNativeBinaryOp(numberType, "&");
-  addNativeBinaryOp(numberType, "^");
-  addNativeBinaryOp(numberType, "|");
-  addNativeBinaryOp(numberType, "<<");
-  addNativeBinaryOp(numberType, ">>");
-  addNativeBinaryOp(numberType, ">>>");
-
-  addNativeUnaryOp(numberType, "+");
-  addNativeUnaryOp(numberType, "-");
-  addNativeUnaryOp(numberType, "~");
-
-  addNativeBinaryOp(booleanType, "&&");
-  addNativeBinaryOp(booleanType, "||");
-  addNativeUnaryOp(booleanType, "!");
-
-  addNativeBinaryOp(stringType, "+");
-});
+function stringType() {
+  return DefaultEnvironment.instance.stringType;
+}

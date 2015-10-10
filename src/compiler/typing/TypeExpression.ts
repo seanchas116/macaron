@@ -14,7 +14,7 @@ class TypeExpression extends Expression {
 
   constructor(location: SourceLocation) {
     super(location);
-    this.setMetaType(voidType);
+    this.setMetaType(voidType());
   }
 
   setMetaType(metaType: Type) {
