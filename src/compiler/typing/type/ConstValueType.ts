@@ -1,9 +1,10 @@
 import Type, {Assignability} from "../Type";
+import Environment from "../Environment";
 
 export default
 class ConstValueType extends Type {
-  constructor(public type: Type, public constValue: any) {
-    super(`[${constValue}]`, [type]);
+  constructor(public type: Type, public constValue: any, env: Environment) {
+    super(`[${constValue}]`, [type], env);
   }
 
   isAssignableUncached(other: Type, reasons: string[]): boolean {
@@ -22,6 +23,6 @@ class ConstValueType extends Type {
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    return new ConstValueType(mapper(this.type), this.constValue);
+    return new ConstValueType(mapper(this.type), this.constValue, this.environment);
   }
 }

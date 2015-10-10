@@ -4,6 +4,7 @@ import ExpressionThunk from "../thunk/ExpressionThunk";
 import Type from "../Type";
 import MetaType from "../type/MetaType";
 import Identifier from "../Identifier";
+import Environment from "../Environment";
 import Member, {Constness} from "../Member";
 import SourceLocation from "../../common/SourceLocation";
 import CompilationError from "../../common/CompilationError";
@@ -14,8 +15,8 @@ class InterfaceExpression extends TypeExpression {
   superTypes: Type[];
   selfType: Type;
 
-  constructor(location: SourceLocation, public name: Identifier, public superExpressions: Expression[]) {
-    super(location);
+  constructor(location: SourceLocation, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
+    super(location, env);
 
     let superTypes = this.superTypes = superExpressions.map(superExpr => {
       const superValueType = superExpr.type;
@@ -26,7 +27,7 @@ class InterfaceExpression extends TypeExpression {
       }
     });
 
-    const type = this.selfType = new Type(name.name, superTypes, location, this);
+    const type = this.selfType = new Type(name.name, superTypes, env, location, this);
     this.setMetaType(type);
   }
 

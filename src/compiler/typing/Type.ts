@@ -2,6 +2,7 @@ import CallSignature from "./CallSignature";
 import Expression from "./Expression";
 import Operator from "./Operator";
 import Member, {Constness} from "./Member";
+import Environment from "./Environment";
 import SourceLocation from "../common/SourceLocation";
 import GenericsParameterType from "./type/GenericsParameterType";
 import {intersection} from "../util/set";
@@ -39,7 +40,7 @@ class Type {
   newSignatures: CallSignature[] = [];
   genericsPlaceholders = new Set<GenericsParameterType>();
 
-  constructor(public name: string, public superTypes: Type[], public location: SourceLocation = null, public expression: Expression = null) {
+  constructor(public name: string, public superTypes: Type[], public environment: Environment, public location: SourceLocation = null, public expression: Expression = null) {
     this.location = location || SourceLocation.empty();
   }
 
@@ -140,7 +141,7 @@ class Type {
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    const newType = new Type(this.name, this.superTypes, this.location, this.expression);
+    const newType = new Type(this.name, this.superTypes, this.environment, this.location, this.expression);
 
     for (const [name, member] of this.selfMembers) {
       newType.selfMembers.set(name, member.mapType(mapper));

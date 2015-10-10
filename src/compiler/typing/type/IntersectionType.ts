@@ -4,10 +4,11 @@ import CallSignature from "../CallSignature";
 import SourceLocation from "../../common/SourceLocation";
 import CompilationError from "../../common/CompilationError";
 import Member, {Constness} from "../Member";
+import Environment from "../Environment";
 import TypeThunk from "../thunk/TypeThunk";
 import {union} from "../../util/set";
 
-function intersectionMembers(location: SourceLocation, members1: Map<string, Member>, members2: Map<string, Member>) {
+function intersectionMembers(environment: Environment, location: SourceLocation, members1: Map<string, Member>, members2: Map<string, Member>) {
   const ret = new Map<string, Member>();
   const names = union(new Set(members1.keys()), new Set(members2.keys()));
 
@@ -39,7 +40,7 @@ function intersectionMembers(location: SourceLocation, members1: Map<string, Mem
       }
     }
 
-    const intersectionType = new IntersectionType([member1Type, member2Type], location);
+    const intersectionType = new IntersectionType([member1Type, member2Type], environment, location);
     ret.set(name, new Member(Constness.Constant, intersectionType));
   }
   return ret;
@@ -50,8 +51,8 @@ class IntersectionType extends Type {
   types: Type[];
 
   // TODO: memoize
-  constructor(types: Type[], loc: SourceLocation) {
-    super("", [], loc);
+  constructor(types: Type[], env: Environment, loc: SourceLocation) {
+    super("", [], env, loc);
     const typeSet = new Set();
 
     for (const type of types) {
@@ -68,13 +69,13 @@ class IntersectionType extends Type {
     this.name = types.join(" & ");
 
     this.selfMembers = types.reduce((members, type) => {
-      return intersectionMembers(loc, members, type.getMembers());
+      return intersectionMembers(env, loc, members, type.getMembers());
     }, new Map<string, Member>());
 
     this.callSignatures = types.reduce((sigs, type) => sigs.concat(type.callSignatures), []);
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    return new IntersectionType(this.types.map(mapper), this.location);
+    return new IntersectionType(this.types.map(mapper), this.environment, this.location);
   }
 }

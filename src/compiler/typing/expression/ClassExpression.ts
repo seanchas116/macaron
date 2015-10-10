@@ -7,15 +7,16 @@ import SourceLocation from "../../common/SourceLocation";
 import {voidType} from "../nativeTypes";
 import MetaType from "../type/MetaType";
 import CallSignature from "../CallSignature";
+import Environment from "../Environment";
 import {Constness} from "../Member";
 
 export default
 class ClassExpression extends InterfaceExpression {
-  constructor(location: SourceLocation, public name: Identifier, public superExpression: Expression) {
+  constructor(location: SourceLocation, env: Environment, public name: Identifier, public superExpression: Expression) {
     // TODO: inherit Object by default
-    super(location, name, [superExpression || new EmptyTypeExpression(voidType())]);
+    super(location, env, name, [superExpression || new EmptyTypeExpression(voidType(), env)]);
 
-    const classType = new MetaType(`class ${name.name}`, this.selfType);
+    const classType = new MetaType(`class ${name.name}`, this.selfType, env);
     this.type = classType;
     classType.newSignatures = [new CallSignature(voidType(), [], this.selfType)];
   }

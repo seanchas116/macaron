@@ -1,13 +1,14 @@
 import Type from "../Type";
 import CallSignature from "../CallSignature";
+import Environment from "../Environment";
 import SourceLocation from "../../common/SourceLocation";
 import {voidType} from "../nativeTypes";
 
 export default
 class FunctionType extends Type {
-  constructor(public selfType: Type, public params: Type[], public optionalParams: Type[], public returnType: Type, loc: SourceLocation) {
+  constructor(public selfType: Type, public params: Type[], public optionalParams: Type[], public returnType: Type, env: Environment, loc: SourceLocation) {
     // TODO: inherit Function type
-    super("", [], loc);
+    super("", [], env, loc);
 
     {
       const funcName = (() => {
@@ -39,6 +40,7 @@ class FunctionType extends Type {
       this.params.map(mapper),
       this.optionalParams.map(mapper),
       mapper(this.returnType),
+      this.environment,
       this.location
     );
   }

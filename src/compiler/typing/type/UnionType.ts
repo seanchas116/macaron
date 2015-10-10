@@ -1,4 +1,5 @@
 import Type from "../Type";
+import Environment from "../Environment";
 import IntersectionType from "./IntersectionType";
 import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
@@ -12,8 +13,8 @@ class UnionType extends Type {
   types: Type[];
 
   // TODO: memoize
-  constructor(types: Type[], loc: SourceLocation) {
-    super("", [], loc);
+  constructor(types: Type[], env: Environment, loc: SourceLocation) {
+    super("", [], env, loc);
 
     if (types.length === 0) {
       throw new Error("cannot create union with no type");
@@ -34,8 +35,8 @@ class UnionType extends Type {
     types = this.types = Array.from(typeSet);
     this.name = types.join(" | ");
 
-    this.selfMembers = buildMembers(this.location, this.types);
-    this.callSignatures = buildCallSignatures(this.location, this.types);
+    this.selfMembers = buildMembers(env, this.location, this.types);
+    this.callSignatures = buildCallSignatures(env, this.location, this.types);
   }
 
   isAssignableUncached(other: Type, reasons: string[]): boolean {
@@ -49,11 +50,11 @@ class UnionType extends Type {
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    return new UnionType(this.types.map(mapper), this.location);
+    return new UnionType(this.types.map(mapper), this.environment, this.location);
   }
 }
 
-function buildMembers(location: SourceLocation, types: Type[]) {
+function buildMembers(env: Environment, location: SourceLocation, types: Type[]) {
   const resultMembers = new Map<string, Member>();
   const names = types
     .map(t => new Set(t.getMembers().keys()))
@@ -61,9 +62,9 @@ function buildMembers(location: SourceLocation, types: Type[]) {
   for (const name of names) {
     const members = types.map(t => t.getMembers().get(name));
     const memberTypes = members.map(m => m.type.get());
-    const type = new UnionType(memberTypes, location);
+    const type = new UnionType(memberTypes, env, location);
     if (members.some(m => m.constness === Constness.Variable)) {
-      const settingType = new IntersectionType(memberTypes, location);
+      const settingType = new IntersectionType(memberTypes, env, location);
       resultMembers.set(name, new Member(Constness.Variable, type, settingType));
     } else {
       resultMembers.set(name, new Member(Constness.Constant, type));
@@ -72,13 +73,13 @@ function buildMembers(location: SourceLocation, types: Type[]) {
   return resultMembers;
 }
 
-function buildCallSignatures(location: SourceLocation, types: Type[]) {
+function buildCallSignatures(env: Environment, location: SourceLocation, types: Type[]) {
   return types
     .map(t => t.callSignatures)
-    .reduce((a, b) => unionCallSignatures(location, a, b));
+    .reduce((a, b) => unionCallSignatures(env, location, a, b));
 }
 
-function unionCallSignatures(location: SourceLocation, signatures1: CallSignature[], signatures2: CallSignature[]) {
+function unionCallSignatures(env: Environment, location: SourceLocation, signatures1: CallSignature[], signatures2: CallSignature[]) {
   // ((Foo, Bar), (Bar, Foo)) & ((Hoge, Piyo), (Piyo, Hoge))
   // ->
   // (Foo, Bar) & (Hoge, Piyo), (Foo, Bar) & (Piyo, Hoge), ...
@@ -89,9 +90,9 @@ function unionCallSignatures(location: SourceLocation, signatures1: CallSignatur
     const sigs2 = signatures2.filter(s => s.params.length == sig1.params.length);
     for (const sig2 of sigs2) {
       signatures.push(new CallSignature(
-        new IntersectionType([sig1.selfType, sig2.selfType], location),
-        sig1.params.map((p, i) => new IntersectionType([p, sig2.params[i]], location)),
-        new UnionType([sig1.returnType, sig2.returnType], location)
+        new IntersectionType([sig1.selfType, sig2.selfType], env, location),
+        sig1.params.map((p, i) => new IntersectionType([p, sig2.params[i]], env, location)),
+        new UnionType([sig1.returnType, sig2.returnType], env, location)
       ));
     }
   }

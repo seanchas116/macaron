@@ -7,6 +7,7 @@ import GenericsParameterType from "./type/GenericsParameterType";
 import Identifier from "./Identifier";
 import Operator from "./Operator";
 import {Constness} from "./Member";
+import Environment from "./Environment";
 
 import SourceLocation from "../common/SourceLocation";
 import CompilationError from "../common/CompilationError";
@@ -209,9 +210,9 @@ function blockType(block: Expression[]) {
 
 export
 class IfExpression extends Expression {
-  constructor(location: SourceLocation, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
+  constructor(location: SourceLocation, public environment: Environment, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
     super(location);
-    this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], location);
+    this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], environment, location);
   }
 }
 

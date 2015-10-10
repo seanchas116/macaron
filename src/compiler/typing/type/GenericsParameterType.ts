@@ -1,9 +1,10 @@
 import Type from "../Type";
+import Environment from "../Environment";
 
 export default
 class GenericsParameterType extends Type {
-  constructor(name: string, public constraint: Type) {
-    super(name, [constraint]);
+  constructor(name: string, public constraint: Type, env: Environment) {
+    super(name, [constraint], env);
   }
 
   isAssignable(other: Type): boolean {

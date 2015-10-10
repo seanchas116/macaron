@@ -71,6 +71,10 @@ class Evaluator {
   constructor(public context: EvaluationContext) {
   }
 
+  get environment() {
+    return this.context.environment;
+  }
+
   evaluateExpressions(asts: ExpressionAST[]) {
     const expressions: ExpressionThunk[] = [];
     const errors: ErrorInfo[] = [];
@@ -233,13 +237,13 @@ class Evaluator {
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
       const subContext = this.context.newChild();
-      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, voidType()));
+      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, voidType(), this.environment));
       for (const [i, p] of params.entries()) {
         subContext.environment.addGenericsPlaceholder(p);
-        subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
+        subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p, this.environment));
       }
       const funcThunk = new Evaluator(subContext).evaluateFunctionMain(ast, thisType);
-      const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template));
+      const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template, this.environment));
       return new ExpressionThunk(
         ast.location,
         () => new GenericsExpression(ast.location, typeThunk.get() as GenericsType, funcThunk.get()),
@@ -271,7 +275,7 @@ class Evaluator {
     });
 
     const createType = (returnType: Type) => {
-      return new FunctionType(thisType, paramTypes, [], returnType, ast.location);
+      return new FunctionType(thisType, paramTypes, [], returnType, this.environment, ast.location);
     }
 
     let typeThunk: TypeThunk;
@@ -320,7 +324,7 @@ class Evaluator {
         }
       }
 
-      const expr = new ClassExpression(ast.location, ast.name, superExpr);
+      const expr = new ClassExpression(ast.location, this.environment, ast.name, superExpr);
       for (const memberAST of ast.members) {
         const memberThunk = new ExpressionThunk(memberAST.location, () => this.evaluateFunction(memberAST, expr.selfType).get());
         expr.addMember(Constness.Constant, memberAST.name, memberThunk);
@@ -353,13 +357,13 @@ class Evaluator {
 
     const returnType = subEvaluator.evaluateType(ast.returnType).metaType;
 
-    const type = new FunctionType(selfType, paramTypes, [], returnType, ast.location);
+    const type = new FunctionType(selfType, paramTypes, [], returnType, this.environment, ast.location);
     return new DeclarationExpression(ast.name, type);
   }
 
   evaluateInterface(ast: InterfaceAST) {
     // TODO: super types
-    const expr = new InterfaceExpression(ast.location, ast.name, []);
+    const expr = new InterfaceExpression(ast.location, this.environment, ast.name, []);
 
     for (const memberAST of ast.members) {
       expr.addMember(Constness.Constant, memberAST.name,
@@ -379,7 +383,7 @@ class Evaluator {
     const ifTrue = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifTrue).map(e => e.get());
     const ifFalse = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
-    return new IfExpression(ast.location, cond, ifTrue, ifFalse, tempVarName);
+    return new IfExpression(ast.location, this.environment, cond, ifTrue, ifFalse, tempVarName);
   }
 
   evaluateTypeAlias(ast: TypeAliasAST) {
@@ -387,7 +391,7 @@ class Evaluator {
 
     this.context.addVariable(Constness.Constant, ast.left, typeExpr.type);
 
-    return new TypeAliasExpression(ast.location, ast.left, typeExpr);
+    return new TypeAliasExpression(ast.location, this.environment, ast.left, typeExpr);
   }
 
   evaluateType(ast: ExpressionAST): TypeExpression {
@@ -404,7 +408,7 @@ class Evaluator {
     const {member} = this.context.getVariable(ast);
     const type = member.type.get();
     if (type instanceof MetaType) {
-      return new TypeIdentifierExpression(ast, type.metaType);
+      return new TypeIdentifierExpression(this.environment, ast, type.metaType);
     }
     throw CompilationError.typeError(
       ast.location,
@@ -418,10 +422,10 @@ class Evaluator {
 
     switch (ast.operator.name) {
       case "&": {
-        return new TypeIntersectionExpression(ast.location, left, right);
+        return new TypeIntersectionExpression(ast.location, this.environment, left, right);
       }
       case "|": {
-        return new TypeUnionExpression(ast.location, left, right);
+        return new TypeUnionExpression(ast.location, this.environment, left, right);
       }
       default: {
         throw new Error(`Unsupported type operator: ${ast.operator.name}`);
