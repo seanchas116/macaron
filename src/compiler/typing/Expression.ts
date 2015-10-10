@@ -1,5 +1,6 @@
 import {voidType, numberType, booleanType, stringType} from "./nativeTypes";
 import Type from "./Type";
+import MetaType from "./type/MetaType";
 import UnionType from "./type/UnionType";
 import GenericsType from "./type/GenericsType";
 import GenericsParameterType from "./type/GenericsParameterType";
@@ -15,6 +16,20 @@ class Expression {
   type = voidType;
 
   constructor(public location: SourceLocation) {
+  }
+}
+
+export
+class TypeExpression extends Expression {
+  metaType = MetaType.typeOnly(voidType);
+  type = this.metaType;
+}
+
+export
+class EmptyTypeExpression extends TypeExpression {
+  constructor(type: Type) {
+    super(SourceLocation.empty());
+    this.type = this.metaType = MetaType.typeOnly(type);
   }
 }
 
@@ -216,7 +231,7 @@ class IfExpression extends Expression {
 
 export
 class EmptyExpression extends Expression {
-  constructor(public location: SourceLocation, public type: Type) {
+  constructor(location: SourceLocation, public type: Type) {
     super(location);
   }
 }
