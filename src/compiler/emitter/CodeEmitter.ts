@@ -11,6 +11,8 @@ import Expression, {
   EmptyExpression,
 } from "../typing/Expression";
 
+import TypeExpression from "../typing/TypeExpression";
+
 import {NativeOperator, MethodOperator} from "../typing/Operator";
 
 import FunctionExpression from "../typing/expression/FunctionExpression";
@@ -82,6 +84,9 @@ class CodeEmitter {
       return this.emitIf(expr, topLevel);
     }
     else if (expr instanceof EmptyExpression) {
+      return  "";
+    }
+    else if (expr instanceof TypeExpression) {
       return  "";
     }
     else {

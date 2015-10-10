@@ -1,4 +1,5 @@
-import Expression, {EmptyExpression, EmptyTypeExpression} from "../Expression";
+import Expression from "../Expression";
+import {EmptyTypeExpression} from "../TypeExpression";
 import InterfaceExpression from "./InterfaceExpression";
 import ExpressionThunk from "../thunk/ExpressionThunk";
 import Identifier from "../Identifier";
@@ -14,15 +15,17 @@ class ClassExpression extends InterfaceExpression {
     // TODO: inherit Object by default
     super(location, name, [superExpression || new EmptyTypeExpression(voidType)]);
 
-    const classType = this.type = new MetaType(`class ${name.name}`, this.selfType);
+    const classType = new MetaType(`class ${name.name}`, this.selfType);
+    this.type = classType;
     classType.newSignatures = [new CallSignature(voidType, [], this.selfType)];
   }
 
-  addMember(constness: Constness, name: Identifier, member: ExpressionThunk) {
+  addMember(constness: Constness, name: Identifier, member: Expression|ExpressionThunk) {
     super.addMember(constness, name, member)
 
     if (name.name === "constructor") {
-      this.type.newSignatures = member.type.get().callSignatures.map(sig => {
+      const memberThunk = ExpressionThunk.resolve(member);
+      this.type.newSignatures = memberThunk.type.get().callSignatures.map(sig => {
         return new CallSignature(voidType, sig.params, this.selfType);
       });
     }

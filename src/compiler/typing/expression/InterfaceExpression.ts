@@ -1,4 +1,5 @@
-import Expression, {TypeExpression} from "../Expression";
+import Expression from "../Expression";
+import TypeExpression from "../TypeExpression";
 import ExpressionThunk from "../thunk/ExpressionThunk";
 import Type from "../Type";
 import MetaType from "../type/MetaType";
@@ -29,17 +30,19 @@ class InterfaceExpression extends TypeExpression {
     for (const superType of superTypes) {
       type.inherit(superType);
     }
-    this.type = this.metaType = MetaType.typeOnly(type);
+    this.setMetaType(type);
   }
 
-  addMember(constness: Constness, name: Identifier, member: ExpressionThunk) {
+  addMember(constness: Constness, name: Identifier, member: Expression|ExpressionThunk) {
+    const memberThunk = ExpressionThunk.resolve(member);
+
     const type = this.selfType;
     type.members.set(name.name, new Member(constness, member.type));
 
     for (const superType of this.superTypes) {
       const superMember = superType.members.get(name.name);
       const errors: string[] = [];
-      if (superMember && !superMember.type.get().isAssignable(member.type.get(), errors)) {
+      if (superMember && !superMember.type.get().isAssignable(memberThunk.type.get(), errors)) {
         throw CompilationError.typeError(
           name.location,
           `Type of "${name.name}" is not compatible to super types`,
@@ -48,6 +51,6 @@ class InterfaceExpression extends TypeExpression {
       }
     }
 
-    this.members.push(member);
+    this.members.push(memberThunk);
   }
 }

@@ -20,20 +20,6 @@ class Expression {
 }
 
 export
-class TypeExpression extends Expression {
-  metaType = MetaType.typeOnly(voidType);
-  type = this.metaType;
-}
-
-export
-class EmptyTypeExpression extends TypeExpression {
-  constructor(type: Type) {
-    super(SourceLocation.empty());
-    this.type = this.metaType = MetaType.typeOnly(type);
-  }
-}
-
-export
 class IdentifierExpression extends Expression {
   constructor(public name: Identifier, public type: Type) {
     super(name.location);
@@ -233,5 +219,12 @@ export
 class EmptyExpression extends Expression {
   constructor(location: SourceLocation, public type: Type) {
     super(location);
+  }
+}
+
+export
+class DeclarationExpression extends Expression {
+  constructor(public name: Identifier, public type: Type) {
+    super(name.location);
   }
 }
