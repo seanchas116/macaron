@@ -52,9 +52,9 @@ class Environment {
     throw new Error("not implemented");
   }
 
-  getGenericsPlaceholders() {
+  getGenericsPlaceholders(): Set<GenericsParameterType> {
     if (this.parent) {
-      return union(this.getOwnGenericsPlaceholders(), this.parent.getOwnGenericsPlaceholders());
+      return union(this.getOwnGenericsPlaceholders(), this.parent.getGenericsPlaceholders());
     } else {
       return this.getOwnGenericsPlaceholders();
     }

@@ -243,7 +243,7 @@ class Evaluator {
         subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p, this.environment));
       }
       const funcThunk = new Evaluator(subContext).evaluateFunctionMain(ast, thisType);
-      const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template, this.environment));
+      const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template, subContext.environment));
       return new ExpressionThunk(
         ast.location,
         () => new GenericsExpression(ast.location, typeThunk.get() as GenericsType, funcThunk.get()),

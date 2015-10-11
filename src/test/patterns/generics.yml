@@ -1,10 +1,10 @@
 - title: "generic function"
   src: |
-    func foo<T>(a T, b T) {
-      a + b
+    func foo<T>(a T, b T, c T) {
+      b
     }
-    foo<number>(1, 2)
-  expected: 3
+    foo<number>(1, 2, 3)
+  expected: 2
 - title: "generic function with type constraint"
   src: |
     interface Foo {

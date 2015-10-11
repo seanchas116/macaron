@@ -122,7 +122,7 @@ class GenericsCallExpression extends Expression {
         types.set(placeholder, args[i]);
       }
 
-      this.type = genericsType.resolveGenerics(types);
+      this.type = genericsType.template.resolveGenerics(types);
     } else {
       throw CompilationError.typeError(
         this.value.location,

@@ -38,7 +38,6 @@ class Type {
   selfUnaryOperators = new Map<string, Operator>();
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
-  genericsPlaceholders = new Set<GenericsParameterType>();
 
   constructor(public name: string, public superTypes: Type[], public environment: Environment, public location: SourceLocation = null, public expression: Expression = null) {
     this.location = location || SourceLocation.empty();
@@ -134,7 +133,7 @@ class Type {
   }
 
   resolveGenerics(types: Map<GenericsParameterType, Type>): Type {
-    if (intersection(new Set(types.keys()), this.genericsPlaceholders).size == 0) {
+    if (intersection(new Set(types.keys()), this.environment.getGenericsPlaceholders()).size == 0) {
       return this;
     }
     return this.mapTypes(t => t.resolveGenerics(types));

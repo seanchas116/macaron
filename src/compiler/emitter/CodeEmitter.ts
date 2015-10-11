@@ -9,6 +9,8 @@ import Expression, {
   OperatorAccessExpression,
   IfExpression,
   EmptyExpression,
+  GenericsExpression,
+  GenericsCallExpression,
 } from "../typing/Expression";
 
 import TypeExpression from "../typing/TypeExpression";
@@ -88,6 +90,12 @@ class CodeEmitter {
     }
     else if (expr instanceof TypeExpression) {
       return  "";
+    }
+    else if (expr instanceof GenericsExpression) {
+      return this.emitExpression(expr.expression);
+    }
+    else if (expr instanceof GenericsCallExpression) {
+      return this.emitExpression(expr.value);
     }
     else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
