@@ -26,3 +26,11 @@
     }
     foo<Bar>(new Hoge(), new Piyo())
   expected: 300
+- title: generic class
+  src: |
+    class Foo<T> {
+      passT(x T) { x }
+    }
+    let foo = new Foo<string>()
+    foo.pass("hogehoge")
+  expected: hogehoge
