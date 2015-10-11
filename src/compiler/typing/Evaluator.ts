@@ -237,7 +237,7 @@ class Evaluator {
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
       const subContext = this.context.newChild();
-      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, voidType(), this.environment));
+      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, this.evaluateType(p.type).metaType, this.environment));
       for (const [i, p] of params.entries()) {
         subContext.environment.addGenericsPlaceholder(p);
         subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p, this.environment));

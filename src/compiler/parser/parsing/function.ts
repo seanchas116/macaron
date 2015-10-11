@@ -25,9 +25,9 @@ var parseParameterList = lazy(() =>
 );
 
 var parseGenericsParameter = lazy(() =>
-  parseIdentifier
+  sequence(parseIdentifier, keyword(":").thenTake(parseTypeExpression).mayBe())
     .withRange()
-    .map(([name, range]) => new ParameterAST(range.begin, name, new IdentifierAST(range.begin, "void")))
+    .map(([[name, type], range]) => new ParameterAST(range.begin, name, type || new IdentifierAST(range.begin, "void")))
 );
 
 export
