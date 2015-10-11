@@ -77,6 +77,6 @@ var parseInterface = lazy(() =>
   )
     .withRange()
     .map(([[name, superTypes, members], range]) =>
-      new InterfaceAST(range.begin, name, superTypes, members)
+      new InterfaceAST(range.begin, name, superTypes || [], members)
     )
 );

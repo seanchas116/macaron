@@ -24,7 +24,7 @@
       bar(x string, y string) string
     }
     interface Baz : Foo, Bar {
-      baz(x K, y K) Foo
+      baz(x K, y K) Baz
     }
     class K {
       foo(x number, y number) {

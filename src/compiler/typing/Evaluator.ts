@@ -362,8 +362,8 @@ class Evaluator {
   }
 
   evaluateInterface(ast: InterfaceAST) {
-    // TODO: super types
-    const expr = new InterfaceExpression(ast.location, this.environment, ast.name, []);
+    const supers = ast.superTypes.map(ast => this.evaluateType(ast));
+    const expr = new InterfaceExpression(ast.location, this.environment, ast.name, supers);
 
     for (const memberAST of ast.members) {
       expr.addMember(Constness.Constant, memberAST.name,
