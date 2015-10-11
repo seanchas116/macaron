@@ -5,6 +5,14 @@
     }
     foo<number>(1, 2, 3)
   expected: 2
+- title: calling generic function directly
+  src: |
+    func foo<T>(a T, b T, c T) {
+      b
+    }
+    foo(1, 2, 3)
+  # TODO: improve error message
+  error: Type '(T,T,T) => T' cannot be called with [number, number, number]
 - title: generic function with type constraint
   src: |
     interface Foo {
