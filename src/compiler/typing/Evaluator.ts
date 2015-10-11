@@ -275,7 +275,7 @@ class Evaluator {
     });
 
     const createType = (returnType: Type) => {
-      return new FunctionType(thisType, paramTypes, [], returnType, this.environment, ast.location);
+      return new FunctionType(thisType, paramTypes, [], returnType, subContext.environment, ast.location);
     }
 
     let typeThunk: TypeThunk;
