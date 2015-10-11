@@ -1,11 +1,11 @@
-- title: "generic function"
+- title: generic function
   src: |
     func foo<T>(a T, b T, c T) {
       b
     }
     foo<number>(1, 2, 3)
   expected: 2
-- title: "generic function with type constraint"
+- title: generic function with type constraint
   src: |
     interface Foo {
       foo() number
