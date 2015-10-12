@@ -1,0 +1,399 @@
+// Type declarations for ECMAScript 2015 standard objects
+
+declare let NaN number
+declare let Infinity number
+declare let undefined nil
+
+declare func eval(x string) dynamic
+declare func isFinite(x number) boolean
+declare func isNaN(x number) boolean
+declare func parseFloat(s string) number
+declare func parseInt(s string, radix? number) number
+
+declare func decodeURI(encodedURI string) string
+declare func decodeURIComponent(encodedURIComponent string) string
+declare func encodeURI(uri string) string
+declare func encodeURIComponent(uriComponent string) string
+
+interface Object {
+  constructor Function
+  toString() string
+  toLocaleString() string
+  valueOf() any
+  hasOwnProperty(v string) boolean
+  isPrototypeOf(v Object) boolean
+  propertyIsEnumerable(v string) boolean
+}
+
+interface ObjectConstructor {
+  new (value? any) Object
+  () any
+  (value any) any
+
+  prototype Object
+  getPrototypeOf(o any) any
+  getOwnPropertyNames(o any) string[]
+
+  // TODO: make use of PropertyDescriptor
+  create(o any, properties? any) any
+  defineProperty(o any, property any) any
+  defineProperties(o any, properties any) any
+  seal<T>(o T) T
+  freeze<T>(o T) T
+  preventExtensions<T>(o T) T
+  isSealed(o any) boolean
+  isFrozen(o any) boolean
+  isExtensible(o any) boolean
+  keys(o any) string[]
+}
+
+declare let Object ObjectConstructor
+
+interface Function<TSelf, TArgs, TReturn> {
+  apply(thisArg TSelf, args TArgs) TReturn
+  call(thisArg TSelf, ...args TArgs) TReturn
+  bind(thisArg TSelf) Function<any, TArgs, TReturn>
+  (...args TArgs) TReturn
+
+  prototype Object
+  length number
+}
+
+interface FunctionConstructor {
+  new (...args string[]) Function
+  (...args string[]) Function
+  prototype Function
+}
+
+declare let Function FunctionConstructor
+
+interface String {
+  charAt(pos number) string
+  charCodeAt(index number) number
+  concat(...strings string[]) string
+  indexOf(str searchString, position? number) number
+  lastIndexOf(str searchString, position? number) number
+  localeCompare(that string) number
+  match(regexp string|RegExp) RegExpMatchArray
+  replace(searchValue string|RegExp, replaceValue string) string
+  replace(searchValue string|RegExp, replacer (substring string, ...args any[])) string
+  search(regexp string|RegExp) number
+  slice(start? number, end? number) string
+  split(separator string|RegExp, limit? number) string[]
+  substring(start number, end? number) string
+  toLowerCase() string
+  toLocaleLowerCase() string
+  toUpperCase() string
+  toLocaleUpperCase() string
+  trim() string
+  length number
+  valueOf() string
+  [] (index number) string
+  + (that string) string
+}
+
+interface StringConstructor {
+  new (value? any) String
+  (value? any) string
+  prototype String
+  fromCharCode(...codes number[]) string
+}
+
+declare let String StringConstructor
+
+interface Boolean {
+  valueOf() boolean
+}
+
+interface BooleanConstructor {
+  new (value? any) Boolean
+  (value? any) boolean
+  prototype Boolean
+}
+
+declare let Boolean BooleanConstructor
+
+interface Number {
+  toString(radix? number) string
+  toFixed(fractionDigits? number) string
+  toExponential(fractionDigits? number) string
+  toPrecision(precision? number) string
+  valueOf() number
+  + () number
+  - () number
+  ~ () number
+  + (that number) number
+  - (that number) number
+  * (that number) number
+  / (that number) number
+  % (that number) number
+  ** (that number) number
+  | (that boolean) number
+  & (that boolean) number
+  ^ (that boolean) number
+}
+
+interface NumberConstructor {
+  new (value? any) Number
+  (value? any) number
+  prototype Number
+  MAX_VALUE number
+  MIN_VALUE number
+  NaN number
+  NEGATIVE_INFINITY number
+  POSITIVE_INFINITY number
+}
+
+declare let Number NumberConstructor
+
+interface Math {
+  E number
+  LN10 number
+  LN2 number
+  LOG2E number
+  LOG10E number
+  PI number
+  SQRT1_2 number
+  SQRT2 number
+
+  abs(x number) number
+  acos(x number) number
+  asin(x number) number
+  atan(x number) number
+  atan2(y number, x number) number
+  ceil(x number) number
+  cos(x number) number
+  exp(x number) number
+  floor(x number) number
+  log(x number) number
+  max(...values number[]) number
+  min(...values number[]) number
+  pow(x number, y number) number
+  random() number
+  round(x number) number
+  sin(x number) number
+  sqrt(x number) number
+  tan(x number) number
+}
+
+declare let Math Math
+
+interface Date {
+  toString() string
+  toDateString() string
+  toTimeString() string
+  toLocaleString() string
+  toLocaleDateString() string
+  toLocaleTimeString() string
+  valueOf() number
+  getTime() number
+  getFullYear() number
+  getUTCFullYear() number
+  getMonth() number
+  getUTCMonth() number
+  getDate() number
+  getUTCDate() number
+  getDay() number
+  getUTCDay() number
+  getHours() number
+  getUTCHours() number
+  getMinutes() number
+  getUTCMinutes() number
+  getSeconds() number
+  getUTCSeconds() number
+  getMilliseconds() number
+  getUTCMilliseconds() number
+  getTimezoneOffset() number
+  setTime(time number) number
+  setMilliseconds(ms number) number
+  setUTCMilliseconds(ms number) number
+
+  setSeconds(sec number, ms? number) number
+  setUTCSeconds(sec number, ms? number) number
+  setMinutes(min number, sec? number, ms? number) number
+  setUTCMinutes(min number, sec? number, ms? number) number
+  setHours(hours number, min? number, sec? number, ms? number) number
+  setUTCHours(hours number, min? number, sec? number, ms? number) number
+  setDate(date number) number
+  setUTCDate(date number) number
+  setMonth(month number, date? number) number
+  setUTCMonth(month number, date? number) number
+  setFullYear(year number, month? number, date? number) number
+  setUTCFullYear(year number, month? number, date? number) number
+  toUTCString() string
+  toISOString() string
+  toJSON(key? any) string
+}
+
+interface DateConstructor {
+  new () Date
+  new (value number) Date
+  new (value string) Date
+  new (year number, month number, date? number, hours? number, minutes? number, seconds? number, ms? number) Date
+  () string
+  prototype Date
+
+  parse(s string) number
+  UTC(year number, month number, date? number, hours? number, minutes? number, seconds? number, ms? number) number
+  now() number
+}
+
+declare let Date DateConstructor
+
+interface RegExpMatchArray : Array<string> {
+  index? number
+  input? string
+}
+
+interface RegExpExecArray : Array<string> {
+  index number
+  input string
+}
+
+interface RegExp {
+  exec(string string) RegExpExecArray
+  test(string string) boolean
+  source string
+  global boolean
+  ignoreCase boolean
+  multiline boolean
+  lastIndex number
+}
+
+interface RegExpConstructor {
+  new (pattern string, flags? string) RegExp
+  (pattern string, flags? string): RegExp
+  prototype RegExp
+}
+
+declare let RegExp RegExpConstructor
+
+interface Error {
+  name string
+  message string
+}
+
+interface ErrorConstructor {
+  new (message? string) Error
+  (message? string) Error
+  prototype: Error
+}
+
+declare let Error ErrorConstructor
+
+interface EvalError : Error {
+}
+
+interface EvalErrorConstructor {
+  new (message? string) EvalError
+  (message? string) EvalError
+  prototype EvalError
+}
+
+declare let EvalError EvalErrorConstructor
+
+interface RangeError : Error {
+}
+
+interface RangeErrorConstructor {
+  new (message? string) RangeError
+  (message? string) RangeError
+  prototype RangeError
+}
+
+declare let RangeError RangeErrorConstructor
+
+interface ReferenceError : Error {
+}
+
+interface ReferenceErrorConstructor {
+  new (message? string) ReferenceError
+  (message? string) ReferenceError
+  prototype ReferenceError
+}
+
+declare let ReferenceError ReferenceErrorConstructor
+
+interface SyntaxError : Error {
+}
+
+interface SyntaxErrorConstructor {
+  new (message? string) SyntaxError
+  (message? string) SyntaxError
+  prototype SyntaxError
+}
+
+declare let SyntaxError SyntaxErrorConstructor
+
+interface TypeError : Error {
+}
+
+interface TypeErrorConstructor {
+  new (message? string) TypeError
+  (message? string) TypeError
+  prototype TypeError
+}
+
+declare let TypeError TypeErrorConstructor
+
+interface URIError : Error {
+}
+
+interface URIErrorConstructor {
+  new (message? string) URIError
+  (message? string) URIError
+  prototype URIError
+}
+
+declare let URIError URIErrorConstructor
+
+interface JSON {
+  parse(text string, reviver? (key any, value any) => any) any
+  stringify(value any) string
+  stringify(value any, replacer (key string, value any) => any, space? string|number) string
+  stringify(value any, replacer any[], space? string|number) string
+}
+
+declare let JSON JSON
+
+interface Array<T> {
+  length number
+  toString() string
+  toLocaleString() string
+  push(...items T[]) number
+  pop() T
+  concat<U>(...items U[]) (T|U)[]
+  join(separator? string) string
+  reverse() T[]
+  shift() T
+  slice(start? number, end? number) T[]
+  sort(compareFn? (a T, b T) => number) T[]
+  splice(start number) T[]
+  splice(start number, deleteCount number, ...items T[]) T[]
+  unshift(...items T[]) number
+  indexOf(searchElement T, fromIndex? number) number
+  lastIndexOf(searchElement T, fromIndex? number) number
+  every(callbackfn (value T, index number, array T[]) => boolean) boolean
+  some(callbackfn (value T, index number, array T[]) => boolean) boolean
+  forEach(callbackfn (value T, index number, array T[]) => void) void
+  map<U>(callbackfn (value T, index number, array T[]) => U) U[]
+  filter(callbackfn (value T, index number, array T[]) => boolean) T[]
+  reduce(callbackfn (previousValue T, currentValue T, currentIndex number, array T[]) => T, initialValue? T) T
+  reduce<U>(callbackfn (previousValue U, currentValue T, currentIndex number, array T[]) => U, initialValue U) U
+  reduceRight(callbackfn (previousValue T, currentValue T, currentIndex number, array T[]) => T, initialValue? T) T
+  reduceRight<U>(callbackfn (previousValue U, currentValue T, currentIndex number, array T[]) => U, initialValue U) U
+
+  [] (n number) T
+  []= (n number, value T) T
+}
+
+interface ArrayConstructor {
+  new <T>(arrayLength? number) T[]
+  new <T>(...items T[]) T[]
+  <T>(arrayLength number?) T[]
+  <T>(...items T[]) T[]
+  isArray(arg any) arg is Array<any>
+  prototype Array<any>
+}
+
+declare let Array ArrayConstructor
