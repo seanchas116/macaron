@@ -1,0 +1,7 @@
+- title: line comment
+  src: |
+    let a = 100
+    let b = 200
+    // let b = 300
+    a + b
+  expected: 300
