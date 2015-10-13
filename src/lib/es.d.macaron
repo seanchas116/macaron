@@ -103,6 +103,9 @@ declare let String StringConstructor
 
 interface Boolean {
   valueOf() boolean
+  && (other boolean) boolean
+  || (other boolean) boolean
+  ! () boolean
 }
 
 interface BooleanConstructor {
