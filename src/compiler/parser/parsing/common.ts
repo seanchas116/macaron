@@ -13,10 +13,19 @@ export
 const separator = regExp(/[\n,]/);
 
 export
-const _ = whitespace.repeat();
+const nonSeparator = regExp(/[^\n,]/);
 
 export
-const __ = choose(whitespace, separator).repeat();
+const comment = sequence(string("//"), nonSeparator.repeat());
+
+export
+const empty = choose<any>(whitespace, comment);
+
+export
+const _ = empty.repeat();
+
+export
+const __ = choose(empty, separator).repeat();
 
 export
 const ___ = sequence(_, separator, sequence(_, separator).repeat(), _);
