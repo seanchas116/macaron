@@ -1,6 +1,11 @@
 import DefaultEnvironment from "./DefaultEnvironment";
 
 export
+function invalidType() {
+  return DefaultEnvironment.instance.invalidType;
+}
+
+export
 function voidType() {
   return DefaultEnvironment.instance.voidType;
 }

@@ -10,6 +10,7 @@ let defaultEnvironment: DefaultEnvironment;
 
 export default
 class DefaultEnvironment extends BlockEnvironment {
+  invalidType = new Type("invalid", [], this);
   voidType = new Type("void", [], this);
   numberType = new Type("number", [this.voidType], this);
   booleanType = new Type("boolean", [this.voidType], this);
