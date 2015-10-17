@@ -8,5 +8,8 @@ interface Point {
 
   // required method
   length() number
+
+  // specify constant
+  type = "point"
 }
 ```
