@@ -59,11 +59,11 @@
 - title: instance initialization
   src: |
     class Foo(let x number, let y number) {
-      var z = x + y
+      z = x + y
       init {
         z += 100
       }
     }
     let foo = new Foo(100, 200)
-    foo.x
+    foo.z
   expected: 400
