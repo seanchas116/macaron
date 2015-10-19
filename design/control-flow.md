@@ -1,5 +1,14 @@
 # Control Flow
 
+## block
+
+let sum = do {
+  let x = 1
+  let y = 1
+  let z = 1
+  x + y + z
+}
+
 ## if
 
 ```
@@ -18,10 +27,6 @@ while true {
     break
   }
 }
-
-do {
-
-} while foo
 ```
 
 ## C-style for
