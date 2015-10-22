@@ -1,28 +1,64 @@
 # Class
 
+## Constructor
+
 ```
-// constructor parameters here
-class Foo(let x number) : Bar {
-  let y = x + 1
+class Person(.name string) {
+  birthDate = new Date()
+
+  init {
+    console.log("creating person: #{name}")
+  }
+}
+
+class Greeter(name string, .message string) : Person(name) {
+  // name - will not be a property
+  // .message - will be a property
+  greet() {
+    console.log("#{name}: #{message}")
+  }
+}
+
+let greeter = new Greeter("Alice", "Hello!")
+greeter.name //=> "Alice"
+greeter.message // => "Hello!"
+greeter.greet() // Alice: Hello!
+```
+
+## Property
+
+```
+class Foo(.x number) {
+  // constant
+  y = x + 1
+
+  // variable
   var z = x + 2
 
-  // private property
-  private let w = 1
+  // private
+  private w = x + 3
 
-  // run on initialization
-  init {
-    console.log("Foo initialized")
+  // getter / setter is like in JavaScript
+  get sum() {
+    x + y + z + w
   }
 
+  // static property
+  static poyo = "poyo"
+
+  // prototype property
+  shared poyopoyo = "poyopoyo"
+}
+```
+
+## Method
+
+```
+class Foo {
   // prototype methods
   // Foo.method is a (this Foo)(x number, y number) => number
   method(x number, y number) {
     x + y
-  }
-
-  // getter / setter is like in JavaScript
-  get sum() {
-    x + y + z
   }
 
   // private method (using Symbols)
@@ -35,11 +71,5 @@ class Foo(let x number) : Bar {
     // calling superclass's hoge
     super.hoge()
   }
-
-  // static property
-  static poyo = "poyo"
-
-  // prototype property
-  shared poyopoyo = "poyopoyo"
 }
 ```
