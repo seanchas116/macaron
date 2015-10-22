@@ -58,7 +58,7 @@
 
 - title: instance initialization
   src: |
-    class Foo(let x number, let y number) {
+    class Foo(.x number, .y number) {
       z = x + y
       init {
         z += 100
