@@ -2,28 +2,28 @@ import Thunk from "../Thunk";
 import Type from "../Type";
 import TypeThunk from "./TypeThunk";
 import Expression from "../Expression";
-import SourceLocation from "../../common/SourceLocation";
+import SourceRange from "../../common/SourceRange";
 
 export default
 class ExpressionThunk extends Thunk<Expression> {
   public type: TypeThunk;
 
-  constructor(location: SourceLocation, getter: () => Expression, type: Type|TypeThunk = null) {
-    super(location, getter);
+  constructor(range: SourceRange, getter: () => Expression, type: Type|TypeThunk = null) {
+    super(range, getter);
     if (type) {
       this.type = TypeThunk.resolve(type);
     } else {
-      this.type = new TypeThunk(location, () => this.get().type);
+      this.type = new TypeThunk(range, () => this.get().type);
     }
   }
 
   map(transformExpr: (expr: Expression) => Expression, transformType: (type: Type) => Type = null) {
-    return new ExpressionThunk(this.location, () => transformExpr(this.get()), this.type.map(transformType));
+    return new ExpressionThunk(this.range, () => transformExpr(this.get()), this.type.map(transformType));
   }
 
   static resolve(expr: Expression|ExpressionThunk) {
     if (expr instanceof Expression) {
-      return new ExpressionThunk(expr.location, () => expr);
+      return new ExpressionThunk(expr.range, () => expr);
     }
     else if (expr instanceof ExpressionThunk) {
       return expr;

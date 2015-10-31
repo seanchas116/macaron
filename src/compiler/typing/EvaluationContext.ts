@@ -24,7 +24,7 @@ class EvaluationContext {
     const variable = this.environment.getVariable(name.name);
     if (!variable) {
       throw CompilationError.typeError(
-        name.location,
+        name.range,
         `Variable '${name.name}' not found`
       );
     }
@@ -37,13 +37,13 @@ class EvaluationContext {
 
     if (member.constness === Constness.Constant && !firstAssign) {
       throw CompilationError.typeError(
-        name.location,
+        name.range,
         `Variable '${name.name}' is constant and cannot be reassigned`
       );
     }
     if (member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
-        name.location,
+        name.range,
         `Variable '${name.name}' is builtin and cannot be reassigned`
       );
     }
@@ -51,7 +51,7 @@ class EvaluationContext {
     const assignable = member.settingType.get().isAssignable(type.get(), reasons);
     if (!assignable) {
       throw CompilationError.typeError(
-        name.location,
+        name.range,
         `Cannot assign '${type.get()}' to type '${member.type.get()}'`,
         ...reasons
       );
@@ -62,13 +62,13 @@ class EvaluationContext {
     const variable = this.environment.getVariable(name.name);
     if (variable && variable.member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
-        name.location,
+        name.range,
         `Variable '${name.name}' is builtin and cannot be redefined`
       );
     }
     if (this.environment.getOwnVariable(name.name)) {
       throw CompilationError.typeError(
-        name.location,
+        name.range,
         `Variable '${name.name}' already defined`
       );
     }

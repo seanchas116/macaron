@@ -1,6 +1,5 @@
 import {ExpressionAST} from "../parser/AST";
 import CompilationError from "../common/CompilationError";
-import SourceLocation from "../common/SourceLocation";
 import {SyntaxError} from "./Parser";
 import {parseLines} from "./parsing/block";
 

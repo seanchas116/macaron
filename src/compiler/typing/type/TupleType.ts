@@ -1,19 +1,19 @@
 import Type from "../Type";
 import Environment from "../Environment";
 import Member, {Constness} from "../Member";
-import SourceLocation from "../../common/SourceLocation";
+import SourceRange from "../../common/SourceRange";
 
 export default
 class TupleType extends Type {
-  constructor(public types: Type[], env: Environment, loc: SourceLocation) {
+  constructor(public types: Type[], env: Environment, range: SourceRange) {
     // TODO: inherit Array
-    super("", [], env, loc);
+    super("", [], env, range);
     types.forEach((type, i) => {
       this.selfMembers.set(i.toString(), new Member(Constness.Constant, type));
     });
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    return new TupleType(this.types.map(mapper), this.environment, this.location);
+    return new TupleType(this.types.map(mapper), this.environment, this.range);
   }
 }

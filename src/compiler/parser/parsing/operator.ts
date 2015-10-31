@@ -28,7 +28,7 @@ function buildBinaryExpression(binaryOperators: string[][], first: ExpressionAST
   for (const reducingOperators of binaryOperators) {
     for (let i = 0; i < operators.length; ++i) {
       if (reducingOperators.indexOf(operators[i].name) >= 0) {
-        operands[i] = new BinaryAST(operators[i].location, operands[i], operators[i], operands[i + 1]);
+        operands[i] = new BinaryAST(operators[i].range, operands[i], operators[i], operands[i + 1]);
         operands.splice(i + 1, 1);
         operators.splice(i, 1);
         --i;

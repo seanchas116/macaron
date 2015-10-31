@@ -6,7 +6,7 @@ import MetaType from "../type/MetaType";
 import Identifier from "../Identifier";
 import Environment from "../Environment";
 import Member, {Constness} from "../Member";
-import SourceLocation from "../../common/SourceLocation";
+import SourceRange from "../../common/SourceRange";
 import CompilationError from "../../common/CompilationError";
 
 export default
@@ -15,8 +15,8 @@ class InterfaceExpression extends TypeExpression {
   superTypes: Type[];
   selfType: Type;
 
-  constructor(location: SourceLocation, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
-    super(location, env);
+  constructor(range: SourceRange, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
+    super(range, env);
 
     let superTypes = this.superTypes = superExpressions.map(superExpr => {
       const superValueType = superExpr.type;
@@ -27,7 +27,7 @@ class InterfaceExpression extends TypeExpression {
       }
     });
 
-    const type = this.selfType = new Type(name.name, superTypes, env, location, this);
+    const type = this.selfType = new Type(name.name, superTypes, env, range, this);
     this.setMetaType(type);
   }
 
@@ -42,7 +42,7 @@ class InterfaceExpression extends TypeExpression {
       const errors: string[] = [];
       if (superMember && !superMember.type.get().isAssignable(memberThunk.type.get(), errors)) {
         throw CompilationError.typeError(
-          name.location,
+          name.range,
           `Type of "${name.name}" is not compatible to super types`,
           ...errors
         );

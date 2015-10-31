@@ -3,7 +3,7 @@ import Expression from "./Expression";
 import Operator from "./Operator";
 import Member, {Constness} from "./Member";
 import Environment from "./Environment";
-import SourceLocation from "../common/SourceLocation";
+import SourceRange from "../common/SourceRange";
 import GenericsParameterType from "./type/GenericsParameterType";
 import {intersection} from "../util/set";
 const HashMap = require("hashmap");
@@ -39,8 +39,8 @@ class Type {
   callSignatures: CallSignature[] = [];
   newSignatures: CallSignature[] = [];
 
-  constructor(public name: string, public superTypes: Type[], public environment: Environment, public location: SourceLocation = null, public expression: Expression = null) {
-    this.location = location || SourceLocation.empty();
+  constructor(public name: string, public superTypes: Type[], public environment: Environment, public range: SourceRange = null, public expression: Expression = null) {
+    this.range = range|| SourceRange.empty();
   }
 
   toString() {
@@ -140,7 +140,7 @@ class Type {
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    const newType = new Type(this.name, this.superTypes, this.environment, this.location, this.expression);
+    const newType = new Type(this.name, this.superTypes, this.environment, this.range, this.expression);
 
     for (const [name, member] of this.selfMembers) {
       newType.selfMembers.set(name, member.mapType(mapper));

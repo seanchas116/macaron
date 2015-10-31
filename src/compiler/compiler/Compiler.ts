@@ -17,7 +17,7 @@ class Compiler {
     const evaluator = new Evaluator(new EvaluationContext(new DefaultEnviromnent()));
     let expressions = evaluator.evaluateExpressions(parsed).map(e => e.get());
     if (options.implicitReturn) {
-      expressions = [new FunctionBodyExpression(expressions[0].location, expressions)];
+      expressions = [new FunctionBodyExpression(expressions[0].range, expressions)];
     }
 
     const emitter = new CodeEmitter();

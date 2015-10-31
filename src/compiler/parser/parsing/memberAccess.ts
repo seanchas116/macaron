@@ -10,6 +10,6 @@ import {parseIdentifier} from "./identifier";
 export
 var parseMemberAccess: Parser<(value: ExpressionAST) => ExpressionAST> = lazy(() =>
   keyword(".").thenTake(parseIdentifier).map(identifier =>
-    (value: ExpressionAST) => new MemberAccessAST(value.location, value, identifier)
+    (value: ExpressionAST) => new MemberAccessAST(value.range, value, identifier)
   )
 );

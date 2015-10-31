@@ -60,7 +60,7 @@ import TypeThunk from "./thunk/TypeThunk";
 import {voidType} from "./nativeTypes";
 
 import CompilationError from "../common/CompilationError";
-import SourceLocation from "../common/SourceLocation";
+import SourceRange from "../common/SourceRange";
 import ErrorInfo from "../common/ErrorInfo";
 
 import EvaluationContext from "./EvaluationContext";
@@ -173,7 +173,7 @@ class Evaluator {
     })();
     this.context.addVariable(constness, ast.left, type);
     this.context.assignVariable(ast.left, right.type, true);
-    return new NewVariableExpression(ast.location, constness, ast.left, right.get());
+    return new NewVariableExpression(ast.range, constness, ast.left, right.get());
   }
 
   evaluateAssignment(ast: AssignmentAST) {
@@ -181,51 +181,51 @@ class Evaluator {
     const right = this.evaluate(ast.right).get();
 
     this.context.assignVariable(ast.left, right.type);
-    return new AssignmentExpression(ast.location, ast.left, right);
+    return new AssignmentExpression(ast.range, ast.left, right);
   }
 
   evaluateUnary(ast: UnaryAST) {
     const operand = this.evaluate(ast.expression).get();
 
-    const operatorAccess = new OperatorAccessExpression(ast.location, operand, ast.operator, 1);
-    return new FunctionCallExpression(ast.location, operatorAccess, []);
+    const operatorAccess = new OperatorAccessExpression(ast.range, operand, ast.operator, 1);
+    return new FunctionCallExpression(ast.range, operatorAccess, []);
   }
 
   evaluateBinary(ast: BinaryAST) {
     const left = this.evaluate(ast.left).get();
     const right = this.evaluate(ast.right).get();
 
-    const operatorAccess = new OperatorAccessExpression(ast.location, left, ast.operator, 2);
-    return new FunctionCallExpression(ast.location, operatorAccess, [right]);
+    const operatorAccess = new OperatorAccessExpression(ast.range, left, ast.operator, 2);
+    return new FunctionCallExpression(ast.range, operatorAccess, [right]);
   }
 
   evaluateIdentifier(ast: IdentifierAST): Expression {
     const {member, needsThis} = this.context.getVariable(ast);
 
     if (needsThis) {
-      const thisIdentifier = new Identifier("this", ast.location);
+      const thisIdentifier = new Identifier("this", ast.range);
       const {member: thisMember} = this.context.getVariable(thisIdentifier);
       const thisExpr = new IdentifierExpression(thisIdentifier, thisMember.type.get());
-      return new MemberAccessExpression(ast.location, thisExpr, ast);
+      return new MemberAccessExpression(ast.range, thisExpr, ast);
     } else {
       return new IdentifierExpression(ast, member.type.get());
     }
   }
 
   evalauteLiteral(ast: LiteralAST) {
-    return new LiteralExpression(ast.location, ast.value);
+    return new LiteralExpression(ast.range, ast.value);
   }
 
   evaluateMemberAccess(ast: MemberAccessAST) {
     const obj = this.evaluate(ast.object).get();
-    return new MemberAccessExpression(ast.location, obj, ast.member)
+    return new MemberAccessExpression(ast.range, obj, ast.member)
   }
 
   evaluateFunction(ast: FunctionAST, thisType = voidType()) {
     const funcThunk = this.evaluateFunctionGenerics(ast, thisType);
     if (ast.addAsVariable) {
-      const thunk = new ExpressionThunk(ast.location, () => {
-        return new NewVariableExpression(ast.location, Constness.Constant, ast.name, funcThunk.get());
+      const thunk = new ExpressionThunk(ast.range, () => {
+        return new NewVariableExpression(ast.range, Constness.Constant, ast.name, funcThunk.get());
       });
       this.context.addVariable(Constness.Constant, ast.name, funcThunk.type);
       return thunk;
@@ -245,8 +245,8 @@ class Evaluator {
       const funcThunk = new Evaluator(subContext).evaluateFunctionMain(ast, thisType);
       const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template, subContext.environment));
       return new ExpressionThunk(
-        ast.location,
-        () => new GenericsExpression(ast.location, typeThunk.get() as GenericsType, funcThunk.get()),
+        ast.range,
+        () => new GenericsExpression(ast.range, typeThunk.get() as GenericsType, funcThunk.get()),
         typeThunk
       );
     } else {
@@ -255,7 +255,7 @@ class Evaluator {
   }
 
   evaluateFunctionMain(ast: FunctionAST, thisType: Type) {
-    const {location} = ast;
+    const {range} = ast;
 
     const paramTypes: Type[] = [];
     const subContext = this.context.newChild(thisType);
@@ -269,13 +269,13 @@ class Evaluator {
 
     subContext.addVariable(Constness.Constant, new Identifier("this"), thisType);
 
-    const bodyThunk = new ExpressionThunk(location, () => {
+    const bodyThunk = new ExpressionThunk(range, () => {
       const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
-      return new FunctionBodyExpression(location, body);
+      return new FunctionBodyExpression(range, body);
     });
 
     const createType = (returnType: Type) => {
-      return new FunctionType(thisType, paramTypes, [], returnType, subContext.environment, ast.location);
+      return new FunctionType(thisType, paramTypes, [], returnType, subContext.environment, ast.range);
     }
 
     let typeThunk: TypeThunk;
@@ -284,31 +284,31 @@ class Evaluator {
       typeThunk = TypeThunk.resolve(createType(returnType));
     }
     else {
-      typeThunk = new TypeThunk(ast.location, () => {
+      typeThunk = new TypeThunk(ast.range, () => {
         const returnType = bodyThunk.get().type;
         return createType(returnType);
       });
     }
 
-    return new ExpressionThunk(location, () => {
-      return new FunctionExpression(location, ast.name, typeThunk.get(), ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
+    return new ExpressionThunk(range, () => {
+      return new FunctionExpression(range, ast.name, typeThunk.get(), ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
     }, typeThunk);
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
     const func = this.evaluate(ast.function).get();
     const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
-    return new FunctionCallExpression(ast.location, func, args, ast.isNewCall);
+    return new FunctionCallExpression(ast.range, func, args, ast.isNewCall);
   }
 
   evaluateGenericsCall(ast: GenericsCallAST) {
     const value = this.evaluate(ast.value).get();
     const args = ast.arguments.map(a => this.evaluateType(a).metaType);
-    return new GenericsCallExpression(ast.location, value, args);
+    return new GenericsCallExpression(ast.range, value, args);
   }
 
   evaluateClass(ast: ClassAST) {
-    const thunk = new ExpressionThunk(ast.location, () => {
+    const thunk = new ExpressionThunk(ast.range, () => {
       let superExpr: Expression;
       if (ast.superclass) {
         console.log(ast.superclass);
@@ -318,15 +318,15 @@ class Evaluator {
         let ok = superType instanceof MetaType && !superType.typeOnly;
         if (!ok) {
           throw CompilationError.typeError(
-            ast.superclass.location,
+            ast.superclass.range,
             `Superclass is not a class`
           );
         }
       }
 
-      const expr = new ClassExpression(ast.location, this.environment, ast.name, superExpr);
+      const expr = new ClassExpression(ast.range, this.environment, ast.name, superExpr);
       for (const memberAST of ast.members) {
-        const memberThunk = new ExpressionThunk(memberAST.location, () => this.evaluateFunction(memberAST, expr.selfType).get());
+        const memberThunk = new ExpressionThunk(memberAST.range, () => this.evaluateFunction(memberAST, expr.selfType).get());
         expr.addMember(Constness.Constant, memberAST.name, memberThunk);
       }
       return expr;
@@ -357,17 +357,17 @@ class Evaluator {
 
     const returnType = subEvaluator.evaluateType(ast.returnType).metaType;
 
-    const type = new FunctionType(selfType, paramTypes, [], returnType, this.environment, ast.location);
+    const type = new FunctionType(selfType, paramTypes, [], returnType, this.environment, ast.range);
     return new DeclarationExpression(ast.name, type);
   }
 
   evaluateInterface(ast: InterfaceAST) {
     const supers = ast.superTypes.map(ast => this.evaluateType(ast));
-    const expr = new InterfaceExpression(ast.location, this.environment, ast.name, supers);
+    const expr = new InterfaceExpression(ast.range, this.environment, ast.name, supers);
 
     for (const memberAST of ast.members) {
       expr.addMember(Constness.Constant, memberAST.name,
-        new ExpressionThunk(memberAST.location, () => this.evaluateDeclarationType(expr.type, memberAST)));
+        new ExpressionThunk(memberAST.range, () => this.evaluateDeclarationType(expr.type, memberAST)));
     }
 
     this.context.addVariable(Constness.Constant, ast.name, expr.type);
@@ -383,7 +383,7 @@ class Evaluator {
     const ifTrue = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifTrue).map(e => e.get());
     const ifFalse = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
-    return new IfExpression(ast.location, this.environment, cond, ifTrue, ifFalse, tempVarName);
+    return new IfExpression(ast.range, this.environment, cond, ifTrue, ifFalse, tempVarName);
   }
 
   evaluateTypeAlias(ast: TypeAliasAST) {
@@ -391,7 +391,7 @@ class Evaluator {
 
     this.context.addVariable(Constness.Constant, ast.left, typeExpr.type);
 
-    return new TypeAliasExpression(ast.location, this.environment, ast.left, typeExpr);
+    return new TypeAliasExpression(ast.range, this.environment, ast.left, typeExpr);
   }
 
   evaluateType(ast: ExpressionAST): TypeExpression {
@@ -411,7 +411,7 @@ class Evaluator {
       return new TypeIdentifierExpression(this.environment, ast, type.metaType);
     }
     throw CompilationError.typeError(
-      ast.location,
+      ast.range,
       `Variable '${ast.name}' is not a type`
     );
   }
@@ -422,10 +422,10 @@ class Evaluator {
 
     switch (ast.operator.name) {
       case "&": {
-        return new TypeIntersectionExpression(ast.location, this.environment, left, right);
+        return new TypeIntersectionExpression(ast.range, this.environment, left, right);
       }
       case "|": {
-        return new TypeUnionExpression(ast.location, this.environment, left, right);
+        return new TypeUnionExpression(ast.range, this.environment, left, right);
       }
       default: {
         throw new Error(`Unsupported type operator: ${ast.operator.name}`);

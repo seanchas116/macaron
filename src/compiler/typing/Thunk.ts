@@ -1,4 +1,4 @@
-import SourceLocation from "../common/SourceLocation";
+import SourceRange from "../common/SourceRange";
 import CompilationError from "../common/CompilationError";
 
 export default
@@ -6,13 +6,13 @@ class Thunk<T> {
   private value: T;
   private getting = false;
 
-  constructor(public location: SourceLocation, private getter: () => T) {
+  constructor(public range: SourceRange, private getter: () => T) {
   }
 
   get() {
     if (this.getting) {
       throw CompilationError.typeError(
-        this.location,
+        this.range,
         `Recursion detected while resolving type`
       );
     }
