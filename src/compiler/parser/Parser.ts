@@ -132,7 +132,7 @@ class Parser<T> {
   constructor(private _parse: (state: State) => Result<T>) {
   }
 
-  parseFrom(state: State) {
+  parseFrom(state: State): Result<T> {
     const index = state.position.index;
     let result = state.cache.get(this, index);
     if (!result) {
@@ -160,7 +160,7 @@ class Parser<T> {
   }
 
   map<U>(transform: (value: T) => U): Parser<U> {
-    return new Parser(state => {
+    return new Parser<U>(state => {
       const result = this.parseFrom(state);
       if (result instanceof Failure) {
         return result;
@@ -206,7 +206,7 @@ class Parser<T> {
   }
 
   withRange(): Parser<[T, SourceRange]> {
-    return new Parser(state => {
+    return new Parser<[T, SourceRange]>(state => {
       const begin = state.position;
       const result = this.parseFrom(state);
       if (result instanceof Success) {
@@ -220,7 +220,7 @@ class Parser<T> {
   }
 
   text(): Parser<string> {
-    return new Parser(state => {
+    return new Parser<string>(state => {
       const begin = state.position.index;
       const result = this.parseFrom(state);
       const end = result.state.position.index;
@@ -233,10 +233,10 @@ class Parser<T> {
     });
   }
 
-  thenSkip<U>(parser: Parser<U>) {
+  thenSkip<U>(parser: Parser<U>): Parser<T> {
     return sequence(this, parser).map(([a, b]) => a);
   }
-  thenTake<U>(parser: Parser<U>) {
+  thenTake<U>(parser: Parser<U>): Parser<U> {
     return sequence(this, parser).map(([a, b]) => b);
   }
 }
@@ -271,7 +271,7 @@ function sequence(...parsers: any[]): Parser<any> {
 // parser1 / parser2 / ...
 export
 function choose<T>(...parsers: Parser<T>[]): Parser<T> {
-  return new Parser(state => {
+  return new Parser<T>(state => {
     const expecteds = new Set<string>();
 
     for (const parser of parsers) {
