@@ -22,7 +22,7 @@ var parseMethod = lazy(() =>
   )
     .withRange()
     .map(([[name, parameters, returnType, expressions], range]) =>
-      new FunctionAST(range.begin, name, [], parameters, returnType, expressions)
+      new FunctionAST(range, name, [], parameters, returnType, expressions)
     )
 );
 
@@ -44,7 +44,7 @@ var parseClass = lazy(() =>
   )
     .withRange()
     .map(([[name, superType, members], range]) =>
-      new ClassAST(range.begin, name, superType, members)
+      new ClassAST(range, name, superType, members)
     )
 );
 
@@ -56,7 +56,7 @@ var parseMethodDeclaration = lazy(() =>
   )
     .withRange()
     .map(([[name, params, returnType], range]) =>
-      new FunctionAST(range.begin, name, [], params, returnType, null)
+      new FunctionAST(range, name, [], params, returnType, null)
     )
 );
 
@@ -77,6 +77,6 @@ var parseInterface = lazy(() =>
   )
     .withRange()
     .map(([[name, superTypes, members], range]) =>
-      new InterfaceAST(range.begin, name, superTypes || [], members)
+      new InterfaceAST(range, name, superTypes || [], members)
     )
 );

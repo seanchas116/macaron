@@ -27,7 +27,7 @@ var parseNewVariable: Parser<ExpressionAST> = lazy(() =>
       keyword("=").thenTake(parseNewVariable)
     )
       .withRange()
-      .map(([[declaration, left, type, right], range]) => new NewVariableAST(range.begin, declaration, type, left, right)),
+      .map(([[declaration, left, type, right], range]) => new NewVariableAST(range, declaration, type, left, right)),
     parseAssignment
   )
 );
@@ -41,7 +41,7 @@ var parseAssignment: Parser<ExpressionAST> = lazy(() =>
       parseAssignment
     )
       .withRange()
-      .map(([[left, op, right], range]) => new AssignmentAST(range.begin, left, op, right)),
+      .map(([[left, op, right], range]) => new AssignmentAST(range, left, op, right)),
     parseBinaryExpression
   )
 );

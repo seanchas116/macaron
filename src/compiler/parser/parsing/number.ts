@@ -47,4 +47,4 @@ const parseNumberLiteral =
   choose(parseBinaryInt, parseHexInt, parseFloat)
     .thenSkip(_)
     .withRange()
-    .map(([num, range]) => new LiteralAST(range.begin, num));
+    .map(([num, range]) => new LiteralAST(range, num));

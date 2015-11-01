@@ -19,6 +19,7 @@
         "./src/compiler/common/CompilationError.ts",
         "./src/compiler/common/ErrorInfo.ts",
         "./src/compiler/common/ErrorType.ts",
+        "./src/compiler/common/SourcePosition.ts",
         "./src/compiler/common/SourceRange.ts",
         "./src/compiler/compiler/Compiler.ts",
         "./src/compiler/emitter/CodeEmitter.ts",

@@ -20,7 +20,7 @@ var parseNew: Parser<ExpressionAST> = lazy(() =>
     )
       .withRange()
       .map(([[klass, args], range]) =>
-        new FunctionCallAST(range.begin, klass, args, true)
+        new FunctionCallAST(range, klass, args, true)
       )
     ,
     parseValue

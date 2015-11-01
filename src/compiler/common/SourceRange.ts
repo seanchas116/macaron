@@ -1,12 +1,13 @@
+import SourcePosition from "./SourcePosition";
 
 export default
 class SourceRange {
-  constructor(public line: number, public column: number, public index: number) {
-  }
-  toString() {
-    return `${this.line}:${this.column}`;
+  constructor(public begin: SourcePosition, public end: SourcePosition) {
   }
   static empty() {
-    return new SourceRange(1, 1, 0);
+    return new SourceRange(
+      new SourcePosition("", 0, 1, 1),
+      new SourcePosition("", 0, 1, 1)
+    );
   }
 }

@@ -12,8 +12,8 @@ interface CompileOption {
 export default
 class Compiler {
 
-  compile(source: string, options: CompileOption = {}) {
-    const parsed = new Parser(source).parse();
+  compile(filePath: string, source: string, options: CompileOption = {}) {
+    const parsed = new Parser(filePath, source).parse();
     const evaluator = new Evaluator(new EvaluationContext(new DefaultEnviromnent()));
     let expressions = evaluator.evaluateExpressions(parsed).map(e => e.get());
     if (options.implicitReturn) {

@@ -18,7 +18,7 @@ export
 function parseOperator(operatorList: string[]) {
   return choose(...operatorList.map(op => keyword(op)))
     .withRange()
-    .map(([op, range]) => new OperatorAST(range.begin, op));
+    .map(([op, range]) => new OperatorAST(range, op));
 }
 
 function buildBinaryExpression(binaryOperators: string[][], first: ExpressionAST, rest: [OperatorAST, ExpressionAST][]): ExpressionAST {
@@ -47,7 +47,7 @@ function parseUnaryExpressionWith(subParser: Parser<ExpressionAST>, operators: s
       subParser
     )
       .withRange()
-      .map(([[operator, operand], range]) => new UnaryAST(range.begin, operator, operand))
+      .map(([[operator, operand], range]) => new UnaryAST(range, operator, operand))
   );
 }
 

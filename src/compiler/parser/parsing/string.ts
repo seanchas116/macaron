@@ -26,4 +26,4 @@ const parseStringLiteral =
   choose(parseString1, parseString2)
     .thenSkip(_)
     .withRange()
-    .map(([str, range]) => new LiteralAST(range.begin, str));
+    .map(([str, range]) => new LiteralAST(range, str));
