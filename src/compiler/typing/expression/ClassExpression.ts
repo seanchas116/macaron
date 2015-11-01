@@ -3,7 +3,7 @@ import {EmptyTypeExpression} from "../TypeExpression";
 import InterfaceExpression from "./InterfaceExpression";
 import ExpressionThunk from "../thunk/ExpressionThunk";
 import Identifier from "../Identifier";
-import SourceLocation from "../../common/SourceLocation";
+import SourceRange from "../../common/SourceRange";
 import {voidType} from "../nativeTypes";
 import MetaType from "../type/MetaType";
 import CallSignature from "../CallSignature";
@@ -12,9 +12,9 @@ import {Constness} from "../Member";
 
 export default
 class ClassExpression extends InterfaceExpression {
-  constructor(location: SourceLocation, env: Environment, public name: Identifier, public superExpression: Expression) {
+  constructor(range: SourceRange, env: Environment, public name: Identifier, public superExpression: Expression) {
     // TODO: inherit Object by default
-    super(location, env, name, [superExpression || new EmptyTypeExpression(voidType(), env)]);
+    super(range, env, name, [superExpression || new EmptyTypeExpression(voidType(), env)]);
 
     const classType = new MetaType(`class ${name.name}`, this.selfType, env);
     this.type = classType;

@@ -1,22 +1,22 @@
 import {ExpressionAST} from "../parser/AST";
 import CompilationError from "../common/CompilationError";
-import SourceLocation from "../common/SourceLocation";
+import SourceRange from "../common/SourceRange";
 import {SyntaxError} from "./Parser";
 import {parseLines} from "./parsing/block";
 
 export default
 class MacaronParser {
-  constructor(public source: string) {
+  constructor(public filePath: string, public source: string) {
   }
 
   parse() {
     try {
-      return parseLines.parse(this.source);
+      return parseLines.parse(this.filePath, this.source);
     }
     catch (error) {
       if (error instanceof SyntaxError) {
         throw CompilationError.syntaxError(
-          error.position,
+          error.range,
           error.message
         );
       } else {

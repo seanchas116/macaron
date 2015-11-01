@@ -9,35 +9,35 @@ import Operator from "./Operator";
 import {Constness} from "./Member";
 import Environment from "./Environment";
 
-import SourceLocation from "../common/SourceLocation";
+import SourceRange from "../common/SourceRange";
 import CompilationError from "../common/CompilationError";
 
 export default
 class Expression {
   type = voidType();
 
-  constructor(public location: SourceLocation) {
+  constructor(public range: SourceRange) {
   }
 }
 
 export
 class IdentifierExpression extends Expression {
   constructor(public name: Identifier, public type: Type) {
-    super(name.location);
+    super(name.range);
   }
 }
 
 export
 class AssignmentExpression extends Expression {
-  constructor(location: SourceLocation, public assignable: Identifier, public value: Expression) {
-    super(location);
+  constructor(range: SourceRange, public assignable: Identifier, public value: Expression) {
+    super(range);
   }
 }
 
 export
 class NewVariableExpression extends Expression {
-  constructor(location: SourceLocation, public constness: Constness, public assignable: Identifier, public value: Expression) {
-    super(location);
+  constructor(range: SourceRange, public constness: Constness, public assignable: Identifier, public value: Expression) {
+    super(range);
   }
 }
 
@@ -47,8 +47,8 @@ class FunctionCallExpression extends Expression {
   arguments: Expression[];
   isNewCall: boolean;
 
-  constructor(location: SourceLocation, func: Expression, args: Expression[], isNewCall = false) {
-    super(location);
+  constructor(range: SourceRange, func: Expression, args: Expression[], isNewCall = false) {
+    super(range);
     this.isNewCall = isNewCall;
     this.function = func;
     this.arguments = args;
@@ -73,7 +73,7 @@ class FunctionCallExpression extends Expression {
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call
     if (!sig) {
       throw CompilationError.typeError(
-        location,
+        range,
         `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`,
         ...reasons
       );
@@ -84,8 +84,8 @@ class FunctionCallExpression extends Expression {
 
 export
 class GenericsExpression extends Expression {
-  constructor(location: SourceLocation, public genericsType: GenericsType, public expression: Expression) {
-    super(location);
+  constructor(range: SourceRange, public genericsType: GenericsType, public expression: Expression) {
+    super(range);
     this.type = genericsType;
   }
 }
@@ -94,8 +94,8 @@ export
 class GenericsCallExpression extends Expression {
   arguments: Type[];
 
-  constructor(location: SourceLocation, public value: Expression, args: Type[]) {
-    super(location);
+  constructor(range: SourceRange, public value: Expression, args: Type[]) {
+    super(range);
     this.arguments = args;
 
     const genericsType = this.value.type;
@@ -103,7 +103,7 @@ class GenericsCallExpression extends Expression {
       const paramLength = genericsType.parameters.length
       if (paramLength !== args.length) {
         throw CompilationError.typeError(
-          args[0].location,
+          args[0].range,
           `Number of generics arguments wrong (${args.length} for ${paramLength})`
         );
       }
@@ -114,7 +114,7 @@ class GenericsCallExpression extends Expression {
         const {constraint} = placeholder;
         if (!constraint.isAssignable(args[i], reasons)) {
           throw CompilationError.typeError(
-            args[i].location,
+            args[i].range,
             `Cannot assign '${args[i]}' to type '${constraint}'`,
             ...reasons
           );
@@ -125,7 +125,7 @@ class GenericsCallExpression extends Expression {
       this.type = genericsType.template.resolveGenerics(types);
     } else {
       throw CompilationError.typeError(
-        this.value.location,
+        this.value.range,
         `The value is not generic`
       );
     }
@@ -134,8 +134,8 @@ class GenericsCallExpression extends Expression {
 
 export
 class LiteralExpression extends Expression {
-  constructor(location: SourceLocation, public value: any) {
-    super(location);
+  constructor(range: SourceRange, public value: any) {
+    super(range);
     const type = (() => {
       switch (typeof value) {
         case "number":
@@ -154,21 +154,21 @@ class LiteralExpression extends Expression {
 
 export
 class ReturnExpression extends Expression {
-  constructor(location: SourceLocation, public expression: Expression) {
-    super(location);
+  constructor(range: SourceRange, public expression: Expression) {
+    super(range);
     this.type = expression.type;
   }
 }
 
 export
 class MemberAccessExpression extends Expression {
-  constructor(location: SourceLocation, public object: Expression , public member: Identifier) {
-    super(location);
+  constructor(range: SourceRange, public object: Expression , public member: Identifier) {
+    super(range);
     const objectType = object.type;
 
     if (!objectType.getMember(member.name)) {
       throw CompilationError.typeError(
-        location,
+        range,
         `Type '${objectType}' don't have member '${member.name}'`
       );
     }
@@ -180,8 +180,8 @@ export
 class OperatorAccessExpression extends Expression {
   operator: Operator;
 
-  constructor(location: SourceLocation, public object: Expression, operatorName: Identifier, arity: number) {
-    super(location);
+  constructor(range: SourceRange, public object: Expression, operatorName: Identifier, arity: number) {
+    super(range);
     const objectType = object.type;
     if (arity === 1) {
       this.operator = objectType.getUnaryOperators().get(operatorName.name);
@@ -192,7 +192,7 @@ class OperatorAccessExpression extends Expression {
     }
     if (!this.operator) {
       throw CompilationError.typeError(
-        operatorName.location,
+        operatorName.range,
         `No operator '${operatorName.name}' for type '${objectType}'`
       );
     }
@@ -210,22 +210,22 @@ function blockType(block: Expression[]) {
 
 export
 class IfExpression extends Expression {
-  constructor(location: SourceLocation, public environment: Environment, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
-    super(location);
-    this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], environment, location);
+  constructor(range: SourceRange, public environment: Environment, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
+    super(range);
+    this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], environment, range);
   }
 }
 
 export
 class EmptyExpression extends Expression {
-  constructor(location: SourceLocation, public type: Type) {
-    super(location);
+  constructor(range: SourceRange, public type: Type) {
+    super(range);
   }
 }
 
 export
 class DeclarationExpression extends Expression {
   constructor(public name: Identifier, public type: Type) {
-    super(name.location);
+    super(name.range);
   }
 }

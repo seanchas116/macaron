@@ -14,7 +14,7 @@ import {parseBlock} from "./block";
 var parseParameter = lazy(() =>
   sequence(parseIdentifier, parseTypeExpression)
     .withRange()
-    .map(([[name, type], range]) => new ParameterAST(range.begin, name, type))
+    .map(([[name, type], range]) => new ParameterAST(range, name, type))
 );
 
 export
@@ -27,7 +27,7 @@ var parseParameterList = lazy(() =>
 var parseGenericsParameter = lazy(() =>
   sequence(parseIdentifier, keyword(":").thenTake(parseTypeExpression).mayBe())
     .withRange()
-    .map(([[name, type], range]) => new ParameterAST(range.begin, name, type || new IdentifierAST(range.begin, "void")))
+    .map(([[name, type], range]) => new ParameterAST(range, name, type || new IdentifierAST(range, "void")))
 );
 
 export
@@ -44,7 +44,7 @@ var parseUnnamedFunction = lazy(() =>
   )
     .withRange()
     .map(([[parameters, expressions], range]) =>
-      new FunctionAST(range.begin, new IdentifierAST(range.begin, ""), [], parameters, null, expressions)
+      new FunctionAST(range, new IdentifierAST(range, ""), [], parameters, null, expressions)
     )
 );
 
@@ -58,7 +58,7 @@ var parseNamedFunction = lazy(() =>
   )
     .withRange()
     .map(([[name, genericsParams, parameters, returnType, expressions], range]) =>
-      new FunctionAST(range.begin, name, genericsParams || [], parameters, returnType, expressions, true)
+      new FunctionAST(range, name, genericsParams || [], parameters, returnType, expressions, true)
     )
 );
 

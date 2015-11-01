@@ -26,7 +26,7 @@ describe("Compiler", () => {
   const patterns = loadPatterns();
 
   for (const {src, title, error, expected} of patterns) {
-    const compile = () => new Compiler().compile(src, {implicitReturn: true});
+    const compile = () => new Compiler().compile("[test source]", src, {implicitReturn: true});
 
     if (expected != null) {
       it(`compiles ${title}`, () => {

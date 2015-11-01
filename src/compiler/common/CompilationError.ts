@@ -1,4 +1,4 @@
-import SourceLocation from "./SourceLocation";
+import SourceRange from "./SourceRange";
 import ErrorInfo from "./ErrorInfo";
 import ErrorType from "./ErrorType";
 import BaseError from "./BaseError";
@@ -9,20 +9,21 @@ class CompilationError extends BaseError {
 
   constructor(public infos: ErrorInfo[]) {
     super();
-    this.message = "\n" + infos.map(({location, summary, descriptions})=> {
-      return `[${location.line}:${location.column}] ${summary}\n  ${descriptions.join("\n  ")}`;
+    this.message = "\n" + infos.map(({range, summary, descriptions})=> {
+      const {begin} = range;
+      return `[${begin.filePath}:${begin.line}:${begin.column}] ${summary}\n  ${descriptions.join("\n  ")}`;
     }).join("\n");
   }
 
-  static typeError(location: SourceLocation, summary: string, ...descriptions: string[]) {
+  static typeError(range: SourceRange, summary: string, ...descriptions: string[]) {
     return new CompilationError([
-      new ErrorInfo(ErrorType.TypeError, summary, descriptions, location)
+      new ErrorInfo(ErrorType.TypeError, summary, descriptions, range)
     ]);
   }
 
-  static syntaxError(location: SourceLocation, summary: string, ...descriptions: string[]) {
+  static syntaxError(range: SourceRange, summary: string, ...descriptions: string[]) {
     return new CompilationError([
-      new ErrorInfo(ErrorType.SyntaxError, summary, descriptions, location)
+      new ErrorInfo(ErrorType.SyntaxError, summary, descriptions, range)
     ]);
   }
 }

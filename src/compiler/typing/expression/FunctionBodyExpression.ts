@@ -1,6 +1,6 @@
 import Expression, {ReturnExpression} from "../Expression";
 import CompilationError from "../../common/CompilationError";
-import SourceLocation from "../../common/SourceLocation";
+import SourceRange from "../../common/SourceRange";
 
 // TODO: improve
 function returnType(expressions: Expression[]) {
@@ -9,8 +9,8 @@ function returnType(expressions: Expression[]) {
 
 export default
 class FunctionBodyExpression extends Expression {
-  constructor(location: SourceLocation, public expressions: Expression[]) {
-    super(location);
+  constructor(range: SourceRange, public expressions: Expression[]) {
+    super(range);
     this.type = returnType(expressions);
   }
 }

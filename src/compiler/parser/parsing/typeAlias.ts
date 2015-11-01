@@ -18,6 +18,6 @@ const parseTypeAlias: Parser<ExpressionAST> =
       keyword("=").thenTake(parseTypeExpression)
     )
       .withRange()
-      .map(([[declaration, left, right], range]) => new TypeAliasAST(range.begin, left, right)),
+      .map(([[declaration, left, right], range]) => new TypeAliasAST(range, left, right)),
     parseNewVariable
   );

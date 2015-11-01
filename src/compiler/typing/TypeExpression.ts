@@ -3,7 +3,7 @@ import Type from "./Type";
 import Identifier from "./Identifier";
 import MetaType from "./type/MetaType";
 import {voidType} from "./nativeTypes";
-import SourceLocation from "../common/SourceLocation";
+import SourceRange from "../common/SourceRange";
 import IntersectionType from "./type/IntersectionType";
 import UnionType from "./type/UnionType";
 import Environment from "./Environment";
@@ -13,8 +13,8 @@ class TypeExpression extends Expression {
   metaType: Type;
   type: Type;
 
-  constructor(location: SourceLocation, public environment: Environment) {
-    super(location);
+  constructor(range: SourceRange, public environment: Environment) {
+    super(range);
     this.setMetaType(voidType());
   }
 
@@ -27,7 +27,7 @@ class TypeExpression extends Expression {
 export
 class EmptyTypeExpression extends TypeExpression {
   constructor(type: Type, env: Environment) {
-    super(SourceLocation.empty(), env);
+    super(SourceRange.empty(), env);
     this.setMetaType(type);
   }
 }
@@ -35,14 +35,14 @@ class EmptyTypeExpression extends TypeExpression {
 export
 class TypeIdentifierExpression extends TypeExpression {
   constructor(env: Environment, public name: Identifier, type: Type) {
-    super(name.location, env);
+    super(name.range, env);
     this.setMetaType(type);
   }
 }
 
 export
 class TypeAliasExpression extends TypeExpression {
-  constructor(loc: SourceLocation, env: Environment, public assignable: Identifier, public value: TypeExpression) {
+  constructor(loc: SourceRange, env: Environment, public assignable: Identifier, public value: TypeExpression) {
     super(loc, env);
     this.setMetaType(value.metaType);
   }
@@ -50,7 +50,7 @@ class TypeAliasExpression extends TypeExpression {
 
 export
 class TypeUnionExpression extends TypeExpression {
-  constructor(loc: SourceLocation, env: Environment, public left: TypeExpression, public right: TypeExpression) {
+  constructor(loc: SourceRange, env: Environment, public left: TypeExpression, public right: TypeExpression) {
     super(loc, env);
     const type = new UnionType([left.metaType, right.metaType], env, loc);
     this.setMetaType(type);
@@ -59,7 +59,7 @@ class TypeUnionExpression extends TypeExpression {
 
 export
 class TypeIntersectionExpression extends TypeExpression {
-  constructor(loc: SourceLocation, env: Environment, public left: TypeExpression, public right: TypeExpression) {
+  constructor(loc: SourceRange, env: Environment, public left: TypeExpression, public right: TypeExpression) {
     super(loc, env);
     const type = new IntersectionType([left.metaType, right.metaType], env, loc);
     this.setMetaType(type);

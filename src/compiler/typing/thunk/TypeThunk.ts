@@ -1,13 +1,13 @@
 import Thunk from "../Thunk";
 import Type from "../Type";
-import SourceLocation from "../../common/SourceLocation";
+import SourceRange from "../../common/SourceRange";
 
 export default
 class TypeThunk extends Thunk<Type> {
 
   static resolve(metaValue: Type|TypeThunk) {
     if (metaValue instanceof Type) {
-      return new TypeThunk(SourceLocation.empty(), () => metaValue);
+      return new TypeThunk(SourceRange.empty(), () => metaValue);
     }
     else if (metaValue instanceof TypeThunk) {
       return metaValue;
@@ -15,6 +15,6 @@ class TypeThunk extends Thunk<Type> {
   }
 
   map(f: (t: Type) => Type) {
-    return new TypeThunk(this.location, () => f(this.get()));
+    return new TypeThunk(this.range, () => f(this.get()));
   }
 }

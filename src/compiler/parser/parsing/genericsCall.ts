@@ -15,6 +15,6 @@ var parseGenericsArgumentList = lazy(() =>
 export
 var parseGenericsCall: Parser<(value: ExpressionAST) => ExpressionAST> = lazy(() =>
   parseGenericsArgumentList.map(args =>
-    (value: ExpressionAST) => new GenericsCallAST(value.location, value, args)
+    (value: ExpressionAST) => new GenericsCallAST(value.range, value, args)
   )
 );

@@ -1,21 +1,8 @@
 import BaseError from "../common/BaseError";
+import SourcePosition from "../common/SourcePosition";
+import SourceRange from "../common/SourceRange";
 import {union} from "../util/set";
 const colors = require("colors/safe");
-
-export
-class Position {
-  constructor(public index: number, public line: number, public column: number) {
-  }
-  toString() {
-    return `${this.line}:${this.column} [${this.index}]`;
-  }
-}
-
-export
-class Range {
-  constructor(public begin: Position, public end: Position) {
-  }
-}
 
 function cacheKey<T>(parser: Parser<T>, index: number) {
   return `${parser.id} ${index}`;
@@ -53,7 +40,7 @@ class FurthestFailure {
 export
 class State {
 
-  constructor(public text: string, public position: Position, public cache: Cache, public furthestFailure: FurthestFailure, public tracer: Tracer) {
+  constructor(public text: string, public position: SourcePosition, public cache: Cache, public furthestFailure: FurthestFailure, public tracer: Tracer) {
   }
 
   substring(length: number) {
@@ -74,12 +61,12 @@ class State {
     const newLine = this.position.line + proceedLines.length - 1;
     const newColumn = (1 < proceedLines.length) ? lastLineLength + 1 : this.position.column + lastLineLength;
 
-    const newPos = new Position(newIndex, newLine, newColumn);
+    const newPos = new SourcePosition(this.position.filePath, newIndex, newLine, newColumn);
     return new State(this.text, newPos, this.cache, this.furthestFailure, this.tracer);
   }
 
-  static init(text: string, trace: boolean) {
-    return new State(text, new Position(0, 1, 1), new Cache(), new FurthestFailure(), trace ? new Tracer() : null);
+  static init(filePath: string, text: string, trace: boolean) {
+    return new State(text, new SourcePosition(filePath, 0, 1, 1), new Cache(), new FurthestFailure(), trace ? new Tracer() : null);
   }
 }
 
@@ -103,7 +90,7 @@ class Failure {
 
 export
 class SyntaxError extends BaseError {
-  constructor(public position: Position, public expected: string[], public found: string) {
+  constructor(public range: SourceRange, public expected: string[], public found: string) {
     super();
     this.name = "SyntaxError";
     this.message = `Expected ${
@@ -161,14 +148,15 @@ class Parser<T> {
     return result;
   }
 
-  parse(text: string, trace = false) {
-    const state = State.init(text, trace);
+  parse(filePath: string, text: string, trace = false) {
+    const state = State.init(filePath, text, trace);
     const result = this.parseFrom(state);
     if (result instanceof Success && result.state.position.index == text.length) {
       return result.value;
     }
     const furthestFailure = state.furthestFailure.furthest;
-    throw new SyntaxError(furthestFailure.state.position, [...furthestFailure.expecteds], furthestFailure.state.currentChar());
+    const range = new SourceRange(furthestFailure.state.position, furthestFailure.state.proceed(1).position);
+    throw new SyntaxError(range, [...furthestFailure.expecteds], furthestFailure.state.currentChar());
   }
 
   map<U>(transform: (value: T) => U): Parser<U> {
@@ -217,13 +205,13 @@ class Parser<T> {
     return this.repeat(0, 1).map(xs => xs[0]);
   }
 
-  withRange(): Parser<[T, Range]> {
+  withRange(): Parser<[T, SourceRange]> {
     return new Parser(state => {
       const begin = state.position;
       const result = this.parseFrom(state);
       if (result instanceof Success) {
         const end = result.state.position;
-        const valueWithRange: [T, Range] = [result.value, new Range(begin, end)];
+        const valueWithRange: [T, SourceRange] = [result.value, new SourceRange(begin, end)];
         return new Success(result.state, valueWithRange);
       } else if (result instanceof Failure) {
         return result;

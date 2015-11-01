@@ -264,8 +264,8 @@ class CodeEmitter {
     const emittingExprs = [
       ...exprs.slice(0, len - 1),
       new AssignmentExpression(
-        last.location,
-        new Identifier(varName, last.location),
+        last.range,
+        new Identifier(varName, last.range),
         last
       )
     ];
@@ -280,7 +280,7 @@ class CodeEmitter {
     const last = exprs[len - 1];
     const emittingExprs = [
       ...exprs.slice(0, len - 1),
-      new ReturnExpression(last.location, last)
+      new ReturnExpression(last.range, last)
     ];
     return this.emitBlock(emittingExprs);
   }

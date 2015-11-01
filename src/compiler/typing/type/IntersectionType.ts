@@ -1,14 +1,14 @@
 import Type from "../Type";
 import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
-import SourceLocation from "../../common/SourceLocation";
+import SourceRange from "../../common/SourceRange";
 import CompilationError from "../../common/CompilationError";
 import Member, {Constness} from "../Member";
 import Environment from "../Environment";
 import TypeThunk from "../thunk/TypeThunk";
 import {union} from "../../util/set";
 
-function intersectionMembers(environment: Environment, location: SourceLocation, members1: Map<string, Member>, members2: Map<string, Member>) {
+function intersectionMembers(environment: Environment, range: SourceRange, members1: Map<string, Member>, members2: Map<string, Member>) {
   const ret = new Map<string, Member>();
   const names = union(new Set(members1.keys()), new Set(members2.keys()));
 
@@ -34,13 +34,13 @@ function intersectionMembers(environment: Environment, location: SourceLocation,
         ret.set(name, new Member(Constness.Variable, member1Type));
       } else {
         throw CompilationError.typeError(
-          location,
+          range,
           `Cannot make mutable intersection of ${member1Type} and {member2Type}`
         );
       }
     }
 
-    const intersectionType = new IntersectionType([member1Type, member2Type], environment, location);
+    const intersectionType = new IntersectionType([member1Type, member2Type], environment, range);
     ret.set(name, new Member(Constness.Constant, intersectionType));
   }
   return ret;
@@ -51,8 +51,8 @@ class IntersectionType extends Type {
   types: Type[];
 
   // TODO: memoize
-  constructor(types: Type[], env: Environment, loc: SourceLocation) {
-    super("", [], env, loc);
+  constructor(types: Type[], env: Environment, range: SourceRange) {
+    super("", [], env, range);
     const typeSet = new Set();
 
     for (const type of types) {
@@ -69,13 +69,13 @@ class IntersectionType extends Type {
     this.name = types.join(" & ");
 
     this.selfMembers = types.reduce((members, type) => {
-      return intersectionMembers(env, loc, members, type.getMembers());
+      return intersectionMembers(env, range, members, type.getMembers());
     }, new Map<string, Member>());
 
     this.callSignatures = types.reduce((sigs, type) => sigs.concat(type.callSignatures), []);
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    return new IntersectionType(this.types.map(mapper), this.environment, this.location);
+    return new IntersectionType(this.types.map(mapper), this.environment, this.range);
   }
 }

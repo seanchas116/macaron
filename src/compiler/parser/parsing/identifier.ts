@@ -27,5 +27,5 @@ var parseIdentifier = lazy(() =>
     .text()
     .withRange()
     .thenSkip(_)
-    .map(([text, range]) => new IdentifierAST(range.begin, text))
+    .map(([text, range]) => new IdentifierAST(range, text))
 );

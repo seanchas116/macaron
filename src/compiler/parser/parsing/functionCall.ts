@@ -15,6 +15,6 @@ var parseArgumentList = lazy(() =>
 export
 var parseFunctionCall: Parser<(value: ExpressionAST) => ExpressionAST> = lazy(() =>
   parseArgumentList.map(args =>
-    (value: ExpressionAST) => new FunctionCallAST(value.location, value, args, false)
+    (value: ExpressionAST) => new FunctionCallAST(value.range, value, args, false)
   )
 );

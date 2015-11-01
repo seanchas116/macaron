@@ -17,7 +17,7 @@ var parseIfExpression: Parser<ExpressionAST> = lazy(() =>
       parseElse.mayBe()
     )
       .withRange()
-      .map(([[cond, ifTrue, ifFalse], range]) => new IfAST(range.begin, cond, ifTrue, ifFalse || []))
+      .map(([[cond, ifTrue, ifFalse], range]) => new IfAST(range, cond, ifTrue, ifFalse || []))
   )
 );
 

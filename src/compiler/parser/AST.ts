@@ -1,8 +1,8 @@
-import SourceLocation from "../common/SourceLocation";
+import SourceRange from "../common/SourceRange";
 
 export
 abstract class AST {
-  location: SourceLocation;
+  range: SourceRange;
 }
 
 export
@@ -12,7 +12,7 @@ abstract class ExpressionAST extends AST {
 export
 class AssignmentAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public left: IdentifierAST,
     public operator: OperatorAST,
     public right: ExpressionAST
@@ -24,7 +24,7 @@ class AssignmentAST extends ExpressionAST {
 export
 class NewVariableAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public declaration: String,
     public type: ExpressionAST,
     public left: IdentifierAST,
@@ -37,7 +37,7 @@ class NewVariableAST extends ExpressionAST {
 export
 class TypeAliasAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public left: IdentifierAST,
     public right: ExpressionAST
   ) {
@@ -48,7 +48,7 @@ class TypeAliasAST extends ExpressionAST {
 export
 class BinaryAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public left: ExpressionAST,
     public operator: OperatorAST,
     public right: ExpressionAST
@@ -60,7 +60,7 @@ class BinaryAST extends ExpressionAST {
 export
 class FunctionAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public name: IdentifierAST,
     public genericsParameters: ParameterAST[],
     public parameters: ParameterAST[],
@@ -78,7 +78,7 @@ class FunctionCallAST extends ExpressionAST {
   arguments: ExpressionAST[];
 
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     func: ExpressionAST,
     args: ExpressionAST[],
     public isNewCall = false
@@ -94,7 +94,7 @@ class GenericsCallAST extends ExpressionAST {
   arguments: ExpressionAST[];
 
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public value: ExpressionAST,
     args: ExpressionAST[]
   ) {
@@ -106,7 +106,7 @@ class GenericsCallAST extends ExpressionAST {
 export
 class IfAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public condition: ExpressionAST,
     public ifTrue: ExpressionAST[],
     public ifFalse: ExpressionAST[]
@@ -118,7 +118,7 @@ class IfAST extends ExpressionAST {
 export
 class IdentifierAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public name: string
   ) {
     super();
@@ -131,7 +131,7 @@ class IdentifierAST extends ExpressionAST {
 export
 class LiteralAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public value: any
   ) {
     super();
@@ -141,7 +141,7 @@ class LiteralAST extends ExpressionAST {
 export
 class MemberAccessAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public object: ExpressionAST,
     public member: IdentifierAST
   ) {
@@ -152,7 +152,7 @@ class MemberAccessAST extends ExpressionAST {
 export
 class OperatorAST extends AST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public name: string
   ) {
     super();
@@ -163,7 +163,7 @@ export
 class ParameterAST extends AST {
   // FIXME: support type more than Identifier
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public name: IdentifierAST,
     public type: ExpressionAST
   ) {
@@ -174,7 +174,7 @@ class ParameterAST extends AST {
 export
 class UnaryAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public operator: OperatorAST,
     public expression: ExpressionAST
   ) {
@@ -185,7 +185,7 @@ class UnaryAST extends ExpressionAST {
 export
 class ClassAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public name: IdentifierAST,
     public superclass: ExpressionAST,
     public members: FunctionAST[]
@@ -197,7 +197,7 @@ class ClassAST extends ExpressionAST {
 export
 class InterfaceAST extends ExpressionAST {
   constructor(
-    public location: SourceLocation,
+    public range: SourceRange,
     public name: IdentifierAST,
     public superTypes: ExpressionAST[],
     public members: FunctionAST[]
