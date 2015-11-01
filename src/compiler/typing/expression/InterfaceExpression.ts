@@ -11,12 +11,13 @@ import CompilationError from "../../common/CompilationError";
 
 export default
 class InterfaceExpression extends TypeExpression {
+  type: MetaType;
   members: ExpressionThunk[] = [];
   superTypes: Type[];
   selfType: Type;
 
-  constructor(range: SourceRange, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
-    super(range, env);
+  constructor(public range: SourceRange, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
+    super();
 
     let superTypes = this.superTypes = superExpressions.map(superExpr => {
       const superValueType = superExpr.type;
@@ -28,7 +29,7 @@ class InterfaceExpression extends TypeExpression {
     });
 
     const type = this.selfType = new Type(name.name, superTypes, env, range, this);
-    this.setMetaType(type);
+    this.type = MetaType.typeOnly(type);
   }
 
   addMember(constness: Constness, name: Identifier, member: Expression|ExpressionThunk) {

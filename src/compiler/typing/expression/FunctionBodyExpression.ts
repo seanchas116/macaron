@@ -9,8 +9,11 @@ function returnType(expressions: Expression[]) {
 
 export default
 class FunctionBodyExpression extends Expression {
-  constructor(range: SourceRange, public expressions: Expression[]) {
-    super(range);
-    this.type = returnType(expressions);
+  type = returnType(this.expressions);
+  constructor(
+    public range: SourceRange,
+    public expressions: Expression[]
+  ) {
+    super();
   }
 }

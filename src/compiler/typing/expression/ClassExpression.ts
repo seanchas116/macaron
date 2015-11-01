@@ -14,7 +14,7 @@ export default
 class ClassExpression extends InterfaceExpression {
   constructor(range: SourceRange, env: Environment, public name: Identifier, public superExpression: Expression) {
     // TODO: inherit Object by default
-    super(range, env, name, [superExpression || new EmptyTypeExpression(voidType(), env)]);
+    super(range, env, name, [superExpression || new EmptyTypeExpression(voidType())]);
 
     const classType = new MetaType(`class ${name.name}`, this.selfType, env);
     this.type = classType;

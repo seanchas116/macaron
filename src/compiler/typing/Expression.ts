@@ -14,30 +14,43 @@ import CompilationError from "../common/CompilationError";
 
 export default
 class Expression {
-  type = voidType();
-
-  constructor(public range: SourceRange) {
-  }
+  type: Type;
+  range: SourceRange;
 }
 
 export
 class IdentifierExpression extends Expression {
-  constructor(public name: Identifier, public type: Type) {
-    super(name.range);
+  constructor(
+    public range: SourceRange,
+    public name: Identifier,
+    public type: Type
+  ) {
+    super();
   }
 }
 
 export
 class AssignmentExpression extends Expression {
-  constructor(range: SourceRange, public assignable: Identifier, public value: Expression) {
-    super(range);
+  type = this.value.type;
+  constructor(
+    public range: SourceRange,
+    public assignable: Identifier,
+    public value: Expression
+  ) {
+    super();
   }
 }
 
 export
 class NewVariableExpression extends Expression {
-  constructor(range: SourceRange, public constness: Constness, public assignable: Identifier, public value: Expression) {
-    super(range);
+  type = this.value.type;
+  constructor(
+    public range: SourceRange,
+    public constness: Constness,
+    public assignable: Identifier,
+    public value: Expression
+  ) {
+    super();
   }
 }
 
@@ -46,9 +59,16 @@ class FunctionCallExpression extends Expression {
   function: Expression;
   arguments: Expression[];
   isNewCall: boolean;
+  type: Type;
 
-  constructor(range: SourceRange, func: Expression, args: Expression[], isNewCall = false) {
-    super(range);
+  constructor(
+    public range: SourceRange,
+    func: Expression,
+    args: Expression[],
+    isNewCall = false
+  ) {
+    super();
+
     this.isNewCall = isNewCall;
     this.function = func;
     this.arguments = args;
@@ -84,18 +104,28 @@ class FunctionCallExpression extends Expression {
 
 export
 class GenericsExpression extends Expression {
-  constructor(range: SourceRange, public genericsType: GenericsType, public expression: Expression) {
-    super(range);
-    this.type = genericsType;
+  type = this.genericsType;
+  constructor(
+    public range: SourceRange,
+    public genericsType: GenericsType,
+    public expression: Expression
+  ) {
+    super();
   }
 }
 
 export
 class GenericsCallExpression extends Expression {
   arguments: Type[];
+  type: Type;
 
-  constructor(range: SourceRange, public value: Expression, args: Type[]) {
-    super(range);
+  constructor(
+    public range: SourceRange,
+    public value: Expression,
+    args: Type[]
+  ) {
+    super();
+
     this.arguments = args;
 
     const genericsType = this.value.type;
@@ -134,8 +164,13 @@ class GenericsCallExpression extends Expression {
 
 export
 class LiteralExpression extends Expression {
-  constructor(range: SourceRange, public value: any) {
-    super(range);
+  type: Type;
+
+  constructor(
+    public range: SourceRange,
+    public value: any
+  ) {
+    super();
     const type = (() => {
       switch (typeof value) {
         case "number":
@@ -154,16 +189,26 @@ class LiteralExpression extends Expression {
 
 export
 class ReturnExpression extends Expression {
-  constructor(range: SourceRange, public expression: Expression) {
-    super(range);
-    this.type = expression.type;
+  type = this.expression.type;
+  constructor(
+    public range: SourceRange,
+    public expression: Expression
+  ) {
+    super();
   }
 }
 
 export
 class MemberAccessExpression extends Expression {
-  constructor(range: SourceRange, public object: Expression , public member: Identifier) {
-    super(range);
+  type: Type;
+
+  constructor(
+    public range: SourceRange,
+    public object: Expression,
+    public member: Identifier
+  ) {
+    super();
+
     const objectType = object.type;
 
     if (!objectType.getMember(member.name)) {
@@ -179,9 +224,16 @@ class MemberAccessExpression extends Expression {
 export
 class OperatorAccessExpression extends Expression {
   operator: Operator;
+  type: Type;
 
-  constructor(range: SourceRange, public object: Expression, operatorName: Identifier, arity: number) {
-    super(range);
+  constructor(
+    public range: SourceRange,
+    public object: Expression,
+    operatorName: Identifier,
+    arity: number
+  ) {
+    super();
+
     const objectType = object.type;
     if (arity === 1) {
       this.operator = objectType.getUnaryOperators().get(operatorName.name);
@@ -210,22 +262,38 @@ function blockType(block: Expression[]) {
 
 export
 class IfExpression extends Expression {
-  constructor(range: SourceRange, public environment: Environment, public condition: Expression, public ifTrue: Expression[], public ifFalse: Expression[], public tempVarName: string) {
-    super(range);
+  type: Type;
+
+  constructor(
+    public range: SourceRange,
+    public environment: Environment,
+    public condition: Expression,
+    public ifTrue: Expression[],
+    public ifFalse: Expression[],
+    public tempVarName: string
+  ) {
+    super();
     this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], environment, range);
   }
 }
 
 export
 class EmptyExpression extends Expression {
-  constructor(range: SourceRange, public type: Type) {
-    super(range);
+  constructor(
+    public range: SourceRange,
+    public type: Type
+  ) {
+    super();
   }
 }
 
 export
 class DeclarationExpression extends Expression {
-  constructor(public name: Identifier, public type: Type) {
-    super(name.range);
+  constructor(
+    public range: SourceRange,
+    public name: Identifier,
+    public type: Type
+  ) {
+    super();
   }
 }

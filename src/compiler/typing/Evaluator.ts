@@ -156,7 +156,7 @@ class Evaluator {
     const right = this.evaluate(ast.right);
     let type: TypeThunk;
     if (ast.type) {
-      type = TypeThunk.resolve(this.evaluateType(ast.type).metaType);
+      type = TypeThunk.resolve(this.evaluateType(ast.type).type.metaType);
     } else {
       type = right.type;
     }
@@ -205,10 +205,10 @@ class Evaluator {
     if (needsThis) {
       const thisIdentifier = new Identifier("this", ast.range);
       const {member: thisMember} = this.context.getVariable(thisIdentifier);
-      const thisExpr = new IdentifierExpression(thisIdentifier, thisMember.type.get());
+      const thisExpr = new IdentifierExpression(ast.range, thisIdentifier, thisMember.type.get());
       return new MemberAccessExpression(ast.range, thisExpr, ast);
     } else {
-      return new IdentifierExpression(ast, member.type.get());
+      return new IdentifierExpression(ast.range, ast, member.type.get());
     }
   }
 
@@ -237,10 +237,10 @@ class Evaluator {
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
       const subContext = this.context.newChild();
-      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, this.evaluateType(p.type).metaType, this.environment));
+      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, this.evaluateType(p.type).type.metaType, this.environment));
       for (const [i, p] of params.entries()) {
         subContext.environment.addGenericsPlaceholder(p);
-        subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p, this.environment));
+        subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
       }
       const funcThunk = new Evaluator(subContext).evaluateFunctionMain(ast, thisType);
       const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template, subContext.environment));
@@ -262,7 +262,7 @@ class Evaluator {
     const subEvaluator = new Evaluator(subContext);
 
     for (const {name, type: typeExpr} of ast.parameters) {
-      const type = subEvaluator.evaluateType(typeExpr).metaType;
+      const type = subEvaluator.evaluateType(typeExpr).type.metaType;
       subContext.addVariable(Constness.Constant, name, type);
       paramTypes.push(type);
     }
@@ -280,7 +280,7 @@ class Evaluator {
 
     let typeThunk: TypeThunk;
     if (ast.returnType) {
-      const returnType = subEvaluator.evaluateType(ast.returnType).metaType;
+      const returnType = subEvaluator.evaluateType(ast.returnType).type.metaType;
       typeThunk = TypeThunk.resolve(createType(returnType));
     }
     else {
@@ -303,7 +303,7 @@ class Evaluator {
 
   evaluateGenericsCall(ast: GenericsCallAST) {
     const value = this.evaluate(ast.value).get();
-    const args = ast.arguments.map(a => this.evaluateType(a).metaType);
+    const args = ast.arguments.map(a => this.evaluateType(a).type.metaType);
     return new GenericsCallExpression(ast.range, value, args);
   }
 
@@ -350,15 +350,15 @@ class Evaluator {
     const subEvaluator = new Evaluator(subContext);
 
     for (const {name, type: typeExpr} of ast.parameters) {
-      const type = subEvaluator.evaluateType(typeExpr).metaType;
+      const type = subEvaluator.evaluateType(typeExpr).type.metaType;
       subContext.addVariable(Constness.Constant, name, type);
       paramTypes.push(type);
     }
 
-    const returnType = subEvaluator.evaluateType(ast.returnType).metaType;
+    const returnType = subEvaluator.evaluateType(ast.returnType).type.metaType;
 
     const type = new FunctionType(selfType, paramTypes, [], returnType, this.environment, ast.range);
-    return new DeclarationExpression(ast.name, type);
+    return new DeclarationExpression(ast.range, ast.name, type);
   }
 
   evaluateInterface(ast: InterfaceAST) {
@@ -391,7 +391,7 @@ class Evaluator {
 
     this.context.addVariable(Constness.Constant, ast.left, typeExpr.type);
 
-    return new TypeAliasExpression(ast.range, this.environment, ast.left, typeExpr);
+    return new TypeAliasExpression(ast.range, ast.left, typeExpr);
   }
 
   evaluateType(ast: ExpressionAST): TypeExpression {
@@ -408,7 +408,7 @@ class Evaluator {
     const {member} = this.context.getVariable(ast);
     const type = member.type.get();
     if (type instanceof MetaType) {
-      return new TypeIdentifierExpression(this.environment, ast, type.metaType);
+      return new TypeIdentifierExpression(ast.range, ast, type.metaType);
     }
     throw CompilationError.typeError(
       ast.range,

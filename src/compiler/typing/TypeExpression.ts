@@ -10,58 +10,74 @@ import Environment from "./Environment";
 
 export default
 class TypeExpression extends Expression {
-  metaType: Type;
-  type: Type;
-
-  constructor(range: SourceRange, public environment: Environment) {
-    super(range);
-    this.setMetaType(voidType());
-  }
-
-  setMetaType(metaType: Type) {
-    this.metaType = metaType;
-    this.type = MetaType.typeOnly(this.metaType, this.environment);
-  }
+  type: MetaType;
 }
 
 export
 class EmptyTypeExpression extends TypeExpression {
-  constructor(type: Type, env: Environment) {
-    super(SourceRange.empty(), env);
-    this.setMetaType(type);
+  range = SourceRange.empty();
+  type = MetaType.typeOnly(this.metaType);
+
+  constructor(
+    public metaType: Type
+  ) {
+    super();
   }
 }
 
 export
 class TypeIdentifierExpression extends TypeExpression {
-  constructor(env: Environment, public name: Identifier, type: Type) {
-    super(name.range, env);
-    this.setMetaType(type);
+  type = MetaType.typeOnly(this.metaType);
+
+  constructor(
+    public range: SourceRange,
+    public name: Identifier,
+    public metaType: Type
+  ) {
+    super();
   }
 }
 
 export
 class TypeAliasExpression extends TypeExpression {
-  constructor(loc: SourceRange, env: Environment, public assignable: Identifier, public value: TypeExpression) {
-    super(loc, env);
-    this.setMetaType(value.metaType);
+  metaType = this.value.type;
+  type = MetaType.typeOnly(this.metaType);
+
+  constructor(
+    public range: SourceRange,
+    public assignable: Identifier,
+    public value: TypeExpression
+  ) {
+    super();
   }
 }
 
 export
 class TypeUnionExpression extends TypeExpression {
-  constructor(loc: SourceRange, env: Environment, public left: TypeExpression, public right: TypeExpression) {
-    super(loc, env);
-    const type = new UnionType([left.metaType, right.metaType], env, loc);
-    this.setMetaType(type);
+  metaType = new UnionType([this.left.type.metaType, this.right.type.metaType], this.environment, this.range);
+  type = MetaType.typeOnly(this.metaType);
+
+  constructor(
+    public range: SourceRange,
+    public environment: Environment,
+    public left: TypeExpression,
+    public right: TypeExpression
+  ) {
+    super();
   }
 }
 
 export
 class TypeIntersectionExpression extends TypeExpression {
-  constructor(loc: SourceRange, env: Environment, public left: TypeExpression, public right: TypeExpression) {
-    super(loc, env);
-    const type = new IntersectionType([left.metaType, right.metaType], env, loc);
-    this.setMetaType(type);
+  metaType = new IntersectionType([this.left.type.metaType, this.right.type.metaType], this.environment, this.range);
+  type = MetaType.typeOnly(this.metaType);
+
+  constructor(
+    public range: SourceRange,
+    public environment: Environment,
+    public left: TypeExpression,
+    public right: TypeExpression
+  ) {
+    super();
   }
 }

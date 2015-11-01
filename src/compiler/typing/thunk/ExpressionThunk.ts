@@ -22,11 +22,10 @@ class ExpressionThunk extends Thunk<Expression> {
   }
 
   static resolve(expr: Expression|ExpressionThunk) {
-    if (expr instanceof Expression) {
-      return new ExpressionThunk(expr.range, () => expr);
-    }
-    else if (expr instanceof ExpressionThunk) {
+    if (expr instanceof ExpressionThunk) {
       return expr;
+    } else {
+      return new ExpressionThunk(expr.range, () => <Expression>expr);
     }
   }
 }

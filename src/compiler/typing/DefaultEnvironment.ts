@@ -67,11 +67,11 @@ class DefaultEnvironment extends BlockEnvironment {
 
     addNativeBinaryOp(stringType, "+");
 
-    this.addVariable("number", new Member(Constness.Constant, MetaType.typeOnly(numberType, this)));
-    this.addVariable("boolean", new Member(Constness.Constant, MetaType.typeOnly(booleanType, this)));
-    this.addVariable("string", new Member(Constness.Constant, MetaType.typeOnly(stringType, this)));
-    this.addVariable("void", new Member(Constness.Constant, MetaType.typeOnly(voidType, this)));
-    this.addVariable("any", new Member(Constness.Constant, MetaType.typeOnly(voidType, this)));
+    this.addVariable("number", new Member(Constness.Constant, MetaType.typeOnly(numberType)));
+    this.addVariable("boolean", new Member(Constness.Constant, MetaType.typeOnly(booleanType)));
+    this.addVariable("string", new Member(Constness.Constant, MetaType.typeOnly(stringType)));
+    this.addVariable("void", new Member(Constness.Constant, MetaType.typeOnly(voidType)));
+    this.addVariable("any", new Member(Constness.Constant, MetaType.typeOnly(voidType)));
 
     this.addVariable("true", new Member(Constness.Builtin, new ConstValueType(booleanType, true, this)));
     this.addVariable("false", new Member(Constness.Builtin, new ConstValueType(booleanType, false, this)));

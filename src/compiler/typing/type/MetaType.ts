@@ -11,7 +11,7 @@ class MetaType extends Type {
     return new MetaType(this.name, mapper(this.metaType), this.environment, this.typeOnly);
   }
 
-  static typeOnly(type: Type, env: Environment) {
-    return new MetaType(`[type ${type.name}]`, type, env, true);
+  static typeOnly(type: Type) {
+    return new MetaType(`[type ${type.name}]`, type, type.environment, true);
   }
 }

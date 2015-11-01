@@ -11,8 +11,13 @@ interface NameType {
 
 export default
 class FunctionExpression extends Expression {
-  constructor(range: SourceRange, public name: Identifier, type: Type, public parameters: Identifier[], public body: FunctionBodyExpression) {
-    super(range);
-    this.type = type;
+  constructor(
+    public range: SourceRange,
+    public name: Identifier,
+    public type: Type,
+    public parameters: Identifier[],
+    public body: FunctionBodyExpression
+  ) {
+    super();
   }
 }
