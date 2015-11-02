@@ -4,7 +4,7 @@ import InterfaceExpression from "./InterfaceExpression";
 import ExpressionThunk from "../thunk/ExpressionThunk";
 import Identifier from "../Identifier";
 import SourceRange from "../../common/SourceRange";
-import {voidType} from "../nativeTypes";
+import {voidType} from "../defaultEnvironment";
 import MetaType from "../type/MetaType";
 import InterfaceType from "../type/InterfaceType";
 import CallSignature from "../CallSignature";
@@ -17,11 +17,11 @@ class ClassExpression extends InterfaceExpression {
 
   constructor(range: SourceRange, env: Environment, public name: Identifier, public superExpression: Expression) {
     // TODO: inherit Object by default
-    super(range, env, name, [superExpression || new EmptyTypeExpression(voidType())]);
+    super(range, env, name, [superExpression || new EmptyTypeExpression(voidType)]);
 
     const classType = this.classType = new InterfaceType(`class ${name.name}`, this.superTypes, env, range);
     this.type = new MetaType(classType, this.selfType, env, range);
-    classType.newSignatures = [new CallSignature(voidType(), [], this.selfType)];
+    classType.newSignatures = [new CallSignature(voidType, [], this.selfType)];
   }
 
   addMember(constness: Constness, name: Identifier, member: Expression|ExpressionThunk) {
@@ -30,7 +30,7 @@ class ClassExpression extends InterfaceExpression {
     if (name.name === "constructor") {
       const memberThunk = ExpressionThunk.resolve(member);
       this.classType.newSignatures = memberThunk.type.get().getCallSignatures().map(sig => {
-        return new CallSignature(voidType(), sig.params, this.selfType);
+        return new CallSignature(voidType, sig.params, this.selfType);
       });
     }
   }

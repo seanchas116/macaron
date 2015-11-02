@@ -1,4 +1,4 @@
-import {voidType, numberType, booleanType, stringType} from "./nativeTypes";
+import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import Type from "./Type";
 import MetaType from "./type/MetaType";
 import UnionType from "./type/UnionType";
@@ -65,7 +65,7 @@ class FunctionCallExpression implements Expression {
     this.function = func;
     this.arguments = args;
 
-    let selfType: Type = voidType();
+    let selfType: Type = voidType;
     let hasSelf = false;
     if (!isNewCall) {
       if (func instanceof MemberAccessExpression) {
@@ -161,13 +161,13 @@ class LiteralExpression implements Expression {
     const type = (() => {
       switch (typeof value) {
         case "number":
-          return numberType();
+          return numberType;
         case "string":
-          return stringType();
+          return stringType;
         case "boolean":
-          return booleanType();
+          return booleanType;
         default:
-          return voidType();
+          return voidType;
       }
     })();
     this.type = type;
@@ -237,7 +237,7 @@ function blockType(block: Expression[]) {
   if (block.length > 0) {
     return block[block.length - 1].type;
   } else {
-    return voidType();
+    return voidType;
   }
 }
 

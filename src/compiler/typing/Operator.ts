@@ -1,10 +1,10 @@
 import CallSignature from "./CallSignature";
 import Type from "./Type";
-import {voidType} from "./nativeTypes";
+import {voidType} from "./defaultEnvironment";
 
 export default
 class Operator {
-  type: Type = voidType();
+  type: Type = voidType;
 }
 
 export

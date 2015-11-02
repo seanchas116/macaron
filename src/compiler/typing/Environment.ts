@@ -1,6 +1,6 @@
 import Type from "./Type";
 import GenericsParameterType from "./type/GenericsParameterType";
-import {voidType} from "./nativeTypes";
+import {voidType} from "./defaultEnvironment";
 import Member, {Constness} from "./Member";
 import CompilationError from "../common/CompilationError";
 import {union} from "../util/set";
@@ -22,7 +22,7 @@ class Environment {
 
   addTempVariable(baseName: string) {
     const name = this.nonDuplicateVariableName(baseName);
-    this.addVariable(name, new Member(Constness.Constant, voidType()));
+    this.addVariable(name, new Member(Constness.Constant, voidType));
     return name;
   }
 

@@ -56,7 +56,7 @@ import ExpressionThunk from "./thunk/ExpressionThunk";
 import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
 import TypeThunk from "./thunk/TypeThunk";
-import {voidType} from "./nativeTypes";
+import {voidType} from "./defaultEnvironment";
 
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
@@ -220,7 +220,7 @@ class Evaluator {
     return new MemberAccessExpression(ast.range, obj, ast.member)
   }
 
-  evaluateFunction(ast: FunctionAST, thisType: Type = voidType()) {
+  evaluateFunction(ast: FunctionAST, thisType: Type = voidType) {
     const funcThunk = this.evaluateFunctionGenerics(ast, thisType);
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(ast.range, () => {

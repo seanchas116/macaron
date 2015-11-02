@@ -3,7 +3,7 @@ import InterfaceType from "./InterfaceType";
 import CallSignature from "../CallSignature";
 import Environment from "../Environment";
 import SourceRange from "../../common/SourceRange";
-import {voidType} from "../nativeTypes";
+import {voidType} from "../defaultEnvironment";
 
 export default
 class FunctionType extends InterfaceType {
@@ -27,7 +27,7 @@ class FunctionType extends InterfaceType {
         }
       })();
 
-      if (selfType == voidType()) {
+      if (selfType == voidType) {
         this.name = funcName;
       }
       else {
