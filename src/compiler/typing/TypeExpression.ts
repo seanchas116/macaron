@@ -8,38 +8,34 @@ import IntersectionType from "./type/IntersectionType";
 import UnionType from "./type/UnionType";
 import Environment from "./Environment";
 
-export default
-class TypeExpression extends Expression {
+interface TypeExpression extends Expression {
   type: MetaType;
 }
+export default TypeExpression;
 
 export
-class EmptyTypeExpression extends TypeExpression {
+class EmptyTypeExpression implements TypeExpression {
   range = SourceRange.empty();
   type = MetaType.typeOnly(this.metaType);
 
   constructor(
     public metaType: Type
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class TypeIdentifierExpression extends TypeExpression {
+class TypeIdentifierExpression implements TypeExpression {
   type = MetaType.typeOnly(this.metaType);
 
   constructor(
     public range: SourceRange,
     public name: Identifier,
     public metaType: Type
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class TypeAliasExpression extends TypeExpression {
+class TypeAliasExpression implements TypeExpression {
   metaType = this.value.type;
   type = MetaType.typeOnly(this.metaType);
 
@@ -47,13 +43,11 @@ class TypeAliasExpression extends TypeExpression {
     public range: SourceRange,
     public assignable: Identifier,
     public value: TypeExpression
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class TypeUnionExpression extends TypeExpression {
+class TypeUnionExpression implements TypeExpression {
   metaType = new UnionType([this.left.type.metaType, this.right.type.metaType], this.environment, this.range);
   type = MetaType.typeOnly(this.metaType);
 
@@ -62,13 +56,11 @@ class TypeUnionExpression extends TypeExpression {
     public environment: Environment,
     public left: TypeExpression,
     public right: TypeExpression
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class TypeIntersectionExpression extends TypeExpression {
+class TypeIntersectionExpression implements TypeExpression {
   metaType = new IntersectionType([this.left.type.metaType, this.right.type.metaType], this.environment, this.range);
   type = MetaType.typeOnly(this.metaType);
 
@@ -77,7 +69,5 @@ class TypeIntersectionExpression extends TypeExpression {
     public environment: Environment,
     public left: TypeExpression,
     public right: TypeExpression
-  ) {
-    super();
-  }
+  ) {}
 }

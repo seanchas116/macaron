@@ -12,50 +12,44 @@ import Environment from "./Environment";
 import SourceRange from "../common/SourceRange";
 import CompilationError from "../common/CompilationError";
 
-export default
-class Expression {
+interface Expression {
   type: Type;
   range: SourceRange;
 }
+export default Expression;
 
 export
-class IdentifierExpression extends Expression {
+class IdentifierExpression implements Expression {
   constructor(
     public range: SourceRange,
     public name: Identifier,
     public type: Type
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class AssignmentExpression extends Expression {
+class AssignmentExpression implements Expression {
   type = this.value.type;
   constructor(
     public range: SourceRange,
     public assignable: Identifier,
     public value: Expression
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class NewVariableExpression extends Expression {
+class NewVariableExpression implements Expression {
   type = this.value.type;
   constructor(
     public range: SourceRange,
     public constness: Constness,
     public assignable: Identifier,
     public value: Expression
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class FunctionCallExpression extends Expression {
+class FunctionCallExpression implements Expression {
   function: Expression;
   arguments: Expression[];
   isNewCall: boolean;
@@ -67,8 +61,6 @@ class FunctionCallExpression extends Expression {
     args: Expression[],
     isNewCall = false
   ) {
-    super();
-
     this.isNewCall = isNewCall;
     this.function = func;
     this.arguments = args;
@@ -103,19 +95,17 @@ class FunctionCallExpression extends Expression {
 }
 
 export
-class GenericsExpression extends Expression {
+class GenericsExpression implements Expression {
   type = this.genericsType;
   constructor(
     public range: SourceRange,
     public genericsType: GenericsType,
     public expression: Expression
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class GenericsCallExpression extends Expression {
+class GenericsCallExpression implements Expression {
   arguments: Type[];
   type: Type;
 
@@ -124,8 +114,6 @@ class GenericsCallExpression extends Expression {
     public value: Expression,
     args: Type[]
   ) {
-    super();
-
     this.arguments = args;
 
     const genericsType = this.value.type;
@@ -163,14 +151,13 @@ class GenericsCallExpression extends Expression {
 }
 
 export
-class LiteralExpression extends Expression {
+class LiteralExpression implements Expression {
   type: Type;
 
   constructor(
     public range: SourceRange,
     public value: any
   ) {
-    super();
     const type = (() => {
       switch (typeof value) {
         case "number":
@@ -188,18 +175,16 @@ class LiteralExpression extends Expression {
 }
 
 export
-class ReturnExpression extends Expression {
+class ReturnExpression implements Expression {
   type = this.expression.type;
   constructor(
     public range: SourceRange,
     public expression: Expression
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class MemberAccessExpression extends Expression {
+class MemberAccessExpression implements Expression {
   type: Type;
 
   constructor(
@@ -207,8 +192,6 @@ class MemberAccessExpression extends Expression {
     public object: Expression,
     public member: Identifier
   ) {
-    super();
-
     const objectType = object.type;
 
     if (!objectType.getMember(member.name)) {
@@ -222,7 +205,7 @@ class MemberAccessExpression extends Expression {
 }
 
 export
-class OperatorAccessExpression extends Expression {
+class OperatorAccessExpression implements Expression {
   operator: Operator;
   type: Type;
 
@@ -232,8 +215,6 @@ class OperatorAccessExpression extends Expression {
     operatorName: Identifier,
     arity: number
   ) {
-    super();
-
     const objectType = object.type;
     if (arity === 1) {
       this.operator = objectType.getUnaryOperators().get(operatorName.name);
@@ -261,7 +242,7 @@ function blockType(block: Expression[]) {
 }
 
 export
-class IfExpression extends Expression {
+class IfExpression implements Expression {
   type: Type;
 
   constructor(
@@ -272,28 +253,23 @@ class IfExpression extends Expression {
     public ifFalse: Expression[],
     public tempVarName: string
   ) {
-    super();
     this.type = new UnionType([blockType(ifTrue), blockType(ifFalse)], environment, range);
   }
 }
 
 export
-class EmptyExpression extends Expression {
+class EmptyExpression implements Expression {
   constructor(
     public range: SourceRange,
     public type: Type
-  ) {
-    super();
-  }
+  ) {}
 }
 
 export
-class DeclarationExpression extends Expression {
+class DeclarationExpression implements Expression {
   constructor(
     public range: SourceRange,
     public name: Identifier,
     public type: Type
-  ) {
-    super();
-  }
+  ) {}
 }

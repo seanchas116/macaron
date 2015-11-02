@@ -11,15 +11,13 @@ import SourceRange from "../../common/SourceRange";
 import CompilationError from "../../common/CompilationError";
 
 export default
-class InterfaceExpression extends TypeExpression {
+class InterfaceExpression implements TypeExpression {
   type: MetaType;
   members: ExpressionThunk[] = [];
   superTypes: Type[];
   selfType: InterfaceType;
 
   constructor(public range: SourceRange, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
-    super();
-
     let superTypes = this.superTypes = superExpressions.map(superExpr => {
       const superValueType = superExpr.type;
       if (superValueType instanceof MetaType) {

@@ -8,12 +8,10 @@ function returnType(expressions: Expression[]) {
 }
 
 export default
-class FunctionBodyExpression extends Expression {
+class FunctionBodyExpression implements Expression {
   type = returnType(this.expressions);
   constructor(
     public range: SourceRange,
     public expressions: Expression[]
-  ) {
-    super();
-  }
+  ) {}
 }

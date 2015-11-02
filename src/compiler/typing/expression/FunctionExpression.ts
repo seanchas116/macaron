@@ -10,14 +10,12 @@ interface NameType {
 }
 
 export default
-class FunctionExpression extends Expression {
+class FunctionExpression implements Expression {
   constructor(
     public range: SourceRange,
     public name: Identifier,
     public type: Type,
     public parameters: Identifier[],
     public body: FunctionBodyExpression
-  ) {
-    super();
-  }
+  ) {}
 }

@@ -88,9 +88,6 @@ class CodeEmitter {
     else if (expr instanceof EmptyExpression) {
       return  "";
     }
-    else if (expr instanceof TypeExpression) {
-      return  "";
-    }
     else if (expr instanceof GenericsExpression) {
       return this.emitExpression(expr.expression);
     }
@@ -98,7 +95,7 @@ class CodeEmitter {
       return this.emitExpression(expr.value);
     }
     else {
-      throw new Error(`Not supported expression: ${expr.constructor.name}`);
+      return "";
     }
   }
 
