@@ -1,5 +1,4 @@
-import {
-  ExpressionAST,
+import AST, {
   FunctionCallAST
 } from "../AST";
 
@@ -10,7 +9,7 @@ import {parseValue} from "./value";
 import {parsePostfixWithoutFunctionCall} from "./postfix";
 
 export
-var parseNew: Parser<ExpressionAST> = lazy(() =>
+var parseNew: Parser<AST> = lazy(() =>
   choose(
     keyword("new").thenTake(
       sequence(

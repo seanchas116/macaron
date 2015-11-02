@@ -1,4 +1,3 @@
-import {ExpressionAST} from "../parser/AST";
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
 import {SyntaxError} from "./Parser";

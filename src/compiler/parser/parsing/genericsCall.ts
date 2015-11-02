@@ -1,5 +1,4 @@
-import {
-  ExpressionAST,
+import AST, {
   GenericsCallAST,
 } from "../AST";
 
@@ -13,8 +12,8 @@ var parseGenericsArgumentList = lazy(() =>
 );
 
 export
-var parseGenericsCall: Parser<(value: ExpressionAST) => ExpressionAST> = lazy(() =>
+var parseGenericsCall: Parser<(value: AST) => AST> = lazy(() =>
   parseGenericsArgumentList.map(args =>
-    (value: ExpressionAST) => new GenericsCallAST(value.range, value, args)
+    (value: AST) => new GenericsCallAST(value.range, value, args)
   )
 );

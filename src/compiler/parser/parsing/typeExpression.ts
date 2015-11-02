@@ -1,7 +1,3 @@
-import {
-  ExpressionAST,
-} from "../AST";
-
 import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword} from "./common";
 import {typeBinaryOperators} from "../operators";

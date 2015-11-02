@@ -1,5 +1,4 @@
-import {
-  ExpressionAST,
+import AST, {
   AssignmentAST,
   NewVariableAST
 } from "../AST";
@@ -18,7 +17,7 @@ var parseAssisgnable = lazy(() =>
 );
 
 export
-var parseNewVariable: Parser<ExpressionAST> = lazy(() =>
+var parseNewVariable: Parser<AST> = lazy(() =>
   choose(
     sequence(
       choose(keyword("let"), keyword("var")),
@@ -33,7 +32,7 @@ var parseNewVariable: Parser<ExpressionAST> = lazy(() =>
 );
 
 export
-var parseAssignment: Parser<ExpressionAST> = lazy(() =>
+var parseAssignment: Parser<AST> = lazy(() =>
   choose(
     sequence(
       parseAssisgnable,

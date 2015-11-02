@@ -1,5 +1,4 @@
 import {
-  ExpressionAST,
   IdentifierAST,
 } from "../AST";
 

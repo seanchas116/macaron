@@ -1,6 +1,4 @@
-import {
-  ExpressionAST,
-} from "../AST";
+import AST from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword, separated} from "./common";
@@ -10,7 +8,7 @@ import {parseGenericsCall} from "./genericsCall";
 import {parseMemberAccess} from "./memberAccess";
 
 export
-function parsePostfixWith(subParser: Parser<ExpressionAST>, postfixParsers: Parser<(value: ExpressionAST) => ExpressionAST>[]) {
+function parsePostfixWith(subParser: Parser<AST>, postfixParsers: Parser<(value: AST) => AST>[]) {
   return sequence(
     subParser,
     choose(...postfixParsers).repeat()

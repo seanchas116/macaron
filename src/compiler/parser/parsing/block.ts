@@ -1,7 +1,3 @@
-import {
-  ExpressionAST,
-} from "../AST";
-
 import Parser, {choose, sequence, lazy} from "../Parser";
 import {_, __, ___, keyword, separated} from "./common";
 import {parseExpression} from "./expression";

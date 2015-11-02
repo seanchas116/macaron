@@ -1,5 +1,4 @@
-import {
-  ExpressionAST,
+import AST, {
   NewVariableAST,
   AssignmentAST,
   UnaryAST,
@@ -75,7 +74,7 @@ class Evaluator {
     return this.context.environment;
   }
 
-  evaluateExpressions(asts: ExpressionAST[]) {
+  evaluateExpressions(asts: AST[]) {
     const expressions: ExpressionThunk[] = [];
     const errors: ErrorInfo[] = [];
 
@@ -100,7 +99,7 @@ class Evaluator {
     return expressions;
   }
 
-  private evaluateImpl(ast: ExpressionAST): Expression|ExpressionThunk {
+  private evaluateImpl(ast: AST): Expression|ExpressionThunk {
     if (ast instanceof NewVariableAST) {
       return this.evaluateNewVariable(ast);
     } else if (ast instanceof AssignmentAST) {
@@ -147,7 +146,7 @@ class Evaluator {
     }
   }
 
-  evaluate(ast: ExpressionAST) {
+  evaluate(ast: AST) {
     return ExpressionThunk.resolve(this.evaluateImpl(ast));
   }
 
@@ -349,7 +348,7 @@ class Evaluator {
     return thunk;
   }
 
-  evaluateDeclarationType(selfType: Type, ast: ExpressionAST) {
+  evaluateDeclarationType(selfType: Type, ast: AST) {
     if (ast instanceof FunctionAST) {
       return this.evaluateMethodDeclarationType(selfType, ast);
     } else {
@@ -407,7 +406,7 @@ class Evaluator {
     return new TypeAliasExpression(ast.range, ast.left, typeExpr);
   }
 
-  evaluateType(ast: ExpressionAST): TypeExpression {
+  evaluateType(ast: AST): TypeExpression {
     if (ast instanceof IdentifierAST) {
       return this.evaluateTypeIdentifier(ast);
     } else if (ast instanceof BinaryAST) {

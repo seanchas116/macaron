@@ -1,5 +1,4 @@
-import {
-  ExpressionAST,
+import AST, {
   ParameterAST,
   IdentifierAST,
   FunctionAST
