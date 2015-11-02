@@ -4,7 +4,7 @@ import {voidType} from "./nativeTypes";
 
 export default
 class Operator {
-  type = voidType();
+  type: Type = voidType();
 }
 
 export

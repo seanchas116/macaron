@@ -221,7 +221,7 @@ class Evaluator {
     return new MemberAccessExpression(ast.range, obj, ast.member)
   }
 
-  evaluateFunction(ast: FunctionAST, thisType = voidType()) {
+  evaluateFunction(ast: FunctionAST, thisType: Type = voidType()) {
     const funcThunk = this.evaluateFunctionGenerics(ast, thisType);
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(ast.range, () => {
@@ -237,13 +237,23 @@ class Evaluator {
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
       const subContext = this.context.newChild();
-      const params = ast.genericsParameters.map(p => new GenericsParameterType(p.name.name, this.evaluateType(p.type).type.metaType, this.environment));
+      const params = ast.genericsParameters.map(p =>
+        new GenericsParameterType(
+          p.name.name, this.evaluateType(p.type).type.metaType,
+          this.environment, p.range
+        )
+      );
       for (const [i, p] of params.entries()) {
         subContext.environment.addGenericsPlaceholder(p);
         subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
       }
       const funcThunk = new Evaluator(subContext).evaluateFunctionMain(ast, thisType);
-      const typeThunk = funcThunk.type.map(template => new GenericsType(template.name, params, template, subContext.environment));
+      const typeThunk = funcThunk.type.map(template =>
+        new GenericsType(
+          template.name, params, template,
+          subContext.environment, ast.range
+        )
+      );
       return new ExpressionThunk(
         ast.range,
         () => new GenericsExpression(ast.range, typeThunk.get() as GenericsType, funcThunk.get()),
@@ -275,7 +285,10 @@ class Evaluator {
     });
 
     const createType = (returnType: Type) => {
-      return new FunctionType(thisType, paramTypes, [], returnType, subContext.environment, ast.range);
+      return new FunctionType(
+        thisType, paramTypes, [], returnType,
+        subContext.environment, ast.range
+      );
     }
 
     let typeThunk: TypeThunk;
@@ -416,7 +429,7 @@ class Evaluator {
     );
   }
 
-  evaluateTypeBinary(ast: BinaryAST) {
+  evaluateTypeBinary(ast: BinaryAST): TypeExpression {
     const left = this.evaluateType(ast.left);
     const right = this.evaluateType(ast.right);
 

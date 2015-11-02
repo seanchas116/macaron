@@ -1,10 +1,12 @@
 import Type from "../Type";
+import InterfaceType from "./InterfaceType";
 import Environment from "../Environment";
 import Member, {Constness} from "../Member";
+import Expression from "../Expression";
 import SourceRange from "../../common/SourceRange";
 
 export default
-class TupleType extends Type {
+class TupleType extends InterfaceType {
   constructor(public types: Type[], env: Environment, range: SourceRange) {
     // TODO: inherit Array
     super("", [], env, range);

@@ -1,10 +1,16 @@
 import Type, {Assignability} from "../Type";
+import InterfaceType from "./InterfaceType";
 import Environment from "../Environment";
+import SourceRange from "../../common/SourceRange";
 
 export default
-class ConstValueType extends Type {
-  constructor(public type: Type, public constValue: any, env: Environment) {
-    super(`[${constValue}]`, [type], env);
+class ConstValueType extends InterfaceType {
+  constructor(
+    public type: Type,
+    public constValue: any,
+    env: Environment, range: SourceRange
+  ) {
+    super(`[${constValue}]`, [type], env, range);
   }
 
   isAssignableUncached(other: Type, reasons: string[]): boolean {
@@ -23,6 +29,11 @@ class ConstValueType extends Type {
   }
 
   mapTypes(mapper: (type: Type) => Type) {
-    return new ConstValueType(mapper(this.type), this.constValue, this.environment);
+    return new ConstValueType(
+      mapper(this.type),
+      this.constValue,
+      this.environment,
+      this.range
+    );
   }
 }

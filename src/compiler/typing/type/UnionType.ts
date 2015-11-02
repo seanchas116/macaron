@@ -11,10 +11,12 @@ import {intersection} from "../../util/set";
 export default
 class UnionType extends Type {
   types: Type[];
+  private members: Map<string, Member>;
+  private callSignatures: CallSignature[];
 
   // TODO: memoize
   constructor(types: Type[], env: Environment, range: SourceRange) {
-    super("", [], env, range);
+    super("", env, range);
 
     if (types.length === 0) {
       throw new Error("cannot create union with no type");
@@ -35,8 +37,8 @@ class UnionType extends Type {
     types = this.types = Array.from(typeSet);
     this.name = types.join(" | ");
 
-    this.selfMembers = buildMembers(env, this.range, this.types);
-    this.callSignatures = buildCallSignatures(env, this.range, this.types);
+    this.members = buildMembers(env, range, this.types);
+    this.callSignatures = buildCallSignatures(env, range, this.types);
   }
 
   isAssignableUncached(other: Type, reasons: string[]): boolean {
@@ -47,6 +49,16 @@ class UnionType extends Type {
     }
     reasons.unshift(`Type '${other}' is not one of '${this}'`);
     return false;
+  }
+
+  getMembers() {
+    return this.members;
+  }
+  getMember(name: string) {
+    return this.members.get(name);
+  }
+  getCallSignatures() {
+    return this.callSignatures;
   }
 
   mapTypes(mapper: (type: Type) => Type) {
@@ -75,11 +87,14 @@ function buildMembers(env: Environment, range: SourceRange, types: Type[]) {
 
 function buildCallSignatures(env: Environment, range: SourceRange, types: Type[]) {
   return types
-    .map(t => t.callSignatures)
+    .map(t => t.getCallSignatures())
     .reduce((a, b) => unionCallSignatures(env, range, a, b));
 }
 
-function unionCallSignatures(env: Environment, range: SourceRange, signatures1: CallSignature[], signatures2: CallSignature[]) {
+function unionCallSignatures(
+  env: Environment, range: SourceRange,
+  signatures1: CallSignature[], signatures2: CallSignature[]
+) {
   // ((Foo, Bar), (Bar, Foo)) & ((Hoge, Piyo), (Piyo, Hoge))
   // ->
   // (Foo, Bar) & (Hoge, Piyo), (Foo, Bar) & (Piyo, Hoge), ...

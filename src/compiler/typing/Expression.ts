@@ -73,7 +73,7 @@ class FunctionCallExpression extends Expression {
     this.function = func;
     this.arguments = args;
 
-    let selfType = voidType();
+    let selfType: Type = voidType();
     let hasSelf = false;
     if (!isNewCall) {
       if (func instanceof MemberAccessExpression) {
@@ -87,7 +87,7 @@ class FunctionCallExpression extends Expression {
     }
 
     const funcType = func.type;
-    const sigs = isNewCall ? funcType.newSignatures : funcType.callSignatures;
+    const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
     const argTypes = args.map(a => a.type);
     const reasons: string[] = [];
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call

@@ -1,12 +1,19 @@
 import Type from "../Type";
+import InterfaceType from "./InterfaceType";
 import CallSignature from "../CallSignature";
 import Environment from "../Environment";
 import SourceRange from "../../common/SourceRange";
 import {voidType} from "../nativeTypes";
 
 export default
-class FunctionType extends Type {
-  constructor(public selfType: Type, public params: Type[], public optionalParams: Type[], public returnType: Type, env: Environment, range: SourceRange) {
+class FunctionType extends InterfaceType {
+  constructor(
+    public selfType: Type,
+    public params: Type[],
+    public optionalParams: Type[],
+    public returnType: Type,
+    env: Environment, range: SourceRange
+  ) {
     // TODO: inherit Function type
     super("", [], env, range);
 

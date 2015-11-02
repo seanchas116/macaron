@@ -1,14 +1,17 @@
 import Type from "../Type";
 import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
-import SourceRange from "../../common/SourceRange";
 import CompilationError from "../../common/CompilationError";
 import Member, {Constness} from "../Member";
 import Environment from "../Environment";
+import SourceRange from "../../common/SourceRange";
 import TypeThunk from "../thunk/TypeThunk";
 import {union} from "../../util/set";
 
-function intersectionMembers(environment: Environment, range: SourceRange, members1: Map<string, Member>, members2: Map<string, Member>) {
+function intersectionMembers(
+  environment: Environment, range: SourceRange,
+  members1: Map<string, Member>, members2: Map<string, Member>
+) {
   const ret = new Map<string, Member>();
   const names = union(new Set(members1.keys()), new Set(members2.keys()));
 
@@ -49,10 +52,12 @@ function intersectionMembers(environment: Environment, range: SourceRange, membe
 export default
 class IntersectionType extends Type {
   types: Type[];
+  private members: Map<string, Member>;
+  private callSignatures: CallSignature[];
 
   // TODO: memoize
   constructor(types: Type[], env: Environment, range: SourceRange) {
-    super("", [], env, range);
+    super("", env, range);
     const typeSet = new Set();
 
     for (const type of types) {
@@ -68,11 +73,21 @@ class IntersectionType extends Type {
     types = this.types = Array.from(typeSet);
     this.name = types.join(" & ");
 
-    this.selfMembers = types.reduce((members, type) => {
+    this.members = types.reduce((members, type) => {
       return intersectionMembers(env, range, members, type.getMembers());
     }, new Map<string, Member>());
 
-    this.callSignatures = types.reduce((sigs, type) => sigs.concat(type.callSignatures), []);
+    this.callSignatures = types.reduce((sigs, type) => sigs.concat(type.getCallSignatures()), []);
+  }
+
+  getMembers() {
+    return this.members;
+  }
+  getMember(name: string) {
+    return this.members.get(name);
+  }
+  getCallSignatures() {
+    return this.callSignatures;
   }
 
   mapTypes(mapper: (type: Type) => Type) {

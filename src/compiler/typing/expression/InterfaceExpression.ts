@@ -2,6 +2,7 @@ import Expression from "../Expression";
 import TypeExpression from "../TypeExpression";
 import ExpressionThunk from "../thunk/ExpressionThunk";
 import Type from "../Type";
+import InterfaceType from "../type/InterfaceType";
 import MetaType from "../type/MetaType";
 import Identifier from "../Identifier";
 import Environment from "../Environment";
@@ -14,7 +15,7 @@ class InterfaceExpression extends TypeExpression {
   type: MetaType;
   members: ExpressionThunk[] = [];
   superTypes: Type[];
-  selfType: Type;
+  selfType: InterfaceType;
 
   constructor(public range: SourceRange, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
     super();
@@ -28,7 +29,7 @@ class InterfaceExpression extends TypeExpression {
       }
     });
 
-    const type = this.selfType = new Type(name.name, superTypes, env, range, this);
+    const type = this.selfType = new InterfaceType(name.name, superTypes, env, range);
     this.type = MetaType.typeOnly(type);
   }
 

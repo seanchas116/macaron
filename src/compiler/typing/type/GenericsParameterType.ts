@@ -1,10 +1,17 @@
 import Type from "../Type";
+import InterfaceType from "./InterfaceType";
 import Environment from "../Environment";
+import SourceRange from "../../common/SourceRange";
 
 export default
-class GenericsParameterType extends Type {
-  constructor(name: string, public constraint: Type, env: Environment) {
-    super(name, [constraint], env);
+class GenericsParameterType extends InterfaceType {
+  constructor(
+    name: string,
+    public constraint: Type,
+    env: Environment,
+    range: SourceRange
+  ) {
+    super(name, [constraint], env, range);
   }
 
   isAssignable(other: Type): boolean {
