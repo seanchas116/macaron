@@ -15,6 +15,8 @@ interface Variable {
 
 export default
 class Environment {
+  private genericsPlaceholders = new Set<GenericsParameterType>();
+
   constructor(public parent: Environment = null) {
   }
 
@@ -61,8 +63,11 @@ class Environment {
       return this.getOwnGenericsPlaceholders();
     }
   }
-  getOwnGenericsPlaceholders(): Set<GenericsParameterType> {
-    throw new Error("not implemented");
+  getOwnGenericsPlaceholders() {
+    return this.genericsPlaceholders;
+  }
+  addGenericsPlaceholder(placeholder: GenericsParameterType) {
+    this.genericsPlaceholders.add(placeholder);
   }
 
   checkGetVariable(name: Identifier) {
@@ -124,7 +129,6 @@ class Environment {
 export
 class BlockEnvironment extends Environment {
   private variables = new Map<string, Member>();
-  private genericsPlaceholders = new Set<GenericsParameterType>();
 
   addVariable(name: string, variable: Member) {
     this.variables.set(name, variable);
@@ -134,12 +138,6 @@ class BlockEnvironment extends Environment {
     if (member) {
       return {member, needsThis: false};
     }
-  }
-  getOwnGenericsPlaceholders() {
-    return this.genericsPlaceholders;
-  }
-  addGenericsPlaceholder(placeholder: GenericsParameterType) {
-    this.genericsPlaceholders.add(placeholder);
   }
 }
 
@@ -154,8 +152,5 @@ class ThisEnvironment extends Environment {
     if (member) {
       return {member, needsThis: true};
     }
-  }
-  getOwnGenericsPlaceholders() {
-    return new Set();
   }
 }
