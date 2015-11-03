@@ -57,21 +57,16 @@ import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
 import TypeThunk from "./thunk/TypeThunk";
 import {voidType} from "./defaultEnvironment";
+import Environment, {BlockEnvironment, ThisEnvironment} from "./Environment";
 
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
 import ErrorInfo from "../common/ErrorInfo";
 
-import EvaluationContext from "./EvaluationContext";
-
 export default
 class Evaluator {
 
-  constructor(public context: EvaluationContext) {
-  }
-
-  get environment() {
-    return this.context.environment;
+  constructor(public environment: Environment) {
   }
 
   evaluateExpressions(asts: AST[]) {
@@ -170,8 +165,8 @@ class Evaluator {
         throw new Error(`not supported declaration: ${ast.declaration}`);
       }
     })();
-    this.context.addVariable(constness, ast.left, type);
-    this.context.assignVariable(ast.left, right.type, true);
+    this.environment.checkAddVariable(constness, ast.left, type);
+    this.environment.checkAssignVariable(ast.left, right.type, true);
     return new NewVariableExpression(ast.range, constness, ast.left, right.get());
   }
 
@@ -179,7 +174,7 @@ class Evaluator {
     const varName = ast.left.name;
     const right = this.evaluate(ast.right).get();
 
-    this.context.assignVariable(ast.left, right.type);
+    this.environment.checkAssignVariable(ast.left, right.type);
     return new AssignmentExpression(ast.range, ast.left, right);
   }
 
@@ -199,11 +194,11 @@ class Evaluator {
   }
 
   evaluateIdentifier(ast: IdentifierAST): Expression {
-    const {member, needsThis} = this.context.getVariable(ast);
+    const {member, needsThis} = this.environment.checkGetVariable(ast);
 
     if (needsThis) {
       const thisIdentifier = new Identifier("this", ast.range);
-      const {member: thisMember} = this.context.getVariable(thisIdentifier);
+      const {member: thisMember} = this.environment.checkGetVariable(thisIdentifier);
       const thisExpr = new IdentifierExpression(ast.range, thisIdentifier, thisMember.type.get());
       return new MemberAccessExpression(ast.range, thisExpr, ast);
     } else {
@@ -226,7 +221,7 @@ class Evaluator {
       const thunk = new ExpressionThunk(ast.range, () => {
         return new NewVariableExpression(ast.range, Constness.Constant, ast.name, funcThunk.get());
       });
-      this.context.addVariable(Constness.Constant, ast.name, funcThunk.type);
+      this.environment.checkAddVariable(Constness.Constant, ast.name, funcThunk.type);
       return thunk;
     } else {
       return funcThunk;
@@ -235,7 +230,7 @@ class Evaluator {
 
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
-      const subContext = this.context.newChild();
+      const subEnv = new BlockEnvironment(this.environment);
       const params = ast.genericsParameters.map(p =>
         new GenericsParameterType(
           p.name.name, this.evaluateType(p.type).type.metaType,
@@ -243,14 +238,14 @@ class Evaluator {
         )
       );
       for (const [i, p] of params.entries()) {
-        subContext.environment.addGenericsPlaceholder(p);
-        subContext.addVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
+        subEnv.addGenericsPlaceholder(p);
+        subEnv.checkAddVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
       }
-      const funcThunk = new Evaluator(subContext).evaluateFunctionMain(ast, thisType);
+      const funcThunk = new Evaluator(subEnv).evaluateFunctionMain(ast, thisType);
       const typeThunk = funcThunk.type.map(template =>
         new GenericsType(
           template.name, params, template,
-          subContext.environment, ast.range
+          subEnv, ast.range
         )
       );
       return new ExpressionThunk(
@@ -267,16 +262,16 @@ class Evaluator {
     const {range} = ast;
 
     const paramTypes: Type[] = [];
-    const subContext = this.context.newChild(thisType);
-    const subEvaluator = new Evaluator(subContext);
+    const subEnv = new BlockEnvironment(new ThisEnvironment(this.environment, thisType));
+    const subEvaluator = new Evaluator(subEnv);
 
     for (const {name, type: typeExpr} of ast.parameters) {
       const type = subEvaluator.evaluateType(typeExpr).type.metaType;
-      subContext.addVariable(Constness.Constant, name, type);
+      subEnv.checkAddVariable(Constness.Constant, name, type);
       paramTypes.push(type);
     }
 
-    subContext.addVariable(Constness.Constant, new Identifier("this"), thisType);
+    subEnv.checkAddVariable(Constness.Constant, new Identifier("this"), thisType);
 
     const bodyThunk = new ExpressionThunk(range, () => {
       const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
@@ -286,7 +281,7 @@ class Evaluator {
     const createType = (returnType: Type) => {
       return new FunctionType(
         thisType, paramTypes, [], returnType,
-        subContext.environment, ast.range
+        subEnv, ast.range
       );
     }
 
@@ -344,7 +339,7 @@ class Evaluator {
       return expr;
     });
 
-    this.context.addVariable(Constness.Constant, ast.name, thunk.type);
+    this.environment.checkAddVariable(Constness.Constant, ast.name, thunk.type);
     return thunk;
   }
 
@@ -358,12 +353,12 @@ class Evaluator {
 
   evaluateMethodDeclarationType(selfType: Type, ast: FunctionAST) {
     const paramTypes: Type[] = [];
-    const subContext = this.context.newChild();
-    const subEvaluator = new Evaluator(subContext);
+    const subEnv = new BlockEnvironment(this.environment);
+    const subEvaluator = new Evaluator(subEnv);
 
     for (const {name, type: typeExpr} of ast.parameters) {
       const type = subEvaluator.evaluateType(typeExpr).type.metaType;
-      subContext.addVariable(Constness.Constant, name, type);
+      subEnv.checkAddVariable(Constness.Constant, name, type);
       paramTypes.push(type);
     }
 
@@ -382,18 +377,18 @@ class Evaluator {
         new ExpressionThunk(memberAST.range, () => this.evaluateDeclarationType(expr.type, memberAST)));
     }
 
-    this.context.addVariable(Constness.Constant, ast.name, expr.type);
+    this.environment.checkAddVariable(Constness.Constant, ast.name, expr.type);
     return expr;
   }
 
   evaluateIf(ast: IfAST) {
-    const tempVarName = this.context.environment.addTempVariable("__macaron$ifTemp");
+    const tempVarName = this.environment.addTempVariable("__macaron$ifTemp");
 
-    const ifContext = this.context.newChild();
-    const cond = new Evaluator(ifContext).evaluate(ast.condition).get();
+    const ifEnv = new BlockEnvironment(this.environment);
+    const cond = new Evaluator(ifEnv).evaluate(ast.condition).get();
 
-    const ifTrue = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifTrue).map(e => e.get());
-    const ifFalse = new Evaluator(ifContext.newChild()).evaluateExpressions(ast.ifFalse).map(e => e.get());
+    const ifTrue = new Evaluator(new BlockEnvironment(ifEnv)).evaluateExpressions(ast.ifTrue).map(e => e.get());
+    const ifFalse = new Evaluator(new BlockEnvironment(ifEnv)).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
     return new IfExpression(ast.range, this.environment, cond, ifTrue, ifFalse, tempVarName);
   }
@@ -401,7 +396,7 @@ class Evaluator {
   evaluateTypeAlias(ast: TypeAliasAST) {
     const typeExpr = this.evaluateType(ast.right);
 
-    this.context.addVariable(Constness.Constant, ast.left, typeExpr.type);
+    this.environment.checkAddVariable(Constness.Constant, ast.left, typeExpr.type);
 
     return new TypeAliasExpression(ast.range, ast.left, typeExpr);
   }
@@ -417,7 +412,7 @@ class Evaluator {
   }
 
   evaluateTypeIdentifier(ast: IdentifierAST) {
-    const {member} = this.context.getVariable(ast);
+    const {member} = this.environment.checkGetVariable(ast);
     const type = member.type.get();
     if (type instanceof MetaType) {
       return new TypeIdentifierExpression(ast.range, ast, type.metaType);

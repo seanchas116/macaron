@@ -51,7 +51,6 @@
         "./src/compiler/typing/CallSignature.ts",
         "./src/compiler/typing/defaultEnvironment.ts",
         "./src/compiler/typing/Environment.ts",
-        "./src/compiler/typing/EvaluationContext.ts",
         "./src/compiler/typing/Evaluator.ts",
         "./src/compiler/typing/Expression.ts",
         "./src/compiler/typing/expression/ClassExpression.ts",

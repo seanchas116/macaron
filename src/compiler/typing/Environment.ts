@@ -2,6 +2,8 @@ import Type from "./Type";
 import GenericsParameterType from "./type/GenericsParameterType";
 import {voidType} from "./defaultEnvironment";
 import Member, {Constness} from "./Member";
+import TypeThunk from "./thunk/TypeThunk";
+import Identifier from "./Identifier";
 import CompilationError from "../common/CompilationError";
 import {union} from "../util/set";
 
@@ -61,6 +63,61 @@ class Environment {
   }
   getOwnGenericsPlaceholders(): Set<GenericsParameterType> {
     throw new Error("not implemented");
+  }
+
+  checkGetVariable(name: Identifier) {
+    const variable = this.getVariable(name.name);
+    if (!variable) {
+      throw CompilationError.typeError(
+        name.range,
+        `Variable '${name.name}' not found`
+      );
+    }
+    return variable;
+  }
+
+  checkAssignVariable(name: Identifier, typeOrOrThunk: Type|TypeThunk, firstAssign = false) {
+    const type = TypeThunk.resolve(typeOrOrThunk);
+    const {member} = this.checkGetVariable(name);
+
+    if (member.constness === Constness.Constant && !firstAssign) {
+      throw CompilationError.typeError(
+        name.range,
+        `Variable '${name.name}' is constant and cannot be reassigned`
+      );
+    }
+    if (member.constness === Constness.Builtin) {
+      throw CompilationError.typeError(
+        name.range,
+        `Variable '${name.name}' is builtin and cannot be reassigned`
+      );
+    }
+    const reasons: string[] = [];
+    const assignable = member.settingType.get().isAssignable(type.get(), reasons);
+    if (!assignable) {
+      throw CompilationError.typeError(
+        name.range,
+        `Cannot assign '${type.get()}' to type '${member.type.get()}'`,
+        ...reasons
+      );
+    }
+  }
+
+  checkAddVariable(constness: Constness, name: Identifier, type: Type|TypeThunk) {
+    const variable = this.getVariable(name.name);
+    if (variable && variable.member.constness === Constness.Builtin) {
+      throw CompilationError.typeError(
+        name.range,
+        `Variable '${name.name}' is builtin and cannot be redefined`
+      );
+    }
+    if (this.getOwnVariable(name.name)) {
+      throw CompilationError.typeError(
+        name.range,
+        `Variable '${name.name}' already defined`
+      );
+    }
+    this.addVariable(name.name, new Member(constness, type));
   }
 }
 
