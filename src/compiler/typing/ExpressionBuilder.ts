@@ -21,6 +21,8 @@ import AssignableExpression, {IdentifierAssignbleExpression} from "./AssignableE
 import Type from "./Type";
 import TypeThunk from "./thunk/TypeThunk";
 import Member, {Constness} from "./Member";
+import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
+import CompilationError from "../common/CompilationError";
 
 export default
 class ExpressionBuilder {
@@ -60,11 +62,40 @@ class ExpressionBuilder {
 
   buildUnary(range: SourceRange, operator: Identifier, operand: Expression) {
     const operatorAccess = new OperatorAccessExpression(range, operand, operator, 1);
-    return new FunctionCallExpression(range, operatorAccess, []);
+    return this.buildFunctionCall(range, operatorAccess, [], false);
   }
 
   buildBinary(range: SourceRange, operator: Identifier, left: Expression, right: Expression) {
     const operatorAccess = new OperatorAccessExpression(range, left, operator, 2);
-    return new FunctionCallExpression(range, operatorAccess, [right]);
+    return this.buildFunctionCall(range, operatorAccess, [right], false);
+  }
+
+  buildFunctionCall(range: SourceRange, func: Expression, args: Expression[], isNewCall: boolean) {
+    let selfType: Type = voidType;
+    let hasSelf = false;
+    if (!isNewCall) {
+      if (func instanceof MemberAccessExpression) {
+        selfType = func.object.type;
+        hasSelf = true;
+      }
+      if (func instanceof OperatorAccessExpression) {
+        selfType = func.object.type;
+        hasSelf = true;
+      }
+    }
+
+    const funcType = func.type;
+    const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
+    const argTypes = args.map(a => a.type);
+    const reasons: string[] = [];
+    const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call
+    if (!sig) {
+      throw CompilationError.typeError(
+        range,
+        `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`,
+        ...reasons
+      );
+    }
+    return new FunctionCallExpression(range, func, args, isNewCall, sig.returnType);
   }
 }

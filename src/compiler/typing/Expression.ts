@@ -52,45 +52,16 @@ export
 class FunctionCallExpression implements Expression {
   function: Expression;
   arguments: Expression[];
-  isNewCall: boolean;
-  type: Type;
 
   constructor(
     public range: SourceRange,
     func: Expression,
     args: Expression[],
-    isNewCall = false
+    public isNewCall: boolean,
+    public type: Type
   ) {
-    this.isNewCall = isNewCall;
     this.function = func;
     this.arguments = args;
-
-    let selfType: Type = voidType;
-    let hasSelf = false;
-    if (!isNewCall) {
-      if (func instanceof MemberAccessExpression) {
-        selfType = func.object.type;
-        hasSelf = true;
-      }
-      if (func instanceof OperatorAccessExpression) {
-        selfType = func.object.type;
-        hasSelf = true;
-      }
-    }
-
-    const funcType = func.type;
-    const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
-    const argTypes = args.map(a => a.type);
-    const reasons: string[] = [];
-    const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call
-    if (!sig) {
-      throw CompilationError.typeError(
-        range,
-        `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`,
-        ...reasons
-      );
-    }
-    this.type = sig.returnType;
   }
 }
 

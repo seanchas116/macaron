@@ -298,7 +298,7 @@ class Evaluator {
   evaluateFunctionCall(ast: FunctionCallAST) {
     const func = this.evaluate(ast.function).get();
     const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
-    return new FunctionCallExpression(ast.range, func, args, ast.isNewCall);
+    return this.builder.buildFunctionCall(ast.range, func, args, ast.isNewCall);
   }
 
   evaluateGenericsCall(ast: GenericsCallAST) {
