@@ -1,4 +1,4 @@
-import {BlockEnvironment} from "./Environment";
+import Environment from "./Environment";
 import Member, {Constness} from "./Member";
 import Type from "./Type";
 import InterfaceType from "./type/InterfaceType";
@@ -10,7 +10,7 @@ import SourceRange from "../common/SourceRange";
 
 const emptyRange = SourceRange.empty();
 
-export const defaultEnvironment = new BlockEnvironment();
+export const defaultEnvironment = new Environment();
 
 export const invalidType = new InterfaceType("invalid", [], defaultEnvironment, emptyRange);
 export const voidType = new InterfaceType("void", [], defaultEnvironment, emptyRange);

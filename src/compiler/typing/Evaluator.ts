@@ -57,7 +57,7 @@ import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
 import TypeThunk from "./thunk/TypeThunk";
 import {voidType} from "./defaultEnvironment";
-import Environment, {BlockEnvironment, ThisEnvironment} from "./Environment";
+import Environment from "./Environment";
 
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
@@ -230,7 +230,7 @@ class Evaluator {
 
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
-      const subEnv = new BlockEnvironment(this.environment);
+      const subEnv = this.environment.newChild();
       const params = ast.genericsParameters.map(p =>
         new GenericsParameterType(
           p.name.name, this.evaluateType(p.type).type.metaType,
@@ -262,7 +262,7 @@ class Evaluator {
     const {range} = ast;
 
     const paramTypes: Type[] = [];
-    const subEnv = new BlockEnvironment(new ThisEnvironment(this.environment, thisType));
+    const subEnv = this.environment.newChild(thisType);
     const subEvaluator = new Evaluator(subEnv);
 
     for (const {name, type: typeExpr} of ast.parameters) {
@@ -353,7 +353,7 @@ class Evaluator {
 
   evaluateMethodDeclarationType(selfType: Type, ast: FunctionAST) {
     const paramTypes: Type[] = [];
-    const subEnv = new BlockEnvironment(this.environment);
+    const subEnv = this.environment.newChild();
     const subEvaluator = new Evaluator(subEnv);
 
     for (const {name, type: typeExpr} of ast.parameters) {
@@ -384,11 +384,11 @@ class Evaluator {
   evaluateIf(ast: IfAST) {
     const tempVarName = this.environment.addTempVariable("__macaron$ifTemp");
 
-    const ifEnv = new BlockEnvironment(this.environment);
+    const ifEnv = this.environment.newChild();
     const cond = new Evaluator(ifEnv).evaluate(ast.condition).get();
 
-    const ifTrue = new Evaluator(new BlockEnvironment(ifEnv)).evaluateExpressions(ast.ifTrue).map(e => e.get());
-    const ifFalse = new Evaluator(new BlockEnvironment(ifEnv)).evaluateExpressions(ast.ifFalse).map(e => e.get());
+    const ifTrue = new Evaluator(ifEnv.newChild()).evaluateExpressions(ast.ifTrue).map(e => e.get());
+    const ifFalse = new Evaluator(ifEnv.newChild()).evaluateExpressions(ast.ifFalse).map(e => e.get());
 
     return new IfExpression(ast.range, this.environment, cond, ifTrue, ifFalse, tempVarName);
   }
