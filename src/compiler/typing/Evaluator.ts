@@ -37,6 +37,10 @@ import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 import ClassExpression from "./expression/ClassExpression";
 import InterfaceExpression from "./expression/InterfaceExpression";
 
+import AssignableExpression, {
+  IdentifierAssignbleExpression
+} from "./AssignableExpression";
+
 import TypeExpression, {
   TypeUnionExpression,
   TypeIntersectionExpression,
@@ -58,6 +62,7 @@ import Member, {Constness} from "./Member";
 import TypeThunk from "./thunk/TypeThunk";
 import {voidType} from "./defaultEnvironment";
 import Environment from "./Environment";
+import ExpressionBuilder from "./ExpressionBuilder";
 
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
@@ -65,6 +70,7 @@ import ErrorInfo from "../common/ErrorInfo";
 
 export default
 class Evaluator {
+  builder = new ExpressionBuilder(this.environment);
 
   constructor(public environment: Environment) {
   }
@@ -146,14 +152,13 @@ class Evaluator {
   }
 
   evaluateNewVariable(ast: NewVariableAST) {
-    const varName = ast.left.name;
-    const right = this.evaluate(ast.right);
-    let type: TypeThunk;
-    if (ast.type) {
-      type = TypeThunk.resolve(this.evaluateType(ast.type).type.metaType);
-    } else {
-      type = right.type;
-    }
+    const left = new IdentifierAssignbleExpression(
+      ast.left.range,
+      ast.left.name,
+      ast.type && this.evaluateType(ast.type).type.metaType
+    );
+
+    const right = this.evaluate(ast.right).get();
 
     const constness = (() => {
       switch (ast.declaration) {
@@ -165,17 +170,18 @@ class Evaluator {
         throw new Error(`not supported declaration: ${ast.declaration}`);
       }
     })();
-    this.environment.checkAddVariable(constness, ast.left, type);
-    this.environment.checkAssignVariable(ast.left, right.type, true);
-    return new NewVariableExpression(ast.range, constness, ast.left, right.get());
+
+    return this.builder.buildNewVariable(ast.range, constness, left, right);
   }
 
   evaluateAssignment(ast: AssignmentAST) {
-    const varName = ast.left.name;
+    const left = new IdentifierAssignbleExpression(
+      ast.left.range,
+      ast.left.name,
+      null
+    );
     const right = this.evaluate(ast.right).get();
-
-    this.environment.checkAssignVariable(ast.left, right.type);
-    return new AssignmentExpression(ast.range, ast.left, right);
+    return this.builder.buildAssignment(ast.range, left, right);
   }
 
   evaluateUnary(ast: UnaryAST) {
@@ -194,16 +200,7 @@ class Evaluator {
   }
 
   evaluateIdentifier(ast: IdentifierAST): Expression {
-    const {member, needsThis} = this.environment.checkGetVariable(ast);
-
-    if (needsThis) {
-      const thisIdentifier = new Identifier("this", ast.range);
-      const {member: thisMember} = this.environment.checkGetVariable(thisIdentifier);
-      const thisExpr = new IdentifierExpression(ast.range, thisIdentifier, thisMember.type.get());
-      return new MemberAccessExpression(ast.range, thisExpr, ast);
-    } else {
-      return new IdentifierExpression(ast.range, ast, member.type.get());
-    }
+    return this.builder.buildIdentifier(ast.range, ast);
   }
 
   evalauteLiteral(ast: LiteralAST) {

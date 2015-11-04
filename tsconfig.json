@@ -57,6 +57,7 @@
         "./src/compiler/typing/expression/FunctionBodyExpression.ts",
         "./src/compiler/typing/expression/FunctionExpression.ts",
         "./src/compiler/typing/expression/InterfaceExpression.ts",
+        "./src/compiler/typing/ExpressionBuilder.ts",
         "./src/compiler/typing/Identifier.ts",
         "./src/compiler/typing/Member.ts",
         "./src/compiler/typing/Operator.ts",
