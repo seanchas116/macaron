@@ -186,17 +186,13 @@ class Evaluator {
 
   evaluateUnary(ast: UnaryAST) {
     const operand = this.evaluate(ast.expression).get();
-
-    const operatorAccess = new OperatorAccessExpression(ast.range, operand, ast.operator, 1);
-    return new FunctionCallExpression(ast.range, operatorAccess, []);
+    return this.builder.buildUnary(ast.range, ast.operator, operand);
   }
 
   evaluateBinary(ast: BinaryAST) {
     const left = this.evaluate(ast.left).get();
     const right = this.evaluate(ast.right).get();
-
-    const operatorAccess = new OperatorAccessExpression(ast.range, left, ast.operator, 2);
-    return new FunctionCallExpression(ast.range, operatorAccess, [right]);
+    return this.builder.buildBinary(ast.range, ast.operator, left, right);
   }
 
   evaluateIdentifier(ast: IdentifierAST): Expression {

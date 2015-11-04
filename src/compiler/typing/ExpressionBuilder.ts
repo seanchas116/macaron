@@ -57,4 +57,14 @@ class ExpressionBuilder {
     this.environment.checkAssignVariable(left, right.type);
     return new AssignmentExpression(range, left, right);
   }
+
+  buildUnary(range: SourceRange, operator: Identifier, operand: Expression) {
+    const operatorAccess = new OperatorAccessExpression(range, operand, operator, 1);
+    return new FunctionCallExpression(range, operatorAccess, []);
+  }
+
+  buildBinary(range: SourceRange, operator: Identifier, left: Expression, right: Expression) {
+    const operatorAccess = new OperatorAccessExpression(range, left, operator, 2);
+    return new FunctionCallExpression(range, operatorAccess, [right]);
+  }
 }
