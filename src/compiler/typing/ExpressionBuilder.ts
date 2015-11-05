@@ -98,4 +98,12 @@ class ExpressionBuilder {
     }
     return new FunctionCallExpression(range, func, args, isNewCall, sig.returnType);
   }
+
+  buildLiteral(range: SourceRange, value: any) {
+    return new LiteralExpression(range, value);
+  }
+
+  buildMemberAccess(range: SourceRange, object: Expression, member: Identifier) {
+    return new MemberAccessExpression(range, object, member);
+  }
 }

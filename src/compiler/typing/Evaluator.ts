@@ -200,12 +200,12 @@ class Evaluator {
   }
 
   evalauteLiteral(ast: LiteralAST) {
-    return new LiteralExpression(ast.range, ast.value);
+    return this.builder.buildLiteral(ast.range, ast.value);
   }
 
   evaluateMemberAccess(ast: MemberAccessAST) {
     const obj = this.evaluate(ast.object).get();
-    return new MemberAccessExpression(ast.range, obj, ast.member)
+    return this.builder.buildMemberAccess(ast.range, obj, ast.member);
   }
 
   evaluateFunction(ast: FunctionAST, thisType: Type = voidType) {
