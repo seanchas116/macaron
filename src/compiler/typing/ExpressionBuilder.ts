@@ -29,17 +29,6 @@ class ExpressionBuilder {
   constructor(public environment: Environment) {
   }
 
-  buildNewVariable(
-    range: SourceRange, constness: Constness,
-    left: IdentifierAssignbleExpression, right: Expression
-  ) {
-    const varName = left.name;
-    const type = left.type || right.type;
-    this.environment.checkAddVariable(constness, left, type);
-    this.environment.checkAssignVariable(left, right.type, true);
-    return new NewVariableExpression(range, constness, left, right);
-  }
-
   buildIdentifier(range: SourceRange, name: Identifier): Expression {
     const {member, needsThis} = this.environment.checkGetVariable(name);
 
@@ -58,6 +47,17 @@ class ExpressionBuilder {
 
     this.environment.checkAssignVariable(left, right.type);
     return new AssignmentExpression(range, left, right);
+  }
+
+  buildNewVariable(
+    range: SourceRange, constness: Constness,
+    left: IdentifierAssignbleExpression, right: Expression
+  ) {
+    const varName = left.name;
+    const type = left.type || right.type;
+    this.environment.checkAddVariable(constness, left, type);
+    this.environment.checkAssignVariable(left, right.type, true);
+    return new NewVariableExpression(range, constness, left, right);
   }
 
   buildUnary(range: SourceRange, operator: Identifier, operand: Expression) {
