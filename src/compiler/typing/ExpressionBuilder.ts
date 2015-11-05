@@ -106,4 +106,21 @@ class ExpressionBuilder {
   buildMemberAccess(range: SourceRange, object: Expression, member: Identifier) {
     return new MemberAccessExpression(range, object, member);
   }
+
+  buildIf(
+    range: SourceRange,
+    evalCondition: (env: Environment) => Expression,
+    evalIfTrue: (env: Environment) => Expression[],
+    evalIfFalse: (env: Environment) => Expression[]
+  ) {
+    const tempVarName = this.environment.addTempVariable("__macaron$ifTemp");
+
+    const ifEnv = this.environment.newChild();
+    const cond = evalCondition(ifEnv);
+
+    const ifTrue = evalIfTrue(ifEnv.newChild());
+    const ifFalse = evalIfFalse(ifEnv.newChild());
+
+    return new IfExpression(range, this.environment, cond, ifTrue, ifFalse, tempVarName);
+  }
 }

@@ -375,15 +375,11 @@ class Evaluator {
   }
 
   evaluateIf(ast: IfAST) {
-    const tempVarName = this.environment.addTempVariable("__macaron$ifTemp");
-
-    const ifEnv = this.environment.newChild();
-    const cond = new Evaluator(ifEnv).evaluate(ast.condition).get();
-
-    const ifTrue = new Evaluator(ifEnv.newChild()).evaluateExpressions(ast.ifTrue).map(e => e.get());
-    const ifFalse = new Evaluator(ifEnv.newChild()).evaluateExpressions(ast.ifFalse).map(e => e.get());
-
-    return new IfExpression(ast.range, this.environment, cond, ifTrue, ifFalse, tempVarName);
+    return this.builder.buildIf(ast.range,
+      (env) => new Evaluator(env).evaluate(ast.condition).get(),
+      (env) => new Evaluator(env).evaluateExpressions(ast.ifTrue).map(e => e.get()),
+      (env) => new Evaluator(env).evaluateExpressions(ast.ifFalse).map(e => e.get())
+    );
   }
 
   evaluateTypeAlias(ast: TypeAliasAST) {
