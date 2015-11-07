@@ -12,7 +12,11 @@ class ExpressionAST extends AST {
 }
 
 export
-class IdentifierAssignableAST extends ExpressionAST {
+class AssignableAST extends AST {
+}
+
+export
+class IdentifierAssignableAST extends AssignableAST {
   constructor(
     range: SourceRange,
     public name: IdentifierAST,
