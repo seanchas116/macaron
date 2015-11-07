@@ -134,7 +134,7 @@ class CodeEmitter {
 
   emitFunction(expr: FunctionExpression) {
     const params = expr.parameters
-      .map(p => p.name)
+      .map(p => this.emitAssignable(p))
       .join(", ");
 
     const body = this.emitFunctionBody(expr.body);
@@ -156,7 +156,7 @@ class CodeEmitter {
 
   emitClassMethod(expr: FunctionExpression) {
     const params = expr.parameters
-      .map(p => p.name)
+      .map(p => this.emitAssignable(p))
       .join(", ");
 
     const body = this.emitFunctionBody(expr.body);

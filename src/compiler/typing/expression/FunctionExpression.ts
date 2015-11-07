@@ -3,6 +3,7 @@ import Identifier from "../Identifier";
 import Type from "../Type";
 import FunctionBodyExpression from "./FunctionBodyExpression";
 import SourceRange from "../../common/SourceRange";
+import AssignableExpression from "../AssignableExpression";
 
 interface NameType {
   name: Identifier;
@@ -15,7 +16,7 @@ class FunctionExpression implements Expression {
     public range: SourceRange,
     public name: Identifier,
     public type: Type,
-    public parameters: Identifier[],
+    public parameters: AssignableExpression[],
     public body: FunctionBodyExpression
   ) {}
 }

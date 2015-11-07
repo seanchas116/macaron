@@ -306,7 +306,11 @@ class Evaluator {
     }
 
     return new ExpressionThunk(range, () => {
-      return new FunctionExpression(range, ast.name, typeThunk.get(), ast.parameters.map(p => p.name), <FunctionBodyExpression>bodyThunk.get());
+      return new FunctionExpression(
+        range, ast.name, typeThunk.get(),
+        ast.parameters.map(p => new IdentifierAssignableExpression(p.range, p.name, null)),
+        <FunctionBodyExpression>bodyThunk.get()
+      );
     }, typeThunk);
   }
 
