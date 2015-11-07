@@ -1,182 +1,221 @@
 import SourceRange from "../common/SourceRange";
 
-interface AST {
-  range: SourceRange;
-}
-export default AST;
-
-export
-class IdentifierAssignableAST implements AST {
+export default
+class AST {
   constructor(
-    public range: SourceRange,
-    public name: IdentifierAST,
-    public type: AST
+    public range: SourceRange
   ) {}
 }
 
 export
-class AssignmentAST implements AST {
+class ExpressionAST extends AST {
+}
+
+export
+class IdentifierAssignableAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
+    public name: IdentifierAST,
+    public type: AST
+  ) {
+    super(range);
+  }
+}
+
+export
+class AssignmentAST extends ExpressionAST {
+  constructor(
+    range: SourceRange,
     public left: IdentifierAST,
     public operator: OperatorAST,
     public right: AST
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class NewVariableAST implements AST {
+class NewVariableAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public declaration: String,
     public type: AST,
     public left: IdentifierAST,
     public right: AST
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class TypeAliasAST implements AST {
+class TypeAliasAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public left: IdentifierAST,
     public right: AST
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class BinaryAST implements AST {
+class BinaryAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public left: AST,
     public operator: OperatorAST,
     public right: AST
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class FunctionAST implements AST {
+class FunctionAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public name: IdentifierAST,
     public genericsParameters: ParameterAST[],
     public parameters: ParameterAST[],
     public returnType: AST,
     public expressions: AST[],
     public addAsVariable = false
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class FunctionCallAST implements AST {
+class FunctionCallAST extends ExpressionAST {
   function: AST;
   arguments: AST[];
 
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     func: AST,
     args: AST[],
     public isNewCall = false
   ) {
+    super(range);
     this.function = func;
     this.arguments = args;
   }
 }
 
 export
-class GenericsCallAST implements AST {
+class GenericsCallAST extends ExpressionAST {
   arguments: AST[];
 
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public value: AST,
     args: AST[]
   ) {
+    super(range);
     this.arguments = args;
   }
 }
 
 export
-class IfAST implements AST {
+class IfAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public condition: AST,
     public ifTrue: AST[],
     public ifFalse: AST[]
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class IdentifierAST implements AST {
+class IdentifierAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public name: string
-  ) {}
+  ) {
+    super(range);
+  }
+
   toString() {
     return this.name;
   }
 }
 
 export
-class LiteralAST implements AST {
+class LiteralAST extends ExpressionAST {
   constructor(
     public range: SourceRange,
     public value: any
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class MemberAccessAST implements AST {
+class MemberAccessAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public object: AST,
     public member: IdentifierAST
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class OperatorAST implements AST {
+class OperatorAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public name: string
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class ParameterAST implements AST {
+class ParameterAST extends ExpressionAST {
   // FIXME: support type more than Identifier
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public name: IdentifierAST,
     public type: AST
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class UnaryAST implements AST {
+class UnaryAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public operator: OperatorAST,
     public expression: AST
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class ClassAST implements AST {
+class ClassAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public name: IdentifierAST,
     public superclass: AST,
     public members: FunctionAST[]
-  ) {}
+  ) {
+    super(range);
+  }
 }
 
 export
-class InterfaceAST implements AST {
+class InterfaceAST extends ExpressionAST {
   constructor(
-    public range: SourceRange,
+    range: SourceRange,
     public name: IdentifierAST,
     public superTypes: AST[],
     public members: FunctionAST[]
-  ) {}
+  ) {
+    super(range);
+  }
 }
