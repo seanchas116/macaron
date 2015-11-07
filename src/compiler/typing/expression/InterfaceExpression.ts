@@ -9,15 +9,18 @@ import Environment from "../Environment";
 import Member, {Constness} from "../Member";
 import SourceRange from "../../common/SourceRange";
 import CompilationError from "../../common/CompilationError";
+import {voidType} from "../defaultEnvironment";
 
 export default
-class InterfaceExpression implements TypeExpression {
+class InterfaceExpression extends TypeExpression {
   type: MetaType;
   members: ExpressionThunk[] = [];
   superTypes: Type[];
   selfType: InterfaceType;
 
   constructor(public range: SourceRange, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
+    super(range, voidType);
+
     let superTypes = this.superTypes = superExpressions.map(superExpr => {
       const superValueType = superExpr.type;
       if (superValueType instanceof MetaType) {

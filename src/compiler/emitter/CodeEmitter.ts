@@ -94,8 +94,11 @@ class CodeEmitter {
     else if (expr instanceof GenericsCallExpression) {
       return this.emitExpression(expr.value);
     }
-    else {
+    else if (expr instanceof TypeExpression) {
       return "";
+    }
+    else {
+      throw new Error(`Not supported Expression: ${expr.constructor.name}`);
     }
   }
 

@@ -3,8 +3,10 @@ import Type from "./Type";
 
 export default
 class AssignableExpression {
-  range: SourceRange;
-  type: Type;
+  constructor(
+    public range: SourceRange,
+    public type: Type
+  ) {}
 }
 
 export
@@ -14,6 +16,6 @@ class IdentifierAssignbleExpression extends AssignableExpression {
     public name: string,
     public type: Type
   ) {
-    super();
+    super(range, type);
   }
 }
