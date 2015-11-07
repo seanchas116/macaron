@@ -8,7 +8,7 @@ import Parser, {choose, sequence, lazy} from "../Parser";
 import {parseExpression} from "./expression";
 import {parseOperator, parseBinaryExpression} from "./operator";
 import {parseIdentifier} from "./identifier";
-import {parseAssisgnable} from "./assignable";
+import {parseAssignable} from "./assignable";
 import {keyword} from "./common";
 
 const parseAssignmentOperator = parseOperator(["="]);
@@ -18,7 +18,7 @@ var parseNewVariable: Parser<ExpressionAST> = lazy(() =>
   choose(
     sequence(
       choose(keyword("let"), keyword("var")),
-      parseAssisgnable,
+      parseAssignable,
       parseBinaryExpression.mayBe(),
       keyword("=").thenTake(parseNewVariable)
     )
@@ -32,7 +32,7 @@ export
 var parseAssignment: Parser<ExpressionAST> = lazy(() =>
   choose(
     sequence(
-      parseAssisgnable,
+      parseAssignable,
       parseAssignmentOperator,
       parseAssignment
     )

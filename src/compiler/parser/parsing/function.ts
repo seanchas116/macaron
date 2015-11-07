@@ -1,6 +1,6 @@
 import AST, {
   ExpressionAST,
-  ParameterAST,
+  GenericsParameterAST,
   IdentifierAST,
   FunctionAST
 } from "../AST";
@@ -9,25 +9,20 @@ import Parser, {choose, sequence, lazy} from "../Parser";
 import {keyword, separated} from "./common";
 import {parseTypeExpression} from "./typeExpression";
 import {parseIdentifier} from "./identifier";
+import {parseAssignable} from "./assignable";
 import {parseBlock} from "./block";
-
-var parseParameter = lazy(() =>
-  sequence(parseIdentifier, parseTypeExpression)
-    .withRange()
-    .map(([[name, type], range]) => new ParameterAST(range, name, type))
-);
 
 export
 var parseParameterList = lazy(() =>
   keyword("(")
-    .thenTake(separated(parseParameter))
+    .thenTake(separated(parseAssignable))
     .thenSkip(keyword(")"))
 );
 
 var parseGenericsParameter = lazy(() =>
   sequence(parseIdentifier, keyword(":").thenTake(parseTypeExpression).mayBe())
     .withRange()
-    .map(([[name, type], range]) => new ParameterAST(range, name, type || new IdentifierAST(range, "void")))
+    .map(([[name, type], range]) => new GenericsParameterAST(range, name, type || new IdentifierAST(range, "void")))
 );
 
 export

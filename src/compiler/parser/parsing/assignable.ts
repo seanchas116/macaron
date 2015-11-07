@@ -7,7 +7,7 @@ import Parser, {sequence, lazy} from "../Parser";
 import {parseIdentifier} from "./identifier";
 import {parseTypeExpression} from "./typeExpression";
 
-var parseIdentifierAssisgnable: Parser<AssignableAST> = lazy(() =>
+var parseIdentifierAssignable: Parser<AssignableAST> = lazy(() =>
   sequence(
     parseIdentifier,
     parseTypeExpression.mayBe()
@@ -17,4 +17,4 @@ var parseIdentifierAssisgnable: Parser<AssignableAST> = lazy(() =>
 );
 
 export
-var parseAssisgnable = parseIdentifierAssisgnable;
+var parseAssignable = parseIdentifierAssignable;

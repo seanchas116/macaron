@@ -14,15 +14,23 @@ import Expression, {
   DeclarationExpression,
 } from "./Expression";
 
-import SourceRange from "../common/SourceRange";
-import Identifier from "./Identifier";
-import Environment from "./Environment";
+import FunctionExpression from "./expression/FunctionExpression";
+import FunctionBodyExpression from "./expression/FunctionBodyExpression";
+
 import AssignableExpression, {IdentifierAssignableExpression} from "./AssignableExpression";
+
 import Type from "./Type";
+import FunctionType from "./type/FunctionType";
+
 import TypeThunk from "./thunk/TypeThunk";
+import ExpressionThunk from "./thunk/ExpressionThunk";
+
 import Member, {Constness} from "./Member";
 import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import CompilationError from "../common/CompilationError";
+import SourceRange from "../common/SourceRange";
+import Identifier from "./Identifier";
+import Environment from "./Environment";
 
 export default
 class ExpressionBuilder {
@@ -127,5 +135,53 @@ class ExpressionBuilder {
     const ifFalse = evalIfFalse(ifEnv.newChild());
 
     return new IfExpression(range, this.environment, cond, ifTrue, ifFalse, tempVarName);
+  }
+
+  buildFunction(
+    range: SourceRange,
+    name: Identifier,
+    evalParameters: (env: Environment) => AssignableExpression[],
+    evalBody: (env: Environment) => FunctionBodyExpression,
+    thisType: Type,
+    returnType: Type
+  ) {
+    const subEnv = this.environment.newChild(thisType);
+    const parameters = evalParameters(subEnv);
+    const paramTypes = parameters.map(p => p.type);
+
+    for (const param of parameters) {
+      if (param instanceof IdentifierAssignableExpression) {
+        subEnv.checkAddVariable(Constness.Constant, param.name, param.type);
+      } else {
+        throw new Error(`unsupported assignable Expression: ${param.constructor.name}`);
+      }
+    }
+
+    subEnv.checkAddVariable(Constness.Constant, new Identifier("this"), thisType);
+
+    const bodyThunk = new ExpressionThunk(range, () => evalBody(subEnv));
+
+    const createType = (returnType: Type) => {
+      return new FunctionType(
+        thisType, paramTypes, [], returnType,
+        subEnv, range
+      );
+    }
+
+    let typeThunk: TypeThunk;
+    if (returnType) {
+      typeThunk = TypeThunk.resolve(createType(returnType));
+    }
+    else {
+      typeThunk = new TypeThunk(range, () => createType(bodyThunk.get().type));
+    }
+
+    return new ExpressionThunk(range, () => {
+      return new FunctionExpression(
+        range, name, typeThunk.get(),
+        parameters,
+        <FunctionBodyExpression>bodyThunk.get()
+      );
+    }, typeThunk);
   }
 }

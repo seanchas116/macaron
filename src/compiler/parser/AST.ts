@@ -79,8 +79,8 @@ class FunctionAST extends ExpressionAST {
   constructor(
     range: SourceRange,
     public name: IdentifierAST,
-    public genericsParameters: ParameterAST[],
-    public parameters: ParameterAST[],
+    public genericsParameters: GenericsParameterAST[],
+    public parameters: AssignableAST[],
     public returnType: AST,
     public expressions: AST[],
     public addAsVariable = false
@@ -178,8 +178,7 @@ class OperatorAST extends ExpressionAST {
 }
 
 export
-class ParameterAST extends ExpressionAST {
-  // FIXME: support type more than Identifier
+class GenericsParameterAST extends AST {
   constructor(
     range: SourceRange,
     public name: IdentifierAST,

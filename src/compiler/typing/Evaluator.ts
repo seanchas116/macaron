@@ -8,7 +8,7 @@ import AST, {
   BinaryAST,
   IdentifierAST,
   LiteralAST,
-  ParameterAST,
+  GenericsParameterAST,
   FunctionAST,
   FunctionCallAST,
   GenericsCallAST,
@@ -267,51 +267,21 @@ class Evaluator {
   }
 
   evaluateFunctionMain(ast: FunctionAST, thisType: Type) {
-    const {range} = ast;
-
-    const paramTypes: Type[] = [];
-    const subEnv = this.environment.newChild(thisType);
-    const subEvaluator = new Evaluator(subEnv);
-
-    for (const {name, type: typeExpr} of ast.parameters) {
-      const type = subEvaluator.evaluateType(typeExpr).type.metaType;
-      subEnv.checkAddVariable(Constness.Constant, name, type);
-      paramTypes.push(type);
-    }
-
-    subEnv.checkAddVariable(Constness.Constant, new Identifier("this"), thisType);
-
-    const bodyThunk = new ExpressionThunk(range, () => {
-      const body = subEvaluator.evaluateExpressions(ast.expressions).map(e => e.get());
-      return new FunctionBodyExpression(range, body);
-    });
-
-    const createType = (returnType: Type) => {
-      return new FunctionType(
-        thisType, paramTypes, [], returnType,
-        subEnv, ast.range
-      );
-    }
-
-    let typeThunk: TypeThunk;
-    if (ast.returnType) {
-      const returnType = subEvaluator.evaluateType(ast.returnType).type.metaType;
-      typeThunk = TypeThunk.resolve(createType(returnType));
-    }
-    else {
-      typeThunk = new TypeThunk(ast.range, () => {
-        const returnType = bodyThunk.get().type;
-        return createType(returnType);
-      });
-    }
-
-    return new ExpressionThunk(range, () => {
-      return new FunctionExpression(
-        range, ast.name, typeThunk.get(),
-        ast.parameters.map(p => new IdentifierAssignableExpression(p.range, p.name, null)),
-        <FunctionBodyExpression>bodyThunk.get()
-      );
-    }, typeThunk);
+    return this.builder.buildFunction(
+      ast.range,
+      ast.name,
+      env => {
+        const evaluator = new Evaluator(env);
+        return ast.parameters.map(p => evaluator.evaluateAssignable(p))
+      },
+      env => {
+        const evaluator = new Evaluator(env);
+        const body = evaluator.evaluateExpressions(ast.expressions).map(e => e.get());
+        return new FunctionBodyExpression(ast.range, body);
+      },
+      thisType,
+      ast.returnType && this.evaluateType(ast.returnType).type.metaType
+    );
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
@@ -368,10 +338,15 @@ class Evaluator {
     const subEnv = this.environment.newChild();
     const subEvaluator = new Evaluator(subEnv);
 
-    for (const {name, type: typeExpr} of ast.parameters) {
-      const type = subEvaluator.evaluateType(typeExpr).type.metaType;
-      subEnv.checkAddVariable(Constness.Constant, name, type);
-      paramTypes.push(type);
+    for (const param of ast.parameters) {
+      if (param instanceof IdentifierAssignableAST) {
+        const {name, type: typeExpr} = param;
+        const type = subEvaluator.evaluateType(typeExpr).type.metaType;
+        subEnv.checkAddVariable(Constness.Constant, name, type);
+        paramTypes.push(type);
+      } else {
+        throw new Error(`unsupported assignable Expression: ${param.constructor.name}`);
+      }
     }
 
     const returnType = subEvaluator.evaluateType(ast.returnType).type.metaType;
