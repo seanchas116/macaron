@@ -6,6 +6,15 @@ interface AST {
 export default AST;
 
 export
+class IdentifierAssignableAST implements AST {
+  constructor(
+    public range: SourceRange,
+    public name: IdentifierAST,
+    public type: AST
+  ) {}
+}
+
+export
 class AssignmentAST implements AST {
   constructor(
     public range: SourceRange,

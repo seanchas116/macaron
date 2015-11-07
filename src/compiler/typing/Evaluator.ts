@@ -174,6 +174,7 @@ class Evaluator {
     return this.builder.buildNewVariable(ast.range, constness, left, right);
   }
 
+
   evaluateAssignment(ast: AssignmentAST) {
     const left = new IdentifierAssignbleExpression(
       ast.left.range,
