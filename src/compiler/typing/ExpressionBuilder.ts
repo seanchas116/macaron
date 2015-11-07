@@ -17,7 +17,7 @@ import Expression, {
 import SourceRange from "../common/SourceRange";
 import Identifier from "./Identifier";
 import Environment from "./Environment";
-import AssignableExpression, {IdentifierAssignbleExpression} from "./AssignableExpression";
+import AssignableExpression, {IdentifierAssignableExpression} from "./AssignableExpression";
 import Type from "./Type";
 import TypeThunk from "./thunk/TypeThunk";
 import Member, {Constness} from "./Member";
@@ -42,22 +42,27 @@ class ExpressionBuilder {
     }
   }
 
-  buildAssignment(range: SourceRange, left: IdentifierAssignbleExpression, right: Expression) {
-    const varName = left.name;
-
-    this.environment.checkAssignVariable(left, right.type);
-    return new AssignmentExpression(range, left, right);
+  buildAssignment(range: SourceRange, left: AssignableExpression, right: Expression) {
+    if (left instanceof IdentifierAssignableExpression) {
+      const varName = left.name;
+      this.environment.checkAssignVariable(left.name, right.type);
+      return new AssignmentExpression(range, left, right);
+    }
+    throw new Error(`unsupported assignable Expression: ${left.constructor.name}`);
   }
 
   buildNewVariable(
     range: SourceRange, constness: Constness,
-    left: IdentifierAssignbleExpression, right: Expression
+    left: AssignableExpression, right: Expression
   ) {
-    const varName = left.name;
-    const type = left.type || right.type;
-    this.environment.checkAddVariable(constness, left, type);
-    this.environment.checkAssignVariable(left, right.type, true);
-    return new NewVariableExpression(range, constness, left, right);
+    if (left instanceof IdentifierAssignableExpression) {
+      const varName = left.name;
+      const type = left.type || right.type;
+      this.environment.checkAddVariable(constness, left.name, type);
+      this.environment.checkAssignVariable(left.name, right.type, true);
+      return new NewVariableExpression(range, constness, left, right);
+    }
+    throw new Error(`unsupported assignable Expression: ${left.constructor.name}`);
   }
 
   buildUnary(range: SourceRange, operator: Identifier, operand: Expression) {

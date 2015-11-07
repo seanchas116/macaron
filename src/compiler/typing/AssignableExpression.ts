@@ -1,5 +1,6 @@
 import SourceRange from "../common/SourceRange";
 import Type from "./Type";
+import Identifier from "./Identifier";
 
 export default
 class AssignableExpression {
@@ -10,10 +11,10 @@ class AssignableExpression {
 }
 
 export
-class IdentifierAssignbleExpression extends AssignableExpression {
+class IdentifierAssignableExpression extends AssignableExpression {
   constructor(
     public range: SourceRange,
-    public name: string,
+    public name: Identifier,
     public type: Type
   ) {
     super(range, type);

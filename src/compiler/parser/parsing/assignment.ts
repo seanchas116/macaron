@@ -8,14 +8,10 @@ import Parser, {choose, sequence, lazy} from "../Parser";
 import {parseExpression} from "./expression";
 import {parseOperator, parseBinaryExpression} from "./operator";
 import {parseIdentifier} from "./identifier";
+import {parseAssisgnable} from "./assignable";
 import {keyword} from "./common";
 
 const parseAssignmentOperator = parseOperator(["="]);
-
-export
-var parseAssisgnable = lazy(() =>
-  parseIdentifier
-);
 
 export
 var parseNewVariable: Parser<ExpressionAST> = lazy(() =>

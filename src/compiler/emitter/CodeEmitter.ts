@@ -13,6 +13,10 @@ import Expression, {
   GenericsCallExpression,
 } from "../typing/Expression";
 
+import AssignableExpression, {
+  IdentifierAssignableExpression
+} from "../typing/AssignableExpression";
+
 import TypeExpression from "../typing/TypeExpression";
 
 import {NativeOperator, MethodOperator} from "../typing/Operator";
@@ -100,6 +104,19 @@ class CodeEmitter {
     else {
       throw new Error(`Not supported Expression: ${expr.constructor.name}`);
     }
+  }
+
+  emitAssignable(expr: AssignableExpression): string {
+    if (expr instanceof IdentifierAssignableExpression) {
+      return this.emitIdentifierAssignable(expr);
+    }
+    else {
+      throw new Error(`Not supported Expression: ${expr.constructor.name}`);
+    }
+  }
+
+  emitIdentifierAssignable(expr: IdentifierAssignableExpression) {
+    return expr.name.name;
   }
 
   emitIdentifier(expr: IdentifierExpression) {
@@ -197,14 +214,14 @@ class CodeEmitter {
 
   emitAssignment(expr: AssignmentExpression) {
     const value = this.emitExpression(expr.value);
-    const name = expr.assignable.name;
+    const name = this.emitAssignable(expr.assignable);
 
     return `${name} = ${value}`;
   }
 
   emitNewVariable(expr: NewVariableExpression) {
     const value = this.emitExpression(expr.value);
-    const name = expr.assignable.name;
+    const name = this.emitAssignable(expr.assignable);
 
     this.prependings.push(`let ${name}`);
     return `${name} = ${value}`;
@@ -265,7 +282,7 @@ class CodeEmitter {
       ...exprs.slice(0, len - 1),
       new AssignmentExpression(
         last.range,
-        new Identifier(varName, last.range),
+        new IdentifierAssignableExpression(last.range, new Identifier(varName, last.range), null),
         last
       )
     ];

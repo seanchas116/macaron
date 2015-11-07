@@ -8,6 +8,7 @@ import Identifier from "./Identifier";
 import Operator from "./Operator";
 import {Constness} from "./Member";
 import Environment from "./Environment";
+import AssignableExpression from "./AssignableExpression";
 
 import SourceRange from "../common/SourceRange";
 import CompilationError from "../common/CompilationError";
@@ -35,7 +36,7 @@ export
 class AssignmentExpression extends Expression {
   constructor(
     range: SourceRange,
-    public assignable: Identifier,
+    public assignable: AssignableExpression,
     public value: Expression
   ) {
     super(range, value.type);
@@ -47,7 +48,7 @@ class NewVariableExpression extends Expression {
   constructor(
     range: SourceRange,
     public constness: Constness,
-    public assignable: Identifier,
+    public assignable: AssignableExpression,
     public value: Expression
   ) {
     super(range, value.type);

@@ -30,7 +30,7 @@ export
 class AssignmentAST extends ExpressionAST {
   constructor(
     range: SourceRange,
-    public left: IdentifierAST,
+    public left: AssignableAST,
     public operator: OperatorAST,
     public right: AST
   ) {
@@ -44,7 +44,7 @@ class NewVariableAST extends ExpressionAST {
     range: SourceRange,
     public declaration: String,
     public type: AST,
-    public left: IdentifierAST,
+    public left: AssignableAST,
     public right: AST
   ) {
     super(range);

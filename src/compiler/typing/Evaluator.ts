@@ -1,4 +1,7 @@
 import AST, {
+  ExpressionAST,
+  AssignableAST,
+  IdentifierAssignableAST,
   NewVariableAST,
   AssignmentAST,
   UnaryAST,
@@ -38,7 +41,7 @@ import ClassExpression from "./expression/ClassExpression";
 import InterfaceExpression from "./expression/InterfaceExpression";
 
 import AssignableExpression, {
-  IdentifierAssignbleExpression
+  IdentifierAssignableExpression
 } from "./AssignableExpression";
 
 import TypeExpression, {
@@ -151,13 +154,25 @@ class Evaluator {
     return ExpressionThunk.resolve(this.evaluateImpl(ast));
   }
 
-  evaluateNewVariable(ast: NewVariableAST) {
-    const left = new IdentifierAssignbleExpression(
-      ast.left.range,
-      ast.left.name,
+  evaluateAssignable(ast: AssignableAST): AssignableExpression {
+    if (ast instanceof IdentifierAssignableAST) {
+      return this.evaluateIdentifierAssignable(ast);
+    }
+    else {
+      throw new Error(`Not supported AST: ${ast.constructor.name}`);
+    }
+  }
+
+  evaluateIdentifierAssignable(ast: IdentifierAssignableAST) {
+    return new IdentifierAssignableExpression(
+      ast.range,
+      ast.name,
       ast.type && this.evaluateType(ast.type).type.metaType
     );
+  }
 
+  evaluateNewVariable(ast: NewVariableAST) {
+    const left = this.evaluateAssignable(ast.left);
     const right = this.evaluate(ast.right).get();
 
     const constness = (() => {
@@ -176,11 +191,7 @@ class Evaluator {
 
 
   evaluateAssignment(ast: AssignmentAST) {
-    const left = new IdentifierAssignbleExpression(
-      ast.left.range,
-      ast.left.name,
-      null
-    );
+    const left = this.evaluateAssignable(ast.left);
     const right = this.evaluate(ast.right).get();
     return this.builder.buildAssignment(ast.range, left, right);
   }
@@ -213,7 +224,10 @@ class Evaluator {
     const funcThunk = this.evaluateFunctionGenerics(ast, thisType);
     if (ast.addAsVariable) {
       const thunk = new ExpressionThunk(ast.range, () => {
-        return new NewVariableExpression(ast.range, Constness.Constant, ast.name, funcThunk.get());
+        return new NewVariableExpression(
+          ast.range, Constness.Constant,
+          new IdentifierAssignableExpression(ast.range, ast.name, null), funcThunk.get()
+        );
       });
       this.environment.checkAddVariable(Constness.Constant, ast.name, funcThunk.type);
       return thunk;
