@@ -1,4 +1,5 @@
 import AST, {
+  ExpressionAST,
   IdentifierAssignableAST
 } from "../AST";
 
@@ -6,7 +7,7 @@ import Parser, {sequence, lazy} from "../Parser";
 import {parseIdentifier} from "./identifier";
 import {parseTypeExpression} from "./typeExpression";
 
-var parseIdentifierAssisgnable: Parser<AST> = lazy(() =>
+var parseIdentifierAssisgnable: Parser<ExpressionAST> = lazy(() =>
   sequence(
     parseIdentifier,
     parseTypeExpression.mayBe()

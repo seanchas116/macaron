@@ -1,4 +1,5 @@
 import AST, {
+  ExpressionAST,
   FunctionCallAST,
 } from "../AST";
 
@@ -12,8 +13,8 @@ var parseArgumentList = lazy(() =>
 );
 
 export
-var parseFunctionCall: Parser<(value: AST) => AST> = lazy(() =>
+var parseFunctionCall: Parser<(value: ExpressionAST) => ExpressionAST> = lazy(() =>
   parseArgumentList.map(args =>
-    (value: AST) => new FunctionCallAST(value.range, value, args, false)
+    (value: ExpressionAST) => new FunctionCallAST(value.range, value, args, false)
   )
 );

@@ -1,8 +1,8 @@
-import AST from "../AST";
+import {ExpressionAST} from "../AST";
 
 import Parser, {lazy} from "../Parser";
 import {parseTypeAlias} from "./typeAlias";
 
 export
-const parseExpression: Parser<AST> =
+const parseExpression: Parser<ExpressionAST> =
   lazy(() => parseTypeAlias);

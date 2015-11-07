@@ -1,4 +1,5 @@
 import AST, {
+  ExpressionAST,
   OperatorAST,
   UnaryAST,
   BinaryAST,
@@ -20,7 +21,7 @@ function parseOperator(operatorList: string[]) {
     .map(([op, range]) => new OperatorAST(range, op));
 }
 
-function buildBinaryExpression(binaryOperators: string[][], first: AST, rest: [OperatorAST, AST][]): AST {
+function buildBinaryExpression(binaryOperators: string[][], first: ExpressionAST, rest: [OperatorAST, ExpressionAST][]): ExpressionAST {
   let operands = [first, ...rest.map(t => t[1])];
   let operators = rest.map(t => t[0]);
 
@@ -38,7 +39,7 @@ function buildBinaryExpression(binaryOperators: string[][], first: AST, rest: [O
 }
 
 export
-function parseUnaryExpressionWith(subParser: Parser<AST>, operators: string[][]) {
+function parseUnaryExpressionWith(subParser: Parser<ExpressionAST>, operators: string[][]) {
   return choose(
     subParser,
     sequence(
@@ -51,7 +52,7 @@ function parseUnaryExpressionWith(subParser: Parser<AST>, operators: string[][])
 }
 
 export
-function parseBinaryExpressionWith(subParser: Parser<AST>, operators: string[][]) {
+function parseBinaryExpressionWith(subParser: Parser<ExpressionAST>, operators: string[][]) {
   const operatorList = flattenSort(operators);
   return sequence(
     subParser,

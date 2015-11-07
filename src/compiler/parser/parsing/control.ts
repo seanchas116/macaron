@@ -1,4 +1,5 @@
 import AST, {
+  ExpressionAST,
   IfAST
 } from "../AST";
 
@@ -8,7 +9,7 @@ import {parseExpression} from "./expression";
 import {parseBlock} from "./block";
 import {parsePostfix} from "./postfix";
 
-var parseIfExpression: Parser<AST> = lazy(() =>
+var parseIfExpression: Parser<ExpressionAST> = lazy(() =>
   keyword("if").thenTake(
     sequence(
       parseExpression,

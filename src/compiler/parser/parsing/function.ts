@@ -1,4 +1,5 @@
 import AST, {
+  ExpressionAST,
   ParameterAST,
   IdentifierAST,
   FunctionAST

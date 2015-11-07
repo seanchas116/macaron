@@ -1,4 +1,5 @@
 import AST, {
+  ExpressionAST,
   TypeAliasAST,
 } from "../AST";
 
@@ -9,7 +10,7 @@ import {parseTypeExpression} from "./typeExpression";
 import {parseIdentifier} from "./identifier";
 
 export
-const parseTypeAlias: Parser<AST> =
+const parseTypeAlias: Parser<ExpressionAST> =
   choose(
     sequence(
       keyword("type"),

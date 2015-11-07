@@ -1,4 +1,4 @@
-import AST from "../AST";
+import AST, {ExpressionAST} from "../AST";
 import {choose, lazy} from "../Parser";
 import {keyword} from "./common";
 import {parseExpression} from "./expression";
@@ -9,7 +9,7 @@ import {parseFunction} from "./function";
 import {parseClass, parseInterface} from "./class";
 
 var parseLiteral = lazy(() =>
-  choose<AST>(
+  choose<ExpressionAST>(
     parseNumberLiteral,
     parseStringLiteral,
     parseFunction,
