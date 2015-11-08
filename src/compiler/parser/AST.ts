@@ -20,7 +20,7 @@ class IdentifierAssignableAST extends AssignableAST {
   constructor(
     range: SourceRange,
     public name: IdentifierAST,
-    public type: AST
+    public type: ExpressionAST
   ) {
     super(range);
   }
@@ -32,7 +32,7 @@ class AssignmentAST extends ExpressionAST {
     range: SourceRange,
     public left: AssignableAST,
     public operator: OperatorAST,
-    public right: AST
+    public right: ExpressionAST
   ) {
     super(range);
   }
@@ -43,9 +43,9 @@ class NewVariableAST extends ExpressionAST {
   constructor(
     range: SourceRange,
     public declaration: String,
-    public type: AST,
+    public type: ExpressionAST,
     public left: AssignableAST,
-    public right: AST
+    public right: ExpressionAST
   ) {
     super(range);
   }
@@ -56,7 +56,7 @@ class TypeAliasAST extends ExpressionAST {
   constructor(
     range: SourceRange,
     public left: IdentifierAST,
-    public right: AST
+    public right: ExpressionAST
   ) {
     super(range);
   }
@@ -66,9 +66,9 @@ export
 class BinaryAST extends ExpressionAST {
   constructor(
     range: SourceRange,
-    public left: AST,
+    public left: ExpressionAST,
     public operator: OperatorAST,
-    public right: AST
+    public right: ExpressionAST
   ) {
     super(range);
   }
@@ -81,8 +81,8 @@ class FunctionAST extends ExpressionAST {
     public name: IdentifierAST,
     public genericsParameters: GenericsParameterAST[],
     public parameters: AssignableAST[],
-    public returnType: AST,
-    public expressions: AST[],
+    public returnType: ExpressionAST,
+    public expressions: ExpressionAST[],
     public addAsVariable = false
   ) {
     super(range);
@@ -92,12 +92,12 @@ class FunctionAST extends ExpressionAST {
 export
 class FunctionCallAST extends ExpressionAST {
   function: AST;
-  arguments: AST[];
+  arguments: ExpressionAST[];
 
   constructor(
     range: SourceRange,
-    func: AST,
-    args: AST[],
+    func: ExpressionAST,
+    args: ExpressionAST[],
     public isNewCall = false
   ) {
     super(range);
@@ -108,12 +108,12 @@ class FunctionCallAST extends ExpressionAST {
 
 export
 class GenericsCallAST extends ExpressionAST {
-  arguments: AST[];
+  arguments: ExpressionAST[];
 
   constructor(
     range: SourceRange,
-    public value: AST,
-    args: AST[]
+    public value: ExpressionAST,
+    args: ExpressionAST[]
   ) {
     super(range);
     this.arguments = args;
@@ -124,9 +124,9 @@ export
 class IfAST extends ExpressionAST {
   constructor(
     range: SourceRange,
-    public condition: AST,
-    public ifTrue: AST[],
-    public ifFalse: AST[]
+    public condition: ExpressionAST,
+    public ifTrue: ExpressionAST[],
+    public ifFalse: ExpressionAST[]
   ) {
     super(range);
   }
@@ -160,7 +160,7 @@ export
 class MemberAccessAST extends ExpressionAST {
   constructor(
     range: SourceRange,
-    public object: AST,
+    public object: ExpressionAST,
     public member: IdentifierAST
   ) {
     super(range);
@@ -182,7 +182,7 @@ class GenericsParameterAST extends AST {
   constructor(
     range: SourceRange,
     public name: IdentifierAST,
-    public type: AST
+    public type: ExpressionAST
   ) {
     super(range);
   }
@@ -193,7 +193,7 @@ class UnaryAST extends ExpressionAST {
   constructor(
     range: SourceRange,
     public operator: OperatorAST,
-    public expression: AST
+    public expression: ExpressionAST
   ) {
     super(range);
   }
@@ -204,7 +204,7 @@ class ClassAST extends ExpressionAST {
   constructor(
     range: SourceRange,
     public name: IdentifierAST,
-    public superclass: AST,
+    public superclass: ExpressionAST,
     public members: FunctionAST[]
   ) {
     super(range);
@@ -216,7 +216,7 @@ class InterfaceAST extends ExpressionAST {
   constructor(
     range: SourceRange,
     public name: IdentifierAST,
-    public superTypes: AST[],
+    public superTypes: ExpressionAST[],
     public members: FunctionAST[]
   ) {
     super(range);
