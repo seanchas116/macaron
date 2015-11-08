@@ -87,11 +87,7 @@ class ExpressionBuilder {
     let selfType: Type = voidType;
     let hasSelf = false;
     if (!isNewCall) {
-      if (func instanceof MemberAccessExpression) {
-        selfType = func.object.type;
-        hasSelf = true;
-      }
-      if (func instanceof OperatorAccessExpression) {
+      if (func instanceof MemberAccessExpression || func instanceof OperatorAccessExpression) {
         selfType = func.object.type;
         hasSelf = true;
       }
@@ -103,8 +99,7 @@ class ExpressionBuilder {
     const reasons: string[] = [];
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call
     if (!sig) {
-      throw CompilationError.typeError(
-        range,
+      throw CompilationError.typeError(range,
         `Type '${funcType}' cannot be called with [${argTypes.join(", ")}]`,
         ...reasons
       );
