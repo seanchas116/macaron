@@ -197,11 +197,15 @@ class ExpressionBuilder {
       subEnv.checkAddVariable(Constness.Constant, param.name, param.type);
     }
     const valueThunk = evalValue(subEnv);
-    const typeThunk = valueThunk.type.map(template =>
-      new GenericsType(
-        template.name, params.map(p => p.parameterType), template,
-        subEnv, range
-      )
+    const typeThunk = new TypeThunk(
+      range,
+      () => {
+        const template = valueThunk.type.get();
+        return new GenericsType(
+          template.name, params.map(p => p.parameterType), template,
+          subEnv, range
+        );
+      }
     );
     return new ExpressionThunk(
       range,
