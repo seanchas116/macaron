@@ -209,4 +209,12 @@ class ExpressionBuilder {
       typeThunk
     );
   }
+
+  buildGenericsCall(
+    range: SourceRange,
+    value: Expression,
+    args: TypeExpression[]
+  ) {
+    return new GenericsCallExpression(range, value, args.map(a => a.type.metaType));
+  }
 }

@@ -283,8 +283,8 @@ class Evaluator {
 
   evaluateGenericsCall(ast: GenericsCallAST) {
     const value = this.evaluate(ast.value).get();
-    const args = ast.arguments.map(a => this.evaluateType(a).type.metaType);
-    return new GenericsCallExpression(ast.range, value, args);
+    const args = ast.arguments.map(a => this.evaluateType(a));
+    return this.builder.buildGenericsCall(ast.range, value, args);
   }
 
   evaluateClass(ast: ClassAST) {
