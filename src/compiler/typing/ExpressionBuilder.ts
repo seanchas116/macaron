@@ -14,6 +14,10 @@ import Expression, {
   DeclarationExpression,
 } from "./Expression";
 
+import TypeExpression, {
+  GenericsParameterExpression
+} from "./TypeExpression";
+
 import FunctionExpression from "./expression/FunctionExpression";
 import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 
@@ -21,6 +25,7 @@ import AssignableExpression, {IdentifierAssignableExpression} from "./Assignable
 
 import Type from "./Type";
 import FunctionType from "./type/FunctionType";
+import GenericsParameterType from "./type/GenericsParameterType";
 
 import TypeThunk from "./thunk/TypeThunk";
 import ExpressionThunk from "./thunk/ExpressionThunk";
@@ -164,5 +169,17 @@ class ExpressionBuilder {
       const type = predefinedType || createType(body.type);
       return new FunctionExpression(range, name, type, parameters, body);
     }, predefinedType);
+  }
+
+  buildGenericsParameter(
+    range: SourceRange,
+    name: Identifier,
+    constraint: TypeExpression
+  ) {
+    const type = new GenericsParameterType(
+      name.name, constraint.type.metaType,
+      this.environment, range
+    );
+    return new GenericsParameterExpression(range, name, constraint, type);
   }
 }

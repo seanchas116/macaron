@@ -238,15 +238,8 @@ class Evaluator {
   }
 
   evaluateGenericsParameter(ast: GenericsParameterAST) {
-    const constrait = this.evaluateType(ast.type);
-    return new GenericsParameterExpression(
-      ast.range, ast.name,
-      constrait,
-      new GenericsParameterType(
-        ast.name.name, constrait.type.metaType,
-        this.environment, ast.range
-      )
-    );
+    const constraint = this.evaluateType(ast.type);
+    return this.builder.buildGenericsParameter(ast.range, ast.name, constraint);
   }
 
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
