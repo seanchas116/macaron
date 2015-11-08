@@ -219,6 +219,36 @@ class ExpressionBuilder {
     value: Expression,
     args: TypeExpression[]
   ) {
-    return new GenericsCallExpression(range, value, args.map(a => a.type.metaType));
+    const genericsType = value.type;
+    if (genericsType instanceof GenericsType) {
+      const paramLength = genericsType.parameters.length
+      if (paramLength !== args.length) {
+        throw CompilationError.typeError(
+          args[0].range,
+          `Number of generics arguments wrong (${args.length} for ${paramLength})`
+        );
+      }
+
+      const types = new Map<GenericsParameterType, Type>();
+      for (const [i, placeholder] of genericsType.parameters.entries()) {
+        const reasons: string[] = [];
+        const {constraint} = placeholder;
+        if (!constraint.isAssignable(args[i].type.metaType, reasons)) {
+          throw CompilationError.typeError(
+            args[i].range,
+            `Cannot assign '${args[i]}' to type '${constraint}'`,
+            ...reasons
+          );
+        }
+        types.set(placeholder, args[i].type.metaType);
+      }
+
+      const type = genericsType.template.resolveGenerics(types);
+      return new GenericsCallExpression(range, value, args, type);
+    } else {
+      throw CompilationError.typeError(value.range,
+        `The value is not generic`
+      );
+    }
   }
 }

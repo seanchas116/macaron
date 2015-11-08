@@ -9,7 +9,7 @@ import Operator from "./Operator";
 import {Constness} from "./Member";
 import Environment from "./Environment";
 import AssignableExpression from "./AssignableExpression";
-import {GenericsParameterExpression} from "./TypeExpression";
+import TypeExpression, {GenericsParameterExpression} from "./TypeExpression";
 
 import SourceRange from "../common/SourceRange";
 import CompilationError from "../common/CompilationError";
@@ -88,48 +88,16 @@ class GenericsExpression extends Expression {
 
 export
 class GenericsCallExpression extends Expression {
-  arguments: Type[];
-  type: Type;
+  arguments: TypeExpression[];
 
   constructor(
     public range: SourceRange,
     public value: Expression,
-    args: Type[]
+    args: TypeExpression[],
+    type: Type
   ) {
-    super(range, voidType);
+    super(range, type);
     this.arguments = args;
-
-    const genericsType = this.value.type;
-    if (genericsType instanceof GenericsType) {
-      const paramLength = genericsType.parameters.length
-      if (paramLength !== args.length) {
-        throw CompilationError.typeError(
-          args[0].range,
-          `Number of generics arguments wrong (${args.length} for ${paramLength})`
-        );
-      }
-
-      const types = new Map<GenericsParameterType, Type>();
-      for (const [i, placeholder] of genericsType.parameters.entries()) {
-        const reasons: string[] = [];
-        const {constraint} = placeholder;
-        if (!constraint.isAssignable(args[i], reasons)) {
-          throw CompilationError.typeError(
-            args[i].range,
-            `Cannot assign '${args[i]}' to type '${constraint}'`,
-            ...reasons
-          );
-        }
-        types.set(placeholder, args[i]);
-      }
-
-      this.type = genericsType.template.resolveGenerics(types);
-    } else {
-      throw CompilationError.typeError(
-        this.value.range,
-        `The value is not generic`
-      );
-    }
   }
 }
 
