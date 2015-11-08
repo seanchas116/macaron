@@ -9,6 +9,7 @@ import Operator from "./Operator";
 import {Constness} from "./Member";
 import Environment from "./Environment";
 import AssignableExpression from "./AssignableExpression";
+import {GenericsParameterExpression} from "./TypeExpression";
 
 import SourceRange from "../common/SourceRange";
 import CompilationError from "../common/CompilationError";
@@ -77,6 +78,7 @@ export
 class GenericsExpression extends Expression {
   constructor(
     range: SourceRange,
+    public parameters: GenericsParameterExpression[],
     public genericsType: GenericsType,
     public expression: Expression
   ) {

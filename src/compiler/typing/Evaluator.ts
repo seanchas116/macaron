@@ -49,6 +49,7 @@ import TypeExpression, {
   TypeIntersectionExpression,
   TypeIdentifierExpression,
   TypeAliasExpression,
+  GenericsParameterExpression
 } from "./TypeExpression"
 
 import Identifier from "./Identifier";
@@ -236,29 +237,38 @@ class Evaluator {
     }
   }
 
+  evaluateGenericsParameter(ast: GenericsParameterAST) {
+    const constrait = this.evaluateType(ast.type);
+    return new GenericsParameterExpression(
+      ast.range, ast.name,
+      constrait,
+      new GenericsParameterType(
+        ast.name.name, constrait.type.metaType,
+        this.environment, ast.range
+      )
+    );
+  }
+
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
       const subEnv = this.environment.newChild();
-      const params = ast.genericsParameters.map(p =>
-        new GenericsParameterType(
-          p.name.name, this.evaluateType(p.type).type.metaType,
-          this.environment, p.range
-        )
-      );
-      for (const [i, p] of params.entries()) {
-        subEnv.addGenericsPlaceholder(p);
-        subEnv.checkAddVariable(Constness.Constant, ast.genericsParameters[i].name, MetaType.typeOnly(p));
+      const subEvaluator = new Evaluator(subEnv);
+
+      const params = ast.genericsParameters.map(p => subEvaluator.evaluateGenericsParameter(p));
+      for (const param of params) {
+        subEnv.addGenericsPlaceholder(param.parameterType);
+        subEnv.checkAddVariable(Constness.Constant, param.name, param.type);
       }
-      const funcThunk = new Evaluator(subEnv).evaluateFunctionMain(ast, thisType);
+      const funcThunk = subEvaluator.evaluateFunctionMain(ast, thisType);
       const typeThunk = funcThunk.type.map(template =>
         new GenericsType(
-          template.name, params, template,
+          template.name, params.map(p => p.parameterType), template,
           subEnv, ast.range
         )
       );
       return new ExpressionThunk(
         ast.range,
-        () => new GenericsExpression(ast.range, typeThunk.get() as GenericsType, funcThunk.get()),
+        () => new GenericsExpression(ast.range, params, typeThunk.get() as GenericsType, funcThunk.get()),
         typeThunk
       );
     } else {

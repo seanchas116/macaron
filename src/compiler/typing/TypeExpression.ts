@@ -5,6 +5,7 @@ import MetaType from "./type/MetaType";
 import SourceRange from "../common/SourceRange";
 import IntersectionType from "./type/IntersectionType";
 import UnionType from "./type/UnionType";
+import GenericsParameterType from "./type/GenericsParameterType";
 import Environment from "./Environment";
 
 export default
@@ -69,5 +70,17 @@ class TypeIntersectionExpression extends TypeExpression {
     public right: TypeExpression
   ) {
     super(range, new IntersectionType([left.type.metaType, right.type.metaType], environment, range));
+  }
+}
+
+export
+class GenericsParameterExpression extends TypeExpression {
+  constructor(
+    range: SourceRange,
+    public name: Identifier,
+    public constrait: TypeExpression,
+    public parameterType: GenericsParameterType
+  ) {
+    super(range, parameterType);
   }
 }
