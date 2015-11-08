@@ -147,7 +147,6 @@ class ExpressionBuilder {
   ) {
     const subEnv = this.environment.newChild(thisType);
     const parameters = evalParameters(subEnv);
-    const paramTypes = parameters.map(p => p.type);
 
     for (const param of parameters) {
       if (param instanceof IdentifierAssignableExpression) {
@@ -159,29 +158,16 @@ class ExpressionBuilder {
 
     subEnv.checkAddVariable(Constness.Constant, new Identifier("this"), thisType);
 
-    const bodyThunk = new ExpressionThunk(range, () => evalBody(subEnv));
+    const paramTypes = parameters.map(p => p.type);
+    const createType = (returnType: Type) =>
+      new FunctionType(thisType, paramTypes, [], returnType, subEnv, range);
 
-    const createType = (returnType: Type) => {
-      return new FunctionType(
-        thisType, paramTypes, [], returnType,
-        subEnv, range
-      );
-    }
-
-    let typeThunk: TypeThunk;
-    if (returnType) {
-      typeThunk = TypeThunk.resolve(createType(returnType));
-    }
-    else {
-      typeThunk = new TypeThunk(range, () => createType(bodyThunk.get().type));
-    }
+    const predefinedType = returnType && createType(returnType);
 
     return new ExpressionThunk(range, () => {
-      return new FunctionExpression(
-        range, name, typeThunk.get(),
-        parameters,
-        <FunctionBodyExpression>bodyThunk.get()
-      );
-    }, typeThunk);
+      const body = evalBody(subEnv);
+      const type = predefinedType || createType(body.type);
+      return new FunctionExpression(range, name, type, parameters, body);
+    }, predefinedType);
   }
 }
