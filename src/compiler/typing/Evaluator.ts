@@ -244,26 +244,14 @@ class Evaluator {
 
   evaluateFunctionGenerics(ast: FunctionAST, thisType: Type) {
     if (ast.genericsParameters && ast.genericsParameters.length > 0) {
-      const subEnv = this.environment.newChild();
-      const subEvaluator = new Evaluator(subEnv);
-
-      const params = ast.genericsParameters.map(p => subEvaluator.evaluateGenericsParameter(p));
-      for (const param of params) {
-        subEnv.addGenericsPlaceholder(param.parameterType);
-        subEnv.checkAddVariable(Constness.Constant, param.name, param.type);
-      }
-      const funcThunk = subEvaluator.evaluateFunctionMain(ast, thisType);
-      const typeThunk = funcThunk.type.map(template =>
-        new GenericsType(
-          template.name, params.map(p => p.parameterType), template,
-          subEnv, ast.range
-        )
-      );
-      return new ExpressionThunk(
+      return this.builder.buildGenerics(
         ast.range,
-        () => new GenericsExpression(ast.range, params, typeThunk.get() as GenericsType, funcThunk.get()),
-        typeThunk
-      );
+        env => {
+          const evaluator = new Evaluator(env);
+          return ast.genericsParameters.map(p => evaluator.evaluateGenericsParameter(p));
+        },
+        env => new Evaluator(env).evaluateFunctionMain(ast, thisType)
+      )
     } else {
       return this.evaluateFunctionMain(ast, thisType);
     }

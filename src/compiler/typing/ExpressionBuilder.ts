@@ -26,6 +26,7 @@ import AssignableExpression, {IdentifierAssignableExpression} from "./Assignable
 import Type from "./Type";
 import FunctionType from "./type/FunctionType";
 import GenericsParameterType from "./type/GenericsParameterType";
+import GenericsType from "./type/GenericsType";
 
 import TypeThunk from "./thunk/TypeThunk";
 import ExpressionThunk from "./thunk/ExpressionThunk";
@@ -181,5 +182,31 @@ class ExpressionBuilder {
       this.environment, range
     );
     return new GenericsParameterExpression(range, name, constraint, type);
+  }
+
+  buildGenerics(
+    range: SourceRange,
+    evalParams: (env: Environment) => GenericsParameterExpression[],
+    evalValue: (env: Environment) => ExpressionThunk
+  ) {
+    const subEnv = this.environment.newChild();
+    const params = evalParams(subEnv);
+
+    for (const param of params) {
+      subEnv.addGenericsPlaceholder(param.parameterType);
+      subEnv.checkAddVariable(Constness.Constant, param.name, param.type);
+    }
+    const valueThunk = evalValue(subEnv);
+    const typeThunk = valueThunk.type.map(template =>
+      new GenericsType(
+        template.name, params.map(p => p.parameterType), template,
+        subEnv, range
+      )
+    );
+    return new ExpressionThunk(
+      range,
+      () => new GenericsExpression(range, params, typeThunk.get() as GenericsType, valueThunk.get()),
+      typeThunk
+    );
   }
 }
