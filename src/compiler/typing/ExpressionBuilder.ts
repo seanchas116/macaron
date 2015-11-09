@@ -10,7 +10,6 @@ import Expression, {
   MemberAccessExpression,
   OperatorAccessExpression,
   IfExpression,
-  EmptyExpression,
   DeclarationExpression,
 } from "./Expression";
 

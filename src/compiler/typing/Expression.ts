@@ -207,10 +207,6 @@ class IfExpression extends Expression {
 }
 
 export
-class EmptyExpression extends Expression {
-}
-
-export
 class DeclarationExpression extends Expression {
   constructor(
     range: SourceRange,

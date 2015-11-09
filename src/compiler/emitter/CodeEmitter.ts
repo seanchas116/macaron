@@ -8,7 +8,6 @@ import Expression, {
   MemberAccessExpression,
   OperatorAccessExpression,
   IfExpression,
-  EmptyExpression,
   GenericsExpression,
   GenericsCallExpression,
 } from "../typing/Expression";
@@ -88,9 +87,6 @@ class CodeEmitter {
     }
     else if (expr instanceof IfExpression) {
       return this.emitIf(expr, topLevel);
-    }
-    else if (expr instanceof EmptyExpression) {
-      return  "";
     }
     else if (expr instanceof GenericsExpression) {
       return this.emitExpression(expr.expression);

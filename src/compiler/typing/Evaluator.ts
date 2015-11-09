@@ -20,19 +20,8 @@ import AST, {
 } from "../parser/AST";
 
 import Expression, {
-  LiteralExpression,
-  IdentifierExpression,
-  AssignmentExpression,
   NewVariableExpression,
-  FunctionCallExpression,
-  GenericsCallExpression,
-  GenericsExpression,
-  ReturnExpression,
-  MemberAccessExpression,
-  OperatorAccessExpression,
-  IfExpression,
-  EmptyExpression,
-  DeclarationExpression,
+  DeclarationExpression
 } from "./Expression";
 
 import FunctionExpression from "./expression/FunctionExpression";
