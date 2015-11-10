@@ -1,4 +1,4 @@
-import TypeThunk from "./thunk/TypeThunk";
+import Thunk from "./Thunk";
 import Type from "./Type";
 
 export
@@ -10,12 +10,12 @@ enum Constness {
 
 export default
 class Member {
-  type: TypeThunk;
-  settingType: TypeThunk;
+  type: Thunk<Type>;
+  settingType: Thunk<Type>;
 
-  constructor(public constness: Constness, type: Type|TypeThunk, settingType: Type|TypeThunk = type) {
-    this.type = TypeThunk.resolve(type);
-    this.settingType = TypeThunk.resolve(settingType);
+  constructor(public constness: Constness, type: Type|Thunk<Type>, settingType: Type|Thunk<Type> = type) {
+    this.type = Thunk.resolve(type);
+    this.settingType = Thunk.resolve(settingType);
   }
 
   mapType(f: (type: Type) => Type) {

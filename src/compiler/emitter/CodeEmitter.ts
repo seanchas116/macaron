@@ -10,6 +10,7 @@ import Expression, {
   IfExpression,
   GenericsExpression,
   GenericsCallExpression,
+  LazyExpression
 } from "../typing/Expression";
 
 import AssignableExpression, {
@@ -94,6 +95,9 @@ class CodeEmitter {
     else if (expr instanceof GenericsCallExpression) {
       return this.emitExpression(expr.value);
     }
+    else if (expr instanceof LazyExpression) {
+      return this.emitExpression(expr.value);
+    }
     else if (expr instanceof TypeExpression) {
       return "";
     }
@@ -142,9 +146,11 @@ class CodeEmitter {
     return this.indentation + this.emitClassMember(expr);
   }
 
-  emitClassMember(expr: Expression) {
+  emitClassMember(expr: Expression): string {
     if (expr instanceof FunctionExpression) {
       return this.emitClassMethod(expr);
+    } else if (expr instanceof LazyExpression) {
+      return this.emitClassMember(expr.value);
     } else {
       throw new Error(`Not supported expression: ${expr.constructor.name}`);
     }
@@ -163,7 +169,6 @@ class CodeEmitter {
   emitClass(expr: ClassExpression) {
     const emitter = this.indented();
     const body = expr.members
-      .map(member => member.get())
       .map(member => emitter.emitClassMemberIndented(member))
       .join("\n");
     let superclass = "";

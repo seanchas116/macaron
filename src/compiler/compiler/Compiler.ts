@@ -15,7 +15,7 @@ class Compiler {
   compile(filePath: string, source: string, options: CompileOption = {}) {
     const parsed = new Parser(filePath, source).parse();
     const evaluator = new Evaluator(defaultEnvironment.newChild());
-    let expressions = evaluator.evaluateExpressions(parsed).map(e => e.get());
+    let expressions = evaluator.evaluateExpressions(parsed);
     if (options.implicitReturn) {
       expressions = [new FunctionBodyExpression(expressions[0].range, expressions)];
     }

@@ -5,7 +5,6 @@ import CompilationError from "../../common/CompilationError";
 import Member, {Constness} from "../Member";
 import Environment from "../Environment";
 import SourceRange from "../../common/SourceRange";
-import TypeThunk from "../thunk/TypeThunk";
 import {union} from "../../util/set";
 
 function intersectionMembers(

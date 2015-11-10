@@ -11,6 +11,7 @@ import Expression, {
   OperatorAccessExpression,
   IfExpression,
   DeclarationExpression,
+  LazyExpression,
 } from "./Expression";
 
 import TypeExpression, {
@@ -27,9 +28,7 @@ import FunctionType from "./type/FunctionType";
 import GenericsParameterType from "./type/GenericsParameterType";
 import GenericsType from "./type/GenericsType";
 
-import TypeThunk from "./thunk/TypeThunk";
-import ExpressionThunk from "./thunk/ExpressionThunk";
-
+import Thunk from "./Thunk";
 import Member, {Constness} from "./Member";
 import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import CompilationError from "../common/CompilationError";
@@ -164,11 +163,15 @@ class ExpressionBuilder {
 
     const predefinedType = returnType && createType(returnType);
 
-    return new ExpressionThunk(range, () => {
-      const body = evalBody(subEnv);
-      const type = predefinedType || createType(body.type);
-      return new FunctionExpression(range, name, type, parameters, body);
-    }, predefinedType);
+    return this.buildLazy(
+      range,
+      () => {
+        const body = evalBody(subEnv);
+        const type = predefinedType || createType(body.type);
+        return new FunctionExpression(range, name, type, parameters, body);
+      },
+      predefinedType && (() => predefinedType)
+    );
   }
 
   buildGenericsParameter(
@@ -186,7 +189,7 @@ class ExpressionBuilder {
   buildGenerics(
     range: SourceRange,
     evalParams: (env: Environment) => GenericsParameterExpression[],
-    evalValue: (env: Environment) => ExpressionThunk
+    evalValue: (env: Environment) => Expression
   ) {
     const subEnv = this.environment.newChild();
     const params = evalParams(subEnv);
@@ -195,21 +198,17 @@ class ExpressionBuilder {
       subEnv.addGenericsPlaceholder(param.parameterType);
       subEnv.checkAddVariable(Constness.Constant, param.name, param.type);
     }
-    const valueThunk = evalValue(subEnv);
-    const typeThunk = new TypeThunk(
+    const value = evalValue(subEnv);
+    return this.buildLazy(
       range,
+      () => value,
       () => {
-        const template = valueThunk.type.get();
+        const template = value.type;
         return new GenericsType(
           template.name, params.map(p => p.parameterType), template,
           subEnv, range
         );
       }
-    );
-    return new ExpressionThunk(
-      range,
-      () => new GenericsExpression(range, params, typeThunk.get() as GenericsType, valueThunk.get()),
-      typeThunk
     );
   }
 
@@ -249,5 +248,14 @@ class ExpressionBuilder {
         `The value is not generic`
       );
     }
+  }
+
+  buildLazy(range: SourceRange, getExpr: () => Expression, getType: () => Type = null) {
+    const exprThunk = new Thunk(range, getExpr);
+    if (!getType) {
+      getType = () => exprThunk.get().type;
+    }
+    const typeThunk = new Thunk(range, getType);
+    return new LazyExpression(range, exprThunk, typeThunk);
   }
 }

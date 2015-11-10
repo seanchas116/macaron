@@ -10,6 +10,7 @@ import {Constness} from "./Member";
 import Environment from "./Environment";
 import AssignableExpression from "./AssignableExpression";
 import TypeExpression, {GenericsParameterExpression} from "./TypeExpression";
+import Thunk from "./Thunk";
 
 import SourceRange from "../common/SourceRange";
 import CompilationError from "../common/CompilationError";
@@ -214,5 +215,21 @@ class DeclarationExpression extends Expression {
     type: Type
   ) {
     super(range, type);
+  }
+}
+
+export
+class LazyExpression implements Expression {
+  constructor(
+    public range: SourceRange,
+    public valueThunk: Thunk<Expression>,
+    public typeThunk: Thunk<Type>
+  ) {}
+
+  get type() {
+    return this.typeThunk.get();
+  }
+  get value() {
+    return this.valueThunk.get();
   }
 }

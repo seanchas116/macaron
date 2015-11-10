@@ -5,7 +5,6 @@ import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import SourceRange from "../../common/SourceRange";
 import Member, {Constness} from "../Member";
-import TypeThunk from "../thunk/TypeThunk";
 import {intersection} from "../../util/set";
 
 export default

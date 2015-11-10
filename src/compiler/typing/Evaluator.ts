@@ -49,10 +49,9 @@ import UnionType from "./type/UnionType";
 import IntersectionType from "./type/IntersectionType";
 import GenericsType from "./type/GenericsType";
 import GenericsParameterType from "./type/GenericsParameterType";
-import ExpressionThunk from "./thunk/ExpressionThunk";
 import CallSignature from "./CallSignature";
 import Member, {Constness} from "./Member";
-import TypeThunk from "./thunk/TypeThunk";
+import Thunk from "./Thunk";
 import {voidType} from "./defaultEnvironment";
 import Environment from "./Environment";
 import ExpressionBuilder from "./ExpressionBuilder";
@@ -69,7 +68,7 @@ class Evaluator {
   }
 
   evaluateExpressions(asts: AST[]) {
-    const expressions: ExpressionThunk[] = [];
+    const expressions: Expression[] = [];
     const errors: ErrorInfo[] = [];
 
     for (const ast of asts) {
@@ -93,7 +92,7 @@ class Evaluator {
     return expressions;
   }
 
-  private evaluateImpl(ast: AST): Expression|ExpressionThunk {
+  evaluate(ast: AST): Expression {
     if (ast instanceof NewVariableAST) {
       return this.evaluateNewVariable(ast);
     } else if (ast instanceof AssignmentAST) {
@@ -140,10 +139,6 @@ class Evaluator {
     }
   }
 
-  evaluate(ast: AST) {
-    return ExpressionThunk.resolve(this.evaluateImpl(ast));
-  }
-
   evaluateAssignable(ast: AssignableAST): AssignableExpression {
     if (ast instanceof IdentifierAssignableAST) {
       return this.evaluateIdentifierAssignable(ast);
@@ -163,7 +158,7 @@ class Evaluator {
 
   evaluateNewVariable(ast: NewVariableAST) {
     const left = this.evaluateAssignable(ast.left);
-    const right = this.evaluate(ast.right).get();
+    const right = this.evaluate(ast.right);
 
     const constness = (() => {
       switch (ast.declaration) {
@@ -182,18 +177,18 @@ class Evaluator {
 
   evaluateAssignment(ast: AssignmentAST) {
     const left = this.evaluateAssignable(ast.left);
-    const right = this.evaluate(ast.right).get();
+    const right = this.evaluate(ast.right);
     return this.builder.buildAssignment(ast.range, left, right);
   }
 
   evaluateUnary(ast: UnaryAST) {
-    const operand = this.evaluate(ast.expression).get();
+    const operand = this.evaluate(ast.expression);
     return this.builder.buildUnary(ast.range, ast.operator, operand);
   }
 
   evaluateBinary(ast: BinaryAST) {
-    const left = this.evaluate(ast.left).get();
-    const right = this.evaluate(ast.right).get();
+    const left = this.evaluate(ast.left);
+    const right = this.evaluate(ast.right);
     return this.builder.buildBinary(ast.range, ast.operator, left, right);
   }
 
@@ -206,23 +201,26 @@ class Evaluator {
   }
 
   evaluateMemberAccess(ast: MemberAccessAST) {
-    const obj = this.evaluate(ast.object).get();
+    const obj = this.evaluate(ast.object);
     return this.builder.buildMemberAccess(ast.range, obj, ast.member);
   }
 
   evaluateFunction(ast: FunctionAST, thisType: Type = voidType) {
-    const funcThunk = this.evaluateFunctionGenerics(ast, thisType);
+    const func = this.evaluateFunctionGenerics(ast, thisType);
     if (ast.addAsVariable) {
-      const thunk = new ExpressionThunk(ast.range, () => {
-        return new NewVariableExpression(
-          ast.range, Constness.Constant,
-          new IdentifierAssignableExpression(ast.range, ast.name, null), funcThunk.get()
-        );
-      });
-      this.environment.checkAddVariable(Constness.Constant, ast.name, funcThunk.type);
-      return thunk;
+      const assignment = this.builder.buildLazy(
+        ast.range,
+        () => {
+          return new NewVariableExpression(
+            ast.range, Constness.Constant,
+            new IdentifierAssignableExpression(ast.range, ast.name, null),func
+          );
+        }
+      );
+      this.environment.checkAddVariable(Constness.Constant, ast.name, assignment.typeThunk);
+      return assignment;
     } else {
-      return funcThunk;
+      return func;
     }
   }
 
@@ -256,7 +254,7 @@ class Evaluator {
       },
       env => {
         const evaluator = new Evaluator(env);
-        const body = evaluator.evaluateExpressions(ast.expressions).map(e => e.get());
+        const body = evaluator.evaluateExpressions(ast.expressions);
         return new FunctionBodyExpression(ast.range, body);
       },
       thisType,
@@ -265,23 +263,23 @@ class Evaluator {
   }
 
   evaluateFunctionCall(ast: FunctionCallAST) {
-    const func = this.evaluate(ast.function).get();
-    const args = this.evaluateExpressions(ast.arguments).map(e => e.get());
+    const func = this.evaluate(ast.function);
+    const args = this.evaluateExpressions(ast.arguments);
     return this.builder.buildFunctionCall(ast.range, func, args, ast.isNewCall);
   }
 
   evaluateGenericsCall(ast: GenericsCallAST) {
-    const value = this.evaluate(ast.value).get();
+    const value = this.evaluate(ast.value);
     const args = ast.arguments.map(a => this.evaluateType(a));
     return this.builder.buildGenericsCall(ast.range, value, args);
   }
 
   evaluateClass(ast: ClassAST) {
-    const thunk = new ExpressionThunk(ast.range, () => {
+    const lazy = this.builder.buildLazy(ast.range, () => {
       let superExpr: Expression;
       if (ast.superclass) {
         console.log(ast.superclass);
-        superExpr = this.evaluate(ast.superclass).get();
+        superExpr = this.evaluate(ast.superclass);
         const superType = superExpr.type;
 
         let ok = superType instanceof MetaType && !superType.typeOnly;
@@ -295,14 +293,17 @@ class Evaluator {
 
       const expr = new ClassExpression(ast.range, this.environment, ast.name, superExpr);
       for (const memberAST of ast.members) {
-        const memberThunk = new ExpressionThunk(memberAST.range, () => this.evaluateFunction(memberAST, expr.selfType).get());
-        expr.addMember(Constness.Constant, memberAST.name, memberThunk);
+        const member = this.builder.buildLazy(
+          memberAST.range,
+          () => this.evaluateFunction(memberAST, expr.selfType)
+        );
+        expr.addMember(Constness.Constant, memberAST.name, member);
       }
       return expr;
     });
 
-    this.environment.checkAddVariable(Constness.Constant, ast.name, thunk.type);
-    return thunk;
+    this.environment.checkAddVariable(Constness.Constant, ast.name, lazy.typeThunk);
+    return lazy;
   }
 
   evaluateDeclarationType(selfType: Type, ast: AST) {
@@ -314,25 +315,27 @@ class Evaluator {
   }
 
   evaluateMethodDeclarationType(selfType: Type, ast: FunctionAST) {
-    const paramTypes: Type[] = [];
-    const subEnv = this.environment.newChild();
-    const subEvaluator = new Evaluator(subEnv);
+    return this.builder.buildLazy(ast.range, () => {
+      const paramTypes: Type[] = [];
+      const subEnv = this.environment.newChild();
+      const subEvaluator = new Evaluator(subEnv);
 
-    for (const param of ast.parameters) {
-      if (param instanceof IdentifierAssignableAST) {
-        const {name, type: typeExpr} = param;
-        const type = subEvaluator.evaluateType(typeExpr).type.metaType;
-        subEnv.checkAddVariable(Constness.Constant, name, type);
-        paramTypes.push(type);
-      } else {
-        throw new Error(`unsupported assignable Expression: ${param.constructor.name}`);
+      for (const param of ast.parameters) {
+        if (param instanceof IdentifierAssignableAST) {
+          const {name, type: typeExpr} = param;
+          const type = subEvaluator.evaluateType(typeExpr).type.metaType;
+          subEnv.checkAddVariable(Constness.Constant, name, type);
+          paramTypes.push(type);
+        } else {
+          throw new Error(`unsupported assignable Expression: ${param.constructor.name}`);
+        }
       }
-    }
 
-    const returnType = subEvaluator.evaluateType(ast.returnType).type.metaType;
+      const returnType = subEvaluator.evaluateType(ast.returnType).type.metaType;
 
-    const type = new FunctionType(selfType, paramTypes, [], returnType, this.environment, ast.range);
-    return new DeclarationExpression(ast.range, ast.name, type);
+      const type = new FunctionType(selfType, paramTypes, [], returnType, this.environment, ast.range);
+      return new DeclarationExpression(ast.range, ast.name, type);
+    });
   }
 
   evaluateInterface(ast: InterfaceAST) {
@@ -341,7 +344,7 @@ class Evaluator {
 
     for (const memberAST of ast.members) {
       expr.addMember(Constness.Constant, memberAST.name,
-        new ExpressionThunk(memberAST.range, () => this.evaluateDeclarationType(expr.type, memberAST)));
+        this.evaluateDeclarationType(expr.type, memberAST));
     }
 
     this.environment.checkAddVariable(Constness.Constant, ast.name, expr.type);
@@ -350,9 +353,9 @@ class Evaluator {
 
   evaluateIf(ast: IfAST) {
     return this.builder.buildIf(ast.range,
-      (env) => new Evaluator(env).evaluate(ast.condition).get(),
-      (env) => new Evaluator(env).evaluateExpressions(ast.ifTrue).map(e => e.get()),
-      (env) => new Evaluator(env).evaluateExpressions(ast.ifFalse).map(e => e.get())
+      (env) => new Evaluator(env).evaluate(ast.condition),
+      (env) => new Evaluator(env).evaluateExpressions(ast.ifTrue),
+      (env) => new Evaluator(env).evaluateExpressions(ast.ifFalse)
     );
   }
 

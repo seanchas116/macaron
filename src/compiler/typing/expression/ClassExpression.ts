@@ -1,7 +1,6 @@
 import Expression from "../Expression";
 import {EmptyTypeExpression} from "../TypeExpression";
 import InterfaceExpression from "./InterfaceExpression";
-import ExpressionThunk from "../thunk/ExpressionThunk";
 import Identifier from "../Identifier";
 import SourceRange from "../../common/SourceRange";
 import {voidType} from "../defaultEnvironment";
@@ -24,12 +23,11 @@ class ClassExpression extends InterfaceExpression {
     classType.newSignatures = [new CallSignature(voidType, [], this.selfType)];
   }
 
-  addMember(constness: Constness, name: Identifier, member: Expression|ExpressionThunk) {
+  addMember(constness: Constness, name: Identifier, member: Expression) {
     super.addMember(constness, name, member)
 
     if (name.name === "constructor") {
-      const memberThunk = ExpressionThunk.resolve(member);
-      this.classType.newSignatures = memberThunk.type.get().getCallSignatures().map(sig => {
+      this.classType.newSignatures = member.type.getCallSignatures().map(sig => {
         return new CallSignature(voidType, sig.params, this.selfType);
       });
     }

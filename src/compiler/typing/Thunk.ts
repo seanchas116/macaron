@@ -23,4 +23,16 @@ class Thunk<T> {
     }
     return this.value;
   }
+
+  map<U>(f: (value: T) => U) {
+    return new Thunk(this.range, () => f(this.value));
+  }
+
+  static resolve<U>(value: U|Thunk<U>) {
+    if (value instanceof Thunk) {
+      return value;
+    } else {
+      return new Thunk<U>(null, () => value as U);
+    }
+  }
 }

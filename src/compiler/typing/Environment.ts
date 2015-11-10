@@ -1,8 +1,8 @@
 import Type from "./Type";
 import GenericsParameterType from "./type/GenericsParameterType";
 import {voidType} from "./defaultEnvironment";
+import Thunk from "./Thunk";
 import Member, {Constness} from "./Member";
-import TypeThunk from "./thunk/TypeThunk";
 import Identifier from "./Identifier";
 import CompilationError from "../common/CompilationError";
 import {union} from "../util/set";
@@ -91,8 +91,7 @@ class Environment {
     return variable;
   }
 
-  checkAssignVariable(name: Identifier, typeOrOrThunk: Type|TypeThunk, firstAssign = false) {
-    const type = TypeThunk.resolve(typeOrOrThunk);
+  checkAssignVariable(name: Identifier, type: Type, firstAssign = false) {
     const {member} = this.checkGetVariable(name);
 
     if (member.constness === Constness.Constant && !firstAssign) {
@@ -108,17 +107,18 @@ class Environment {
       );
     }
     const reasons: string[] = [];
-    const assignable = member.settingType.get().isAssignable(type.get(), reasons);
+    const assignable = member.settingType.get().isAssignable(type, reasons);
     if (!assignable) {
       throw CompilationError.typeError(
         name.range,
-        `Cannot assign '${type.get()}' to type '${member.type.get()}'`,
+        `Cannot assign '${type}' to type '${member.type.get()}'`,
         ...reasons
       );
     }
   }
 
-  checkAddVariable(constness: Constness, name: Identifier, type: Type|TypeThunk) {
+  checkAddVariable(constness: Constness, name: Identifier, type: Type|Thunk<Type>) {
+    const typeThunk = Thunk.resolve(type);
     const variable = this.getVariable(name.name);
     if (variable && variable.member.constness === Constness.Builtin) {
       throw CompilationError.typeError(
@@ -132,6 +132,6 @@ class Environment {
         `Variable '${name.name}' already defined`
       );
     }
-    this.addVariable(name.name, new Member(constness, type));
+    this.addVariable(name.name, new Member(constness, typeThunk));
   }
 }
