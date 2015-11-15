@@ -8,79 +8,82 @@ import UnionType from "./type/UnionType";
 import GenericsParameterType from "./type/GenericsParameterType";
 import Environment from "./Environment";
 
-export default
-class TypeExpression extends Expression {
-  type: MetaType;
-  constructor(range: SourceRange, metaType: Type) {
-    super(range, MetaType.typeOnly(metaType));
-  }
+interface TypeExpression {
+  range: SourceRange;
+  metaType: Type;
+}
+
+export default TypeExpression;
+
+export
+function isTypeExpression(expr: any): expr is TypeExpression {
+  return expr && expr.metaType instanceof Type;
 }
 
 export
-class EmptyTypeExpression extends TypeExpression {
+class EmptyTypeExpression implements TypeExpression {
+  range = SourceRange.empty();
   constructor(
-    metaType: Type
+    public metaType: Type
   ) {
-    super(SourceRange.empty(), metaType);
   }
 }
 
 export
-class TypeIdentifierExpression extends TypeExpression {
+class TypeIdentifierExpression implements TypeExpression {
   constructor(
-    range: SourceRange,
+    public range: SourceRange,
     public name: Identifier,
-    metaType: Type
+    public metaType: Type
   ) {
-    super(range, metaType);
   }
 }
 
 export
-class TypeAliasExpression extends TypeExpression {
-  metaType = this.value.type;
+class TypeAliasExpression implements TypeExpression {
+  metaType = this.value.metaType;
 
   constructor(
-    range: SourceRange,
+    public range: SourceRange,
     public assignable: Identifier,
     public value: TypeExpression
   ) {
-    super(range, value.type);
   }
 }
 
 export
-class TypeUnionExpression extends TypeExpression {
-  constructor(
-    range: SourceRange,
-    public environment: Environment,
-    public left: TypeExpression,
-    public right: TypeExpression
-  ) {
-    super(range, new UnionType([left.type.metaType, right.type.metaType], environment, range));
-  }
-}
-
-export
-class TypeIntersectionExpression extends TypeExpression {
+class TypeUnionExpression implements TypeExpression {
+  metaType: Type;
   constructor(
     public range: SourceRange,
     public environment: Environment,
     public left: TypeExpression,
     public right: TypeExpression
   ) {
-    super(range, new IntersectionType([left.type.metaType, right.type.metaType], environment, range));
+    this.metaType = new UnionType([left.metaType, right.metaType], environment, range);
   }
 }
 
 export
-class GenericsParameterExpression extends TypeExpression {
+class TypeIntersectionExpression implements TypeExpression {
+  metaType: Type;
   constructor(
-    range: SourceRange,
+    public range: SourceRange,
+    public environment: Environment,
+    public left: TypeExpression,
+    public right: TypeExpression
+  ) {
+    this.metaType = new IntersectionType([left.metaType, right.metaType], environment, range);
+  }
+}
+
+export
+class GenericsParameterExpression implements TypeExpression {
+  constructor(
+    public range: SourceRange,
     public name: Identifier,
     public constrait: TypeExpression,
-    public parameterType: GenericsParameterType
+    public metaType: GenericsParameterType
   ) {
-    super(range, parameterType);
   }
 }

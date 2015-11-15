@@ -12,6 +12,7 @@ import Expression, {
   IfExpression,
   DeclarationExpression,
   LazyExpression,
+  TypeOnlyExpression
 } from "./Expression";
 
 import TypeExpression, {
@@ -27,6 +28,7 @@ import Type from "./Type";
 import FunctionType from "./type/FunctionType";
 import GenericsParameterType from "./type/GenericsParameterType";
 import GenericsType from "./type/GenericsType";
+import MetaType from "./type/MetaType";
 
 import Thunk from "./Thunk";
 import Member, {Constness} from "./Member";
@@ -57,7 +59,7 @@ class ExpressionBuilder {
   buildAssignment(range: SourceRange, left: AssignableExpression, right: Expression) {
     if (left instanceof IdentifierAssignableExpression) {
       const varName = left.name;
-      this.environment.checkAssignVariable(left.name, right.type);
+      this.environment.checkAssignVariable(left.name, right.valueType);
       return new AssignmentExpression(range, left, right);
     }
     throw new Error(`unsupported assignable Expression: ${left.constructor.name}`);
@@ -69,9 +71,9 @@ class ExpressionBuilder {
   ) {
     if (left instanceof IdentifierAssignableExpression) {
       const varName = left.name;
-      const type = left.type || right.type;
+      const type = left.type || right.valueType;
       this.environment.checkAddVariable(constness, left.name, type);
-      this.environment.checkAssignVariable(left.name, right.type, true);
+      this.environment.checkAssignVariable(left.name, right.valueType, true);
       return new NewVariableExpression(range, constness, left, right);
     }
     throw new Error(`unsupported assignable Expression: ${left.constructor.name}`);
@@ -92,14 +94,14 @@ class ExpressionBuilder {
     let hasSelf = false;
     if (!isNewCall) {
       if (func instanceof MemberAccessExpression || func instanceof OperatorAccessExpression) {
-        selfType = func.object.type;
+        selfType = func.object.valueType;
         hasSelf = true;
       }
     }
 
-    const funcType = func.type;
+    const funcType = func.valueType;
     const sigs = isNewCall ? funcType.getNewSignatures() : funcType.getCallSignatures();
-    const argTypes = args.map(a => a.type);
+    const argTypes = args.map(a => a.valueType);
     const reasons: string[] = [];
     const sig = sigs.find(sig => sig.isCallable(selfType, argTypes, reasons, hasSelf)); // ignore self type check on method call
     if (!sig) {
@@ -167,7 +169,7 @@ class ExpressionBuilder {
       range,
       () => {
         const body = evalBody(subEnv);
-        const type = predefinedType || createType(body.type);
+        const type = predefinedType || createType(body.valueType);
         return new FunctionExpression(range, name, type, parameters, body);
       },
       predefinedType && (() => predefinedType)
@@ -180,7 +182,7 @@ class ExpressionBuilder {
     constraint: TypeExpression
   ) {
     const type = new GenericsParameterType(
-      name.name, constraint.type.metaType,
+      name.name, constraint.metaType,
       this.environment, range
     );
     return new GenericsParameterExpression(range, name, constraint, type);
@@ -195,17 +197,17 @@ class ExpressionBuilder {
     const params = evalParams(subEnv);
 
     for (const param of params) {
-      subEnv.addGenericsPlaceholder(param.parameterType);
-      subEnv.checkAddVariable(Constness.Constant, param.name, param.type);
+      subEnv.addGenericsPlaceholder(param.metaType);
+      subEnv.checkAddVariable(Constness.Constant, param.name, MetaType.typeOnly(param.metaType));
     }
     const value = evalValue(subEnv);
     return this.buildLazy(
       range,
       () => value,
       () => {
-        const template = value.type;
+        const template = value.valueType;
         return new GenericsType(
-          template.name, params.map(p => p.parameterType), template,
+          template.name, params.map(p => p.metaType), template,
           subEnv, range
         );
       }
@@ -217,7 +219,7 @@ class ExpressionBuilder {
     value: Expression,
     args: TypeExpression[]
   ) {
-    const genericsType = value.type;
+    const genericsType = value.valueType;
     if (genericsType instanceof GenericsType) {
       const paramLength = genericsType.parameters.length
       if (paramLength !== args.length) {
@@ -231,14 +233,14 @@ class ExpressionBuilder {
       for (const [i, placeholder] of genericsType.parameters.entries()) {
         const reasons: string[] = [];
         const {constraint} = placeholder;
-        if (!constraint.isAssignable(args[i].type.metaType, reasons)) {
+        if (!constraint.isAssignable(args[i].metaType, reasons)) {
           throw CompilationError.typeError(
             args[i].range,
             `Cannot assign '${args[i]}' to type '${constraint}'`,
             ...reasons
           );
         }
-        types.set(placeholder, args[i].type.metaType);
+        types.set(placeholder, args[i].metaType);
       }
 
       const type = genericsType.template.resolveGenerics(types);
@@ -253,9 +255,13 @@ class ExpressionBuilder {
   buildLazy(range: SourceRange, getExpr: () => Expression, getType: () => Type = null) {
     const exprThunk = new Thunk(range, getExpr);
     if (!getType) {
-      getType = () => exprThunk.get().type;
+      getType = () => exprThunk.get().valueType;
     }
     const typeThunk = new Thunk(range, getType);
     return new LazyExpression(range, exprThunk, typeThunk);
+  }
+
+  buildTypeOnly(range: SourceRange, typeExpr: TypeExpression) {
+    return new TypeOnlyExpression(range, typeExpr, voidType);
   }
 }

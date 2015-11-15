@@ -15,7 +15,7 @@ class FunctionExpression implements Expression {
   constructor(
     public range: SourceRange,
     public name: Identifier,
-    public type: Type,
+    public valueType: Type,
     public parameters: AssignableExpression[],
     public body: FunctionBodyExpression
   ) {}

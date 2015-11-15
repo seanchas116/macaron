@@ -98,11 +98,8 @@ class CodeEmitter {
     else if (expr instanceof LazyExpression) {
       return this.emitExpression(expr.value);
     }
-    else if (expr instanceof TypeExpression) {
-      return "";
-    }
     else {
-      throw new Error(`Not supported Expression: ${expr.constructor.name}`);
+      return "";
     }
   }
 
@@ -173,7 +170,7 @@ class CodeEmitter {
       .join("\n");
     let superclass = "";
     if (expr.superExpression) {
-      superclass = " extends " + this.emitExpression(expr.superExpression);
+      superclass = " extends " + this.emitExpression(expr.superValueExpression);
     }
 
     return `class ${expr.name.name}${superclass} {\n${body}\n${this.indentation}}`;

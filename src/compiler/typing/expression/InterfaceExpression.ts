@@ -12,36 +12,26 @@ import CompilationError from "../../common/CompilationError";
 import {voidType} from "../defaultEnvironment";
 
 export default
-class InterfaceExpression extends TypeExpression {
-  type: MetaType;
+class InterfaceExpression implements TypeExpression {
+  metaType: InterfaceType;
+
   members: Expression[] = [];
   superTypes: Type[];
-  selfType: InterfaceType;
 
-  constructor(public range: SourceRange, env: Environment, public name: Identifier, public superExpressions: Expression[]) {
-    super(range, voidType);
+  constructor(public range: SourceRange, env: Environment, public name: Identifier, public superExpressions: TypeExpression[]) {
+    let superTypes = this.superTypes = superExpressions.map(superExpr => superExpr.metaType);
 
-    let superTypes = this.superTypes = superExpressions.map(superExpr => {
-      const superValueType = superExpr.type;
-      if (superValueType instanceof MetaType) {
-        return superValueType.metaType;
-      } else {
-        throw new Error("super value is not a type");
-      }
-    });
-
-    const type = this.selfType = new InterfaceType(name.name, superTypes, env, range);
-    this.type = MetaType.typeOnly(type);
+    const type = this.metaType = new InterfaceType(name.name, superTypes, env, range);
   }
 
   addMember(constness: Constness, name: Identifier, member: Expression) {
-    const type = this.selfType;
-    type.selfMembers.set(name.name, new Member(constness, new Thunk(member.range, () => member.type)));
+    const type = this.metaType;
+    type.selfMembers.set(name.name, new Member(constness, new Thunk(member.range, () => member.valueType)));
 
     for (const superType of this.superTypes) {
       const superMember = superType.getMember(name.name);
       const errors: string[] = [];
-      if (superMember && !superMember.type.get().isAssignable(member.type, errors)) {
+      if (superMember && !superMember.type.get().isAssignable(member.valueType, errors)) {
         throw CompilationError.typeError(
           name.range,
           `Type of "${name.name}" is not compatible to super types`,
