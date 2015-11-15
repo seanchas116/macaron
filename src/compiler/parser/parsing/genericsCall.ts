@@ -1,9 +1,9 @@
-import AST, {
+import {
   ExpressionAST,
   GenericsCallAST,
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import Parser, {lazy} from "../Parser";
 import {keyword, separated} from "./common";
 import {parsePostfix} from "./postfix";
 

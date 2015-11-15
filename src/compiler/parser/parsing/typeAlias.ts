@@ -1,9 +1,9 @@
-import AST, {
+import {
   ExpressionAST,
   TypeAliasAST,
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import Parser, {choose, sequence} from "../Parser";
 import {keyword} from "./common";
 import {parseNewVariable} from "./assignment";
 import {parseTypeExpression} from "./typeExpression";

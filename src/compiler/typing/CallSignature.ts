@@ -1,5 +1,4 @@
 import Type from "./Type";
-import GenericsParameterType from "./type/GenericsParameterType";
 
 export default
 class CallSignature {

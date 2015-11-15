@@ -2,8 +2,7 @@ import Parser, {
   choose,
   sequence,
   string,
-  regExp,
-  anyChar
+  regExp
 } from "../Parser";
 
 export

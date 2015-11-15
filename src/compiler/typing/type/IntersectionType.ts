@@ -1,5 +1,4 @@
 import Type from "../Type";
-import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import CompilationError from "../../common/CompilationError";
 import Member, {Constness} from "../Member";

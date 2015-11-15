@@ -1,4 +1,4 @@
-import AST, {
+import {
   ExpressionAST,
   OperatorAST,
   UnaryAST,
@@ -53,7 +53,6 @@ function parseUnaryExpressionWith(subParser: Parser<ExpressionAST>, operators: s
 
 export
 function parseBinaryExpressionWith(subParser: Parser<ExpressionAST>, operators: string[][]) {
-  const operatorList = flattenSort(operators);
   return sequence(
     subParser,
     sequence(parseOperator(flattenSort(operators)), subParser).repeat()

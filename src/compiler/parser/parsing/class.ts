@@ -1,12 +1,10 @@
-import AST, {
-  ExpressionAST,
-  IdentifierAST,
+import {
   FunctionAST,
   ClassAST,
   InterfaceAST
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import {sequence, lazy} from "../Parser";
 import {keyword, separated} from "./common";
 import {parseTypeExpression} from "./typeExpression";
 import {parseIdentifier} from "./identifier";

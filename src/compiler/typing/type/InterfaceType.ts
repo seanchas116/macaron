@@ -1,6 +1,6 @@
 import CallSignature from "../CallSignature";
 import Operator from "../Operator";
-import Member, {Constness} from "../Member";
+import Member from "../Member";
 import Environment from "../Environment";
 import Type from "../Type";
 import SourceRange from "../../common/SourceRange";

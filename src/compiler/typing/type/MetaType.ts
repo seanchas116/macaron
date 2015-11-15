@@ -1,6 +1,5 @@
 import Type from "../Type";
 import Environment from "../Environment";
-import Expression from "../Expression";
 import SourceRange from "../../common/SourceRange";
 
 export default

@@ -1,6 +1,5 @@
 import Parser from "../parser/MacaronParser";
 import {defaultEnvironment} from "../typing/defaultEnvironment";
-import Environment from "../typing/Environment";
 import Evaluator from "../typing/Evaluator";
 import CodeEmitter from "../emitter/CodeEmitter";
 import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression";

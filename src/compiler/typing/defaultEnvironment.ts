@@ -1,10 +1,8 @@
 import Environment from "./Environment";
 import Member, {Constness} from "./Member";
-import Type from "./Type";
 import InterfaceType from "./type/InterfaceType";
 import MetaType from "./type/MetaType";
 import ConstValueType from "./type/ConstValueType";
-import Thunk from "./Thunk";
 import CallSignature from "./CallSignature";
 import {NativeOperator} from "./Operator";
 import SourceRange from "../common/SourceRange";

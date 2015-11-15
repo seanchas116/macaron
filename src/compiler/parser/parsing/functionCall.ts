@@ -1,9 +1,9 @@
-import AST, {
+import {
   ExpressionAST,
   FunctionCallAST,
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import Parser, {lazy} from "../Parser";
 import {keyword} from "./common";
 import {parseLines} from "./block";
 

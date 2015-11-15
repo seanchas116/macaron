@@ -5,12 +5,9 @@ import Expression, {
   NewVariableExpression,
   FunctionCallExpression,
   GenericsCallExpression,
-  GenericsExpression,
-  ReturnExpression,
   MemberAccessExpression,
   OperatorAccessExpression,
   IfExpression,
-  DeclarationExpression,
   LazyExpression,
   TypeOnlyExpression
 } from "./Expression";
@@ -31,8 +28,8 @@ import GenericsType from "./type/GenericsType";
 import MetaType from "./type/MetaType";
 
 import Thunk from "./Thunk";
-import Member, {Constness} from "./Member";
-import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
+import {Constness} from "./Member";
+import {voidType} from "./defaultEnvironment";
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
 import Identifier from "./Identifier";
@@ -58,7 +55,6 @@ class ExpressionBuilder {
 
   buildAssignment(range: SourceRange, left: AssignableExpression, right: Expression) {
     if (left instanceof IdentifierAssignableExpression) {
-      const varName = left.name;
       this.environment.checkAssignVariable(left.name, right.valueType);
       return new AssignmentExpression(range, left, right);
     }
@@ -70,7 +66,6 @@ class ExpressionBuilder {
     left: AssignableExpression, right: Expression
   ) {
     if (left instanceof IdentifierAssignableExpression) {
-      const varName = left.name;
       const type = left.type || right.valueType;
       this.environment.checkAddVariable(constness, left.name, type);
       this.environment.checkAssignVariable(left.name, right.valueType, true);

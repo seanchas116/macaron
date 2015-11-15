@@ -1,7 +1,6 @@
 import Type from "../Type";
 import Environment from "../Environment";
 import IntersectionType from "./IntersectionType";
-import Operator, {NativeOperator, MethodOperator} from "../Operator";
 import CallSignature from "../CallSignature";
 import SourceRange from "../../common/SourceRange";
 import Member, {Constness} from "../Member";

@@ -11,14 +11,8 @@ const escapeStringRegexp = require('escape-string-regexp');
 function evalIsolated(code: string) {
   const es5: string = babel.transform(code).code;
   const sandbox = {};
-  const context = vm.createContext(sandbox);
+  vm.createContext(sandbox);
   return vm.runInContext(es5, sandbox);
-}
-
-function toLines(source: string) {
-  return source.split("\n")
-    .map(line => line.trim())
-    .filter(line => line != "");
 }
 
 describe("Compiler", () => {

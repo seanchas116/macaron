@@ -2,7 +2,6 @@ import Type from "../Type";
 import InterfaceType from "./InterfaceType";
 import Environment from "../Environment";
 import Member, {Constness} from "../Member";
-import Expression from "../Expression";
 import SourceRange from "../../common/SourceRange";
 
 export default

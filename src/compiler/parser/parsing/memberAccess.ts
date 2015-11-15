@@ -1,9 +1,9 @@
-import AST, {
+import {
   ExpressionAST,
   MemberAccessAST,
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import Parser, {lazy} from "../Parser";
 import {keyword} from "./common";
 import {parseIdentifier} from "./identifier";
 

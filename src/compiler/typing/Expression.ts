@@ -1,9 +1,7 @@
 import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import Type from "./Type";
-import MetaType from "./type/MetaType";
 import UnionType from "./type/UnionType";
 import GenericsType from "./type/GenericsType";
-import GenericsParameterType from "./type/GenericsParameterType";
 import Identifier from "./Identifier";
 import Operator from "./Operator";
 import {Constness} from "./Member";

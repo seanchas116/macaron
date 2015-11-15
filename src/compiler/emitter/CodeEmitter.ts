@@ -17,15 +17,12 @@ import AssignableExpression, {
   IdentifierAssignableExpression
 } from "../typing/AssignableExpression";
 
-import TypeExpression from "../typing/TypeExpression";
-
 import {NativeOperator, MethodOperator} from "../typing/Operator";
 
 import FunctionExpression from "../typing/expression/FunctionExpression";
 import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression";
 import ClassExpression from "../typing/expression/ClassExpression";
 
-import {Constness} from "../typing/Member";
 import Identifier from "../typing/Identifier";
 
 export default

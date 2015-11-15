@@ -1,6 +1,5 @@
 import Type from "../Type";
 import GenericsParameterType from "./GenericsParameterType";
-import CallSignature from "../CallSignature";
 import Environment from "../Environment";
 import SourceRange from "../../common/SourceRange";
 

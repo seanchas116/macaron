@@ -1,7 +1,5 @@
-import Expression from "./Expression";
 import Type from "./Type";
 import Identifier from "./Identifier";
-import MetaType from "./type/MetaType";
 import SourceRange from "../common/SourceRange";
 import IntersectionType from "./type/IntersectionType";
 import UnionType from "./type/UnionType";

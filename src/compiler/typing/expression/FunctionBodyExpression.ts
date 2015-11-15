@@ -1,5 +1,4 @@
-import Expression, {ReturnExpression} from "../Expression";
-import CompilationError from "../../common/CompilationError";
+import Expression from "../Expression";
 import SourceRange from "../../common/SourceRange";
 
 // TODO: improve

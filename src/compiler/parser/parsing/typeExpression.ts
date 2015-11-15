@@ -1,5 +1,4 @@
-import Parser, {choose, sequence, lazy} from "../Parser";
-import {keyword} from "./common";
+import {lazy} from "../Parser";
 import {typeBinaryOperators} from "../operators";
 import {parseIdentifier} from "./identifier";
 import {parsePostfixWith} from "./postfix";

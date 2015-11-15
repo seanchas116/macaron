@@ -2,18 +2,14 @@ import {
   IdentifierAST,
 } from "../AST";
 
-import Parser, {
-  choose,
+import {
   sequence,
-  string,
   regExp,
-  testChar,
   lazy
 } from "../Parser";
 
 import {
-  _, __, ___,
-  keyword
+  _,
 } from "./common";
 
 // TODO: allow more characters

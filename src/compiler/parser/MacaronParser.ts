@@ -1,5 +1,4 @@
 import CompilationError from "../common/CompilationError";
-import SourceRange from "../common/SourceRange";
 import {SyntaxError} from "./Parser";
 import {parseLines} from "./parsing/block";
 

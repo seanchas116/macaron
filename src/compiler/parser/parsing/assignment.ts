@@ -1,13 +1,11 @@
-import AST, {
+import {
   ExpressionAST,
   AssignmentAST,
   NewVariableAST
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
-import {parseExpression} from "./expression";
 import {parseOperator, parseBinaryExpression} from "./operator";
-import {parseIdentifier} from "./identifier";
 import {parseAssignable} from "./assignable";
 import {keyword} from "./common";
 

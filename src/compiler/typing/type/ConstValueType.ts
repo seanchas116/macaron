@@ -1,4 +1,4 @@
-import Type, {Assignability} from "../Type";
+import Type from "../Type";
 import InterfaceType from "./InterfaceType";
 import Environment from "../Environment";
 import SourceRange from "../../common/SourceRange";

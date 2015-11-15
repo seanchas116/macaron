@@ -1,4 +1,4 @@
-import AST, {ExpressionAST} from "../AST";
+import {ExpressionAST} from "../AST";
 import {choose, lazy} from "../Parser";
 import {keyword} from "./common";
 import {parseExpression} from "./expression";

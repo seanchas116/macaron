@@ -1,5 +1,4 @@
 import AST, {
-  ExpressionAST,
   AssignableAST,
   IdentifierAssignableAST,
   NewVariableAST,
@@ -24,7 +23,6 @@ import Expression, {
   DeclarationExpression
 } from "./Expression";
 
-import FunctionExpression from "./expression/FunctionExpression";
 import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 import ClassExpression from "./expression/ClassExpression";
 import InterfaceExpression from "./expression/InterfaceExpression";
@@ -34,31 +32,21 @@ import AssignableExpression, {
 } from "./AssignableExpression";
 
 import TypeExpression, {
-  isTypeExpression,
   TypeUnionExpression,
   TypeIntersectionExpression,
   TypeIdentifierExpression,
   TypeAliasExpression,
-  GenericsParameterExpression
 } from "./TypeExpression"
 
-import Identifier from "./Identifier";
 import Type from "./Type";
 import FunctionType from "./type/FunctionType";
 import MetaType from "./type/MetaType";
-import UnionType from "./type/UnionType";
-import IntersectionType from "./type/IntersectionType";
-import GenericsType from "./type/GenericsType";
-import GenericsParameterType from "./type/GenericsParameterType";
-import CallSignature from "./CallSignature";
-import Member, {Constness} from "./Member";
-import Thunk from "./Thunk";
+import {Constness} from "./Member";
 import {voidType} from "./defaultEnvironment";
 import Environment from "./Environment";
 import ExpressionBuilder from "./ExpressionBuilder";
 
 import CompilationError from "../common/CompilationError";
-import SourceRange from "../common/SourceRange";
 import ErrorInfo from "../common/ErrorInfo";
 
 export default

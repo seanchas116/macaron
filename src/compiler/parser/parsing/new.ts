@@ -1,10 +1,10 @@
-import AST, {
+import {
   ExpressionAST,
   FunctionCallAST
 } from "../AST";
 
 import Parser, {choose, sequence, lazy} from "../Parser";
-import {keyword, separated} from "./common";
+import {keyword} from "./common";
 import {parseArgumentList} from "./functionCall";
 import {parseValue} from "./value";
 import {parsePostfixWithoutFunctionCall} from "./postfix";

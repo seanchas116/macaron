@@ -1,4 +1,3 @@
-import CallSignature from "./CallSignature";
 import Type from "./Type";
 import {voidType} from "./defaultEnvironment";
 
