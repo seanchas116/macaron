@@ -149,6 +149,26 @@ class IfExpression implements Expression {
 }
 
 export
+class FunctionBodyExpression implements Expression {
+  constructor(
+    public range: SourceRange,
+    public expressions: Expression[],
+    public valueType: Type
+  ) {}
+}
+
+export
+class FunctionExpression implements Expression {
+  constructor(
+    public range: SourceRange,
+    public name: Identifier,
+    public valueType: Type,
+    public parameters: AssignableExpression[],
+    public body: FunctionBodyExpression
+  ) {}
+}
+
+export
 class DeclarationExpression implements Expression {
   constructor(
     public range: SourceRange,

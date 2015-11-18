@@ -22,7 +22,6 @@ import Expression, {
   DeclarationExpression
 } from "./Expression";
 
-import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 import ClassExpression from "./expression/ClassExpression";
 import InterfaceExpression from "./expression/InterfaceExpression";
 
@@ -236,7 +235,7 @@ class Evaluator {
       env => {
         const evaluator = new Evaluator(env);
         const body = evaluator.evaluateExpressions(ast.expressions);
-        return new FunctionBodyExpression(ast.range, body);
+        return this.builder.buildFunctionBody(ast.range, body);
       },
       thisType,
       ast.returnType && this.evaluateType(ast.returnType).metaType

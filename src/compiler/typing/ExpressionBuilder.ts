@@ -8,6 +8,8 @@ import Expression, {
   MemberAccessExpression,
   OperatorAccessExpression,
   IfExpression,
+  FunctionBodyExpression,
+  FunctionExpression,
   LazyExpression,
   TypeOnlyExpression
 } from "./Expression";
@@ -15,9 +17,6 @@ import Expression, {
 import TypeExpression, {
   GenericsParameterExpression
 } from "./TypeExpression";
-
-import FunctionExpression from "./expression/FunctionExpression";
-import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 
 import AssignableExpression, {IdentifierAssignableExpression} from "./AssignableExpression";
 
@@ -232,6 +231,14 @@ class ExpressionBuilder {
       },
       predefinedType && (() => predefinedType)
     );
+  }
+
+  buildFunctionBody(
+    range: SourceRange,
+    exprs: Expression[]
+  ) {
+    const returnType = exprs[exprs.length - 1].valueType;
+    return new FunctionBodyExpression(range, exprs, returnType);
   }
 
   buildGenericsParameter(

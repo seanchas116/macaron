@@ -54,8 +54,6 @@
         "./src/compiler/typing/Evaluator.ts",
         "./src/compiler/typing/Expression.ts",
         "./src/compiler/typing/expression/ClassExpression.ts",
-        "./src/compiler/typing/expression/FunctionBodyExpression.ts",
-        "./src/compiler/typing/expression/FunctionExpression.ts",
         "./src/compiler/typing/expression/InterfaceExpression.ts",
         "./src/compiler/typing/ExpressionBuilder.ts",
         "./src/compiler/typing/Identifier.ts",

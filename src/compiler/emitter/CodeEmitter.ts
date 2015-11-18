@@ -8,6 +8,8 @@ import Expression, {
   MemberAccessExpression,
   OperatorAccessExpression,
   IfExpression,
+  FunctionBodyExpression,
+  FunctionExpression,
   GenericsExpression,
   GenericsCallExpression,
   LazyExpression
@@ -19,8 +21,6 @@ import AssignableExpression, {
 
 import {NativeOperator, MethodOperator} from "../typing/Operator";
 
-import FunctionExpression from "../typing/expression/FunctionExpression";
-import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression";
 import ClassExpression from "../typing/expression/ClassExpression";
 
 import Identifier from "../typing/Identifier";

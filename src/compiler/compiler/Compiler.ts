@@ -2,7 +2,6 @@ import Parser from "../parser/MacaronParser";
 import {defaultEnvironment} from "../typing/defaultEnvironment";
 import Evaluator from "../typing/Evaluator";
 import CodeEmitter from "../emitter/CodeEmitter";
-import FunctionBodyExpression from "../typing/expression/FunctionBodyExpression";
 
 interface CompileOption {
   implicitReturn? : boolean;
@@ -16,7 +15,7 @@ class Compiler {
     const evaluator = new Evaluator(defaultEnvironment.newChild());
     let expressions = evaluator.evaluateExpressions(parsed);
     if (options.implicitReturn) {
-      expressions = [new FunctionBodyExpression(expressions[0].range, expressions)];
+      expressions = [evaluator.builder.buildFunctionBody(expressions[0].range, expressions)];
     }
 
     const emitter = new CodeEmitter();
