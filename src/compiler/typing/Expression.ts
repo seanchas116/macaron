@@ -129,30 +129,12 @@ class MemberAccessExpression implements Expression {
 
 export
 class OperatorAccessExpression implements Expression {
-  operator: Operator;
-  valueType: Type;
-
   constructor(
     public range: SourceRange,
     public object: Expression,
-    operatorName: Identifier,
-    arity: number
+    public operator: Operator,
+    public valueType: Type
   ) {
-    const objectType = object.valueType;
-    if (arity === 1) {
-      this.operator = objectType.getUnaryOperators().get(operatorName.name);
-    } else if (arity === 2) {
-      this.operator = objectType.getBinaryOperators().get(operatorName.name);
-    } else {
-      throw new Error("unsupported arity");
-    }
-    if (!this.operator) {
-      throw CompilationError.typeError(
-        operatorName.range,
-        `No operator '${operatorName.name}' for type '${objectType}'`
-      );
-    }
-    this.valueType = this.operator.type;
   }
 }
 

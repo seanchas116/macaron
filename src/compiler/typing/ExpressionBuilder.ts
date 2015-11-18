@@ -28,6 +28,7 @@ import GenericsType from "./type/GenericsType";
 import MetaType from "./type/MetaType";
 
 import Thunk from "./Thunk";
+import Operator from "./Operator";
 import {Constness} from "./Member";
 import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import CompilationError from "../common/CompilationError";
@@ -81,12 +82,12 @@ class ExpressionBuilder {
   }
 
   buildUnary(range: SourceRange, operator: Identifier, operand: Expression) {
-    const operatorAccess = new OperatorAccessExpression(range, operand, operator, 1);
+    const operatorAccess = this.buildOperatorAccess(range, operand, operator, 1);
     return this.buildFunctionCall(range, operatorAccess, [], false);
   }
 
   buildBinary(range: SourceRange, operator: Identifier, left: Expression, right: Expression) {
-    const operatorAccess = new OperatorAccessExpression(range, left, operator, 2);
+    const operatorAccess = this.buildOperatorAccess(range, left, operator, 2);
     return this.buildFunctionCall(range, operatorAccess, [right], false);
   }
 
@@ -141,6 +142,31 @@ class ExpressionBuilder {
     }
     const valueType = objectType.getMember(member.name).type.get();
     return new MemberAccessExpression(range, object, member, valueType);
+  }
+
+  buildOperatorAccess(
+    range: SourceRange,
+    object: Expression,
+    operatorName: Identifier,
+    arity: number
+  ) {
+    const objectType = object.valueType;
+    let operator: Operator;
+    if (arity === 1) {
+      operator = objectType.getUnaryOperators().get(operatorName.name);
+    } else if (arity === 2) {
+      operator = objectType.getBinaryOperators().get(operatorName.name);
+    } else {
+      throw new Error("unsupported arity");
+    }
+    if (!operator) {
+      throw CompilationError.typeError(
+        operatorName.range,
+        `No operator '${operatorName.name}' for type '${objectType}'`
+      );
+    }
+    const valueType = operator.type;
+    return new OperatorAccessExpression(range, object, operator, valueType);
   }
 
   buildIf(
