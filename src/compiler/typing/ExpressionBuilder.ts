@@ -18,18 +18,21 @@ import TypeExpression, {
   GenericsParameterExpression
 } from "./TypeExpression";
 
+import {InterfaceExpression, ClassExpression} from "./ClassExpression";
+
 import AssignableExpression, {IdentifierAssignableExpression} from "./AssignableExpression";
 
 import Type from "./Type";
+import InterfaceType from "./type/InterfaceType";
 import UnionType from "./type/UnionType";
 import FunctionType from "./type/FunctionType";
 import GenericsParameterType from "./type/GenericsParameterType";
 import GenericsType from "./type/GenericsType";
 import MetaType from "./type/MetaType";
-
+import CallSignature from "./CallSignature";
 import Thunk from "./Thunk";
 import Operator from "./Operator";
-import {Constness} from "./Member";
+import Member, {Constness} from "./Member";
 import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
@@ -328,5 +331,96 @@ class ExpressionBuilder {
 
   buildTypeOnly(range: SourceRange, typeExpr: TypeExpression) {
     return new TypeOnlyExpression(range, typeExpr, voidType);
+  }
+}
+
+export
+class InterfaceExpressionBuilder {
+  members: [Constness, Identifier, Expression][] = [];
+  selfType = this.createSelfType();
+
+  constructor(public range: SourceRange, public environment: Environment, public name: Identifier, public superExpressions: TypeExpression[]) {
+  }
+
+  addMember(constness: Constness, name: Identifier, member: Expression) {
+    for (const superType of this.superTypes()) {
+      const superMember = superType.getMember(name.name);
+      const errors: string[] = [];
+      if (superMember && !superMember.type.get().isAssignable(member.valueType, errors)) {
+        throw CompilationError.typeError(
+          name.range,
+          `Type of "${name.name}" is not compatible to super types`,
+          ...errors
+        );
+      }
+    }
+    this.selfType.selfMembers.set(name.name, new Member(constness, new Thunk(member.range, () => member.valueType)));
+    this.members.push([constness, name, member]);
+  }
+
+  superTypes() {
+    return this.superExpressions.map(e => e.metaType);
+  }
+
+  createSelfType() {
+    return new InterfaceType(this.name.name, this.superTypes(), this.environment, this.range);
+  }
+
+  buildInterface() {
+    return new InterfaceExpression(
+      this.range,
+      this.name,
+      this.superExpressions,
+      this.members.map(m => m[2]),
+      this.environment,
+      this.selfType
+    );
+  }
+}
+
+export
+class ClassExpressionBuilder extends InterfaceExpressionBuilder {
+  classType = this.createClassType();
+
+  constructor(range: SourceRange, environment: Environment, public name: Identifier, public superExpression: TypeExpression, public superClassExpression: Expression) {
+    super(range, environment, name, superExpression ? [superExpression] : []);
+  }
+
+  createSelfType() {
+    return new InterfaceType(this.name.name, this.superTypes(), this.environment, this.range);
+  }
+
+  createClassType() {
+    return new InterfaceType(
+      `class ${this.name.name}`,
+      this.superClassExpression ? [this.superClassExpression.valueType] : [],
+      this.environment, this.range
+    );
+  }
+
+  buildClass() {
+    const valueType = new MetaType(
+      this.classType, this.selfType,
+      this.environment, this.range
+    );
+    let newSignatures = [new CallSignature(voidType, [], this.selfType)];
+    for (const [constness, name, expr] of this.members) {
+      if (name.name === "constructor") {
+        newSignatures = expr.valueType.getCallSignatures().map(sig => {
+          return new CallSignature(voidType, sig.params, this.selfType);
+        });
+      }
+    }
+    this.classType.newSignatures = newSignatures;
+    return new ClassExpression(
+      this.range,
+      this.name,
+      this.superExpression,
+      this.superClassExpression,
+      this.members.map(m => m[2]),
+      this.environment,
+      valueType,
+      this.selfType
+    )
   }
 }

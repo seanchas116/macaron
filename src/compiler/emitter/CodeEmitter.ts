@@ -19,9 +19,9 @@ import AssignableExpression, {
   IdentifierAssignableExpression
 } from "../typing/AssignableExpression";
 
-import {NativeOperator, MethodOperator} from "../typing/Operator";
+import {ClassExpression} from "../typing/ClassExpression";
 
-import ClassExpression from "../typing/expression/ClassExpression";
+import {NativeOperator, MethodOperator} from "../typing/Operator";
 
 import Identifier from "../typing/Identifier";
 
@@ -167,7 +167,7 @@ class CodeEmitter {
       .join("\n");
     let superclass = "";
     if (expr.superExpression) {
-      superclass = " extends " + this.emitExpression(expr.superValueExpression);
+      superclass = " extends " + this.emitExpression(expr.superClassExpression);
     }
 
     return `class ${expr.name.name}${superclass} {\n${body}\n${this.indentation}}`;

@@ -22,8 +22,7 @@ import Expression, {
   DeclarationExpression
 } from "./Expression";
 
-import ClassExpression from "./expression/ClassExpression";
-import InterfaceExpression from "./expression/InterfaceExpression";
+import {ClassExpression, InterfaceExpression} from "./ClassExpression";
 
 import AssignableExpression, {
   IdentifierAssignableExpression
@@ -42,7 +41,7 @@ import MetaType from "./type/MetaType";
 import {Constness} from "./Member";
 import {voidType} from "./defaultEnvironment";
 import Environment from "./Environment";
-import ExpressionBuilder from "./ExpressionBuilder";
+import ExpressionBuilder, {ClassExpressionBuilder, InterfaceExpressionBuilder} from "./ExpressionBuilder";
 
 import CompilationError from "../common/CompilationError";
 import ErrorInfo from "../common/ErrorInfo";
@@ -256,25 +255,25 @@ class Evaluator {
 
   evaluateClass(ast: ClassAST) {
     const lazy = this.builder.buildLazy(ast.range, () => {
-      let expr: ClassExpression;
+      let builder: ClassExpressionBuilder;
 
       if (ast.superclass) {
         const superExpr = this.evaluate(ast.superclass);
         const superType = this.evaluateType(ast.superclass);
-        expr = new ClassExpression(ast.range, this.environment, ast.name, superExpr, superType);
+        builder = new ClassExpressionBuilder(ast.range, this.environment, ast.name, superType, superExpr);
       } else {
-        expr = new ClassExpression(ast.range, this.environment, ast.name, null, null);
+        builder = new ClassExpressionBuilder(ast.range, this.environment, ast.name, null, null);
       }
 
       for (const memberAST of ast.members) {
         const member = this.builder.buildLazy(
           memberAST.range,
-          () => this.evaluateFunction(memberAST, expr.metaType)
+          () => this.evaluateFunction(memberAST, builder.selfType)
         );
-        expr.addMember(Constness.Constant, memberAST.name, member);
+        builder.addMember(Constness.Constant, memberAST.name, member);
       }
 
-      return expr;
+      return builder.buildClass();
     });
 
     this.environment.checkAddVariable(Constness.Constant, ast.name, lazy.valueTypeThunk);
@@ -315,15 +314,15 @@ class Evaluator {
 
   evaluateInterface(ast: InterfaceAST) {
     const supers = ast.superTypes.map(ast => this.evaluateType(ast));
-    const expr = new InterfaceExpression(ast.range, this.environment, ast.name, supers);
+    const builder = new InterfaceExpressionBuilder(ast.range, this.environment, ast.name, supers);
 
     for (const memberAST of ast.members) {
-      expr.addMember(Constness.Constant, memberAST.name,
-        this.evaluateDeclarationType(expr.metaType, memberAST));
+      builder.addMember(Constness.Constant, memberAST.name,
+        this.evaluateDeclarationType(builder.selfType, memberAST));
     }
 
-    this.environment.checkAddVariable(Constness.Constant, ast.name, MetaType.typeOnly(expr.metaType));
-    return expr;
+    this.environment.checkAddVariable(Constness.Constant, ast.name, MetaType.typeOnly(builder.selfType));
+    return builder.buildInterface();
   }
 
   evaluateIf(ast: IfAST) {
