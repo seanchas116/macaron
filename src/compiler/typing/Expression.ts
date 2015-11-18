@@ -7,9 +7,7 @@ import Environment from "./Environment";
 import AssignableExpression from "./AssignableExpression";
 import TypeExpression, {GenericsParameterExpression} from "./TypeExpression";
 import Thunk from "./Thunk";
-
 import SourceRange from "../common/SourceRange";
-import CompilationError from "../common/CompilationError";
 
 export
 interface Expression {

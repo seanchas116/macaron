@@ -19,7 +19,6 @@ import AST, {
 } from "../parser/AST";
 
 import Expression, {
-  NewVariableExpression,
   DeclarationExpression
 } from "./Expression";
 
