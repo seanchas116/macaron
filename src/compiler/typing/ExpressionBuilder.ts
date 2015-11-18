@@ -22,6 +22,7 @@ import FunctionBodyExpression from "./expression/FunctionBodyExpression";
 import AssignableExpression, {IdentifierAssignableExpression} from "./AssignableExpression";
 
 import Type from "./Type";
+import UnionType from "./type/UnionType";
 import FunctionType from "./type/FunctionType";
 import GenericsParameterType from "./type/GenericsParameterType";
 import GenericsType from "./type/GenericsType";
@@ -35,6 +36,14 @@ import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
 import Identifier from "./Identifier";
 import Environment from "./Environment";
+
+function blockType(block: Expression[]) {
+  if (block.length > 0) {
+    return block[block.length - 1].valueType;
+  } else {
+    return voidType;
+  }
+}
 
 export default
 class ExpressionBuilder {
@@ -182,8 +191,9 @@ class ExpressionBuilder {
 
     const ifTrue = evalIfTrue(ifEnv.newChild());
     const ifFalse = evalIfFalse(ifEnv.newChild());
+    const valueType = new UnionType([blockType(ifTrue), blockType(ifFalse)], ifEnv, range);
 
-    return new IfExpression(range, this.environment, cond, ifTrue, ifFalse, tempVarName);
+    return new IfExpression(range, this.environment, cond, ifTrue, ifFalse, tempVarName, valueType);
   }
 
   buildFunction(

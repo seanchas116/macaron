@@ -1,6 +1,4 @@
-import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import Type from "./Type";
-import UnionType from "./type/UnionType";
 import GenericsType from "./type/GenericsType";
 import Identifier from "./Identifier";
 import Operator from "./Operator";
@@ -138,26 +136,17 @@ class OperatorAccessExpression implements Expression {
   }
 }
 
-function blockType(block: Expression[]) {
-  if (block.length > 0) {
-    return block[block.length - 1].valueType;
-  } else {
-    return voidType;
-  }
-}
-
 export
 class IfExpression implements Expression {
-  valueType: Type;
   constructor(
     public range: SourceRange,
     public environment: Environment,
     public condition: Expression,
     public ifTrue: Expression[],
     public ifFalse: Expression[],
-    public tempVarName: string
+    public tempVarName: string,
+    public valueType: Type
   ) {
-    this.valueType = new UnionType([blockType(ifTrue), blockType(ifFalse)], environment, range);
   }
 }
 
