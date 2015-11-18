@@ -1,4 +1,4 @@
-import Expression from "./Expression";
+import {Expression, NamedExpression} from "./Expression";
 import TypeExpression from "./TypeExpression";
 import Type from "./Type";
 import InterfaceType from "./type/InterfaceType";
@@ -14,7 +14,7 @@ class InterfaceExpression implements TypeExpression {
     public range: SourceRange,
     public name: Identifier,
     public superExpression: TypeExpression[],
-    public members: Expression[],
+    public members: NamedExpression[],
     public environment: Environment,
     public metaType: InterfaceType
   ) {}
@@ -27,7 +27,7 @@ class ClassExpression implements TypeExpression, Expression {
     public name: Identifier,
     public superExpression: TypeExpression,
     public superClassExpression: Expression,
-    public members: Expression[],
+    public members: NamedExpression[],
     public environment: Environment,
     public valueType: MetaType,
     public metaType: InterfaceType

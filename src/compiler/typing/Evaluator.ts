@@ -270,7 +270,7 @@ class Evaluator {
           memberAST.range, memberAST.name,
           () => this.evaluateFunction(memberAST, builder.selfType)
         );
-        builder.addMember(Constness.Constant, memberAST.name, member);
+        builder.addMember(Constness.Constant, member);
       }
 
       return builder.buildClass();
@@ -317,8 +317,7 @@ class Evaluator {
     const builder = new InterfaceExpressionBuilder(ast.range, this.environment, ast.name, supers);
 
     for (const memberAST of ast.members) {
-      builder.addMember(Constness.Constant, memberAST.name,
-        this.evaluateDeclarationType(builder.selfType, memberAST));
+      builder.addMember(Constness.Constant, this.evaluateDeclarationType(builder.selfType, memberAST));
     }
 
     this.environment.checkAddVariable(Constness.Constant, ast.name, MetaType.typeOnly(builder.selfType));

@@ -338,13 +338,14 @@ class ExpressionBuilder {
 
 export
 class InterfaceExpressionBuilder {
-  members: [Constness, Identifier, Expression][] = [];
+  members: [Constness, NamedExpression][] = [];
   selfType = this.createSelfType();
 
   constructor(public range: SourceRange, public environment: Environment, public name: Identifier, public superExpressions: TypeExpression[]) {
   }
 
-  addMember(constness: Constness, name: Identifier, member: Expression) {
+  addMember(constness: Constness, member: NamedExpression) {
+    const {name} = member;
     for (const superType of this.superTypes()) {
       const superMember = superType.getMember(name.name);
       const errors: string[] = [];
@@ -357,7 +358,7 @@ class InterfaceExpressionBuilder {
       }
     }
     this.selfType.selfMembers.set(name.name, new Member(constness, new Thunk(member.range, () => member.valueType)));
-    this.members.push([constness, name, member]);
+    this.members.push([constness, member]);
   }
 
   superTypes() {
@@ -373,7 +374,7 @@ class InterfaceExpressionBuilder {
       this.range,
       this.name,
       this.superExpressions,
-      this.members.map(m => m[2]),
+      this.members.map(m => m[1]),
       this.environment,
       this.selfType
     );
@@ -406,7 +407,8 @@ class ClassExpressionBuilder extends InterfaceExpressionBuilder {
       this.environment, this.range
     );
     let newSignatures = [new CallSignature(voidType, [], this.selfType)];
-    for (const [constness, name, expr] of this.members) {
+    for (const [constness, expr] of this.members) {
+      const {name} = expr;
       if (name.name === "constructor") {
         newSignatures = expr.valueType.getCallSignatures().map(sig => {
           return new CallSignature(voidType, sig.params, this.selfType);
@@ -419,7 +421,7 @@ class ClassExpressionBuilder extends InterfaceExpressionBuilder {
       this.name,
       this.superExpression,
       this.superClassExpression,
-      this.members.map(m => m[2]),
+      this.members.map(m => m[1]),
       this.environment,
       valueType,
       this.selfType
