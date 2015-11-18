@@ -33,11 +33,11 @@ class IdentifierExpression implements Expression {
 
 export
 class AssignmentExpression implements Expression {
-  valueType = this.value.valueType;
   constructor(
     public range: SourceRange,
     public assignable: AssignableExpression,
-    public value: Expression
+    public value: Expression,
+    public valueType: Type
   ) {
   }
 }

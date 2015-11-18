@@ -278,7 +278,7 @@ class CodeEmitter {
       new AssignmentExpression(
         last.range,
         new IdentifierAssignableExpression(last.range, new Identifier(varName, last.range), null),
-        last
+        last, last.valueType
       )
     ];
     return this.emitBlock(emittingExprs);

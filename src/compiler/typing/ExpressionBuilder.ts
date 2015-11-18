@@ -56,7 +56,7 @@ class ExpressionBuilder {
   buildAssignment(range: SourceRange, left: AssignableExpression, right: Expression) {
     if (left instanceof IdentifierAssignableExpression) {
       this.environment.checkAssignVariable(left.name, right.valueType);
-      return new AssignmentExpression(range, left, right);
+      return new AssignmentExpression(range, left, right, right.valueType);
     }
     throw new Error(`unsupported assignable Expression: ${left.constructor.name}`);
   }
