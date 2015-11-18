@@ -118,22 +118,12 @@ class ReturnExpression implements Expression {
 
 export
 class MemberAccessExpression implements Expression {
-  valueType: Type;
-
   constructor(
     public range: SourceRange,
     public object: Expression,
-    public member: Identifier
+    public member: Identifier,
+    public valueType: Type
   ) {
-    const objectType = object.valueType;
-
-    if (!objectType.getMember(member.name)) {
-      throw CompilationError.typeError(
-        range,
-        `Type '${objectType}' don't have member '${member.name}'`
-      );
-    }
-    this.valueType = objectType.getMember(member.name).type.get();
   }
 }
 

@@ -42,14 +42,15 @@ class ExpressionBuilder {
 
   buildIdentifier(range: SourceRange, name: Identifier): Expression {
     const {member, needsThis} = this.environment.checkGetVariable(name);
+    const type = member.type.get();
 
     if (needsThis) {
       const thisIdentifier = new Identifier("this", range);
       const {member: thisMember} = this.environment.checkGetVariable(thisIdentifier);
       const thisExpr = new IdentifierExpression(range, thisIdentifier, thisMember.type.get());
-      return new MemberAccessExpression(range, thisExpr, name);
+      return new MemberAccessExpression(range, thisExpr, name, type);
     } else {
-      return new IdentifierExpression(range, name, member.type.get());
+      return new IdentifierExpression(range, name, type);
     }
   }
 
@@ -130,7 +131,16 @@ class ExpressionBuilder {
   }
 
   buildMemberAccess(range: SourceRange, object: Expression, member: Identifier) {
-    return new MemberAccessExpression(range, object, member);
+    const objectType = object.valueType;
+
+    if (!objectType.getMember(member.name)) {
+      throw CompilationError.typeError(
+        range,
+        `Type '${objectType}' don't have member '${member.name}'`
+      );
+    }
+    const valueType = objectType.getMember(member.name).type.get();
+    return new MemberAccessExpression(range, object, member, valueType);
   }
 
   buildIf(
