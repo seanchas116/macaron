@@ -29,7 +29,7 @@ import MetaType from "./type/MetaType";
 
 import Thunk from "./Thunk";
 import {Constness} from "./Member";
-import {voidType} from "./defaultEnvironment";
+import {voidType, numberType, booleanType, stringType} from "./defaultEnvironment";
 import CompilationError from "../common/CompilationError";
 import SourceRange from "../common/SourceRange";
 import Identifier from "./Identifier";
@@ -114,7 +114,19 @@ class ExpressionBuilder {
   }
 
   buildLiteral(range: SourceRange, value: any) {
-    return new LiteralExpression(range, value);
+    const valueType = (() => {
+      switch (typeof value) {
+        case "number":
+          return numberType;
+        case "string":
+          return stringType;
+        case "boolean":
+          return booleanType;
+        default:
+          return voidType;
+      }
+    })();
+    return new LiteralExpression(range, value, valueType);
   }
 
   buildMemberAccess(range: SourceRange, object: Expression, member: Identifier) {

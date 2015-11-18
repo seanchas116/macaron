@@ -98,22 +98,10 @@ class GenericsCallExpression implements Expression {
 
 export
 class LiteralExpression implements Expression {
-  valueType = (() => {
-    switch (typeof this.value) {
-      case "number":
-        return numberType;
-      case "string":
-        return stringType;
-      case "boolean":
-        return booleanType;
-      default:
-        return voidType;
-    }
-  })();
-
   constructor(
     public range: SourceRange,
-    public value: any
+    public value: any,
+    public valueType: Type
   ) {
   }
 }
