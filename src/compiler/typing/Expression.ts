@@ -18,6 +18,11 @@ interface Expression {
 export default Expression;
 
 export
+interface NamedExpression extends Expression {
+  name: Identifier;
+}
+
+export
 class IdentifierExpression implements Expression {
   constructor(
     public range: SourceRange,
@@ -182,6 +187,7 @@ export
 class LazyExpression implements Expression {
   constructor(
     public range: SourceRange,
+    public name: Identifier,
     public valueThunk: Thunk<Expression>,
     public valueTypeThunk: Thunk<Type>
   ) {}

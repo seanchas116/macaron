@@ -254,7 +254,7 @@ class Evaluator {
   }
 
   evaluateClass(ast: ClassAST) {
-    const lazy = this.builder.buildLazy(ast.range, () => {
+    const lazy = this.builder.buildLazy(ast.range, ast.name, () => {
       let builder: ClassExpressionBuilder;
 
       if (ast.superclass) {
@@ -267,7 +267,7 @@ class Evaluator {
 
       for (const memberAST of ast.members) {
         const member = this.builder.buildLazy(
-          memberAST.range,
+          memberAST.range, memberAST.name,
           () => this.evaluateFunction(memberAST, builder.selfType)
         );
         builder.addMember(Constness.Constant, memberAST.name, member);
@@ -289,7 +289,7 @@ class Evaluator {
   }
 
   evaluateMethodDeclarationType(selfType: Type, ast: FunctionAST) {
-    return this.builder.buildLazy(ast.range, () => {
+    return this.builder.buildLazy(ast.range, ast.name, () => {
       const paramTypes: Type[] = [];
       const subEnv = this.environment.newChild();
       const subEvaluator = new Evaluator(subEnv);

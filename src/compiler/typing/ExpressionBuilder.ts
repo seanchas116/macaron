@@ -11,7 +11,8 @@ import Expression, {
   FunctionBodyExpression,
   FunctionExpression,
   LazyExpression,
-  TypeOnlyExpression
+  TypeOnlyExpression,
+  NamedExpression
 } from "./Expression";
 
 import TypeExpression, {
@@ -86,7 +87,7 @@ class ExpressionBuilder {
       } else {
         // Expression can be lazy
         this.environment.checkAddVariable(constness, left.name, new Thunk(right.range, () => right.valueType));
-        return this.buildLazy(range, () => new NewVariableExpression(range, constness, left, right, right.valueType));
+        return this.buildLazy(range, left.name, () => new NewVariableExpression(range, constness, left, right, right.valueType));
       }
     }
     throw new Error(`unsupported assignable Expression: ${left.constructor.name}`);
@@ -226,7 +227,7 @@ class ExpressionBuilder {
     const predefinedType = returnType && createType(returnType);
 
     return this.buildLazy(
-      range,
+      range, name,
       () => {
         const body = evalBody(subEnv);
         const type = predefinedType || createType(body.valueType);
@@ -259,7 +260,7 @@ class ExpressionBuilder {
   buildGenerics(
     range: SourceRange,
     evalParams: (env: Environment) => GenericsParameterExpression[],
-    evalValue: (env: Environment) => Expression
+    evalValue: (env: Environment) => NamedExpression
   ) {
     const subEnv = this.environment.newChild();
     const params = evalParams(subEnv);
@@ -271,6 +272,7 @@ class ExpressionBuilder {
     const value = evalValue(subEnv);
     return this.buildLazy(
       range,
+      value.name,
       () => value,
       () => {
         const template = value.valueType;
@@ -320,13 +322,13 @@ class ExpressionBuilder {
     }
   }
 
-  buildLazy(range: SourceRange, getExpr: () => Expression, getType: () => Type = null) {
+  buildLazy(range: SourceRange, name: Identifier, getExpr: () => Expression, getType: () => Type = null) {
     const exprThunk = new Thunk(range, getExpr);
     if (!getType) {
       getType = () => exprThunk.get().valueType;
     }
     const typeThunk = new Thunk(range, getType);
-    return new LazyExpression(range, exprThunk, typeThunk);
+    return new LazyExpression(range, name, exprThunk, typeThunk);
   }
 
   buildTypeOnly(range: SourceRange, typeExpr: TypeExpression) {
