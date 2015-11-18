@@ -64,12 +64,17 @@ class ExpressionBuilder {
   buildNewVariable(
     range: SourceRange, constness: Constness,
     left: AssignableExpression, right: Expression
-  ) {
+  ): Expression {
     if (left instanceof IdentifierAssignableExpression) {
-      const type = left.type || right.valueType;
-      this.environment.checkAddVariable(constness, left.name, type);
-      this.environment.checkAssignVariable(left.name, right.valueType, true);
-      return new NewVariableExpression(range, constness, left, right);
+      if (left.type) {
+        this.environment.checkAddVariable(constness, left.name, left.type);
+        this.environment.checkAssignVariable(left.name, right.valueType, true);
+        return new NewVariableExpression(range, constness, left, right, right.valueType);
+      } else {
+        // Expression can be lazy
+        this.environment.checkAddVariable(constness, left.name, new Thunk(right.range, () => right.valueType));
+        return this.buildLazy(range, () => new NewVariableExpression(range, constness, left, right, right.valueType));
+      }
     }
     throw new Error(`unsupported assignable Expression: ${left.constructor.name}`);
   }

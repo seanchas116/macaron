@@ -44,12 +44,12 @@ class AssignmentExpression implements Expression {
 
 export
 class NewVariableExpression implements Expression {
-  valueType = this.value.valueType;
   constructor(
     public range: SourceRange,
     public constness: Constness,
     public assignable: AssignableExpression,
-    public value: Expression
+    public value: Expression,
+    public valueType: Type
   ) {
   }
 }

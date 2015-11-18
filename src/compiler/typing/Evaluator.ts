@@ -194,20 +194,13 @@ class Evaluator {
     return this.builder.buildMemberAccess(ast.range, obj, ast.member);
   }
 
-  evaluateFunction(ast: FunctionAST, thisType: Type = voidType) {
+  evaluateFunction(ast: FunctionAST, thisType: Type = voidType): Expression {
     const func = this.evaluateFunctionGenerics(ast, thisType);
     if (ast.addAsVariable) {
-      const assignment = this.builder.buildLazy(
-        ast.range,
-        () => {
-          return new NewVariableExpression(
-            ast.range, Constness.Constant,
-            new IdentifierAssignableExpression(ast.range, ast.name, null),func
-          );
-        }
+      return this.builder.buildNewVariable(
+        ast.range, Constness.Constant,
+        new IdentifierAssignableExpression(ast.range, ast.name, null), func
       );
-      this.environment.checkAddVariable(Constness.Constant, ast.name, assignment.valueTypeThunk);
-      return assignment;
     } else {
       return func;
     }
