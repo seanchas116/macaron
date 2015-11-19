@@ -226,10 +226,7 @@ class Evaluator {
     return this.builder.buildFunction(
       ast.range,
       ast.name,
-      env => {
-        const evaluator = new Evaluator(env);
-        return ast.parameters.map(p => evaluator.evaluateAssignable(p))
-      },
+      ast.parameters.map(p => this.evaluateAssignable(p)),
       env => {
         const evaluator = new Evaluator(env);
         const body = evaluator.evaluateExpressions(ast.expressions);

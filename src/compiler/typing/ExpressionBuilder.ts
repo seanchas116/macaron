@@ -202,13 +202,12 @@ class ExpressionBuilder {
   buildFunction(
     range: SourceRange,
     name: Identifier,
-    evalParameters: (env: Environment) => AssignableExpression[],
+    parameters: AssignableExpression[],
     evalBody: (env: Environment) => FunctionBodyExpression,
     thisType: Type,
     returnType: Type
   ) {
     const subEnv = this.environment.newChild(thisType);
-    const parameters = evalParameters(subEnv);
 
     for (const param of parameters) {
       if (param instanceof IdentifierAssignableExpression) {
