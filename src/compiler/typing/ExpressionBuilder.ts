@@ -10,6 +10,7 @@ import Expression, {
   IfExpression,
   FunctionBodyExpression,
   FunctionExpression,
+  DeclarationExpression,
   LazyExpression,
   TypeOnlyExpression,
   NamedExpression
@@ -331,6 +332,19 @@ class ExpressionBuilder {
 
   buildTypeOnly(range: SourceRange, typeExpr: TypeExpression) {
     return new TypeOnlyExpression(range, typeExpr, voidType);
+  }
+
+  buildFunctionDeclaration(
+    range: SourceRange,
+    name: Identifier,
+    parameters: AssignableExpression[],
+    thisType: Type,
+    returnType: TypeExpression
+  ) {
+    const subEnv = this.environment.newChild();
+    const paramTypes = parameters.map(p => p.type);
+    const type = new FunctionType(thisType, paramTypes, [], returnType.metaType, this.environment, range);
+    return new DeclarationExpression(range, name, type);
   }
 }
 

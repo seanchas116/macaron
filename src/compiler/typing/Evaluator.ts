@@ -283,27 +283,15 @@ class Evaluator {
   }
 
   evaluateMethodDeclarationType(selfType: Type, ast: FunctionAST) {
-    return this.builder.buildLazy(ast.range, ast.name, () => {
-      const paramTypes: Type[] = [];
-      const subEnv = this.environment.newChild();
-      const subEvaluator = new Evaluator(subEnv);
-
-      for (const param of ast.parameters) {
-        if (param instanceof IdentifierAssignableAST) {
-          const {name, type: typeExpr} = param;
-          const type = subEvaluator.evaluateType(typeExpr).metaType;
-          subEnv.checkAddVariable(Constness.Constant, name, type);
-          paramTypes.push(type);
-        } else {
-          throw new Error(`unsupported assignable Expression: ${param.constructor.name}`);
-        }
-      }
-
-      const returnType = subEvaluator.evaluateType(ast.returnType).metaType;
-
-      const type = new FunctionType(selfType, paramTypes, [], returnType, this.environment, ast.range);
-      return new DeclarationExpression(ast.range, ast.name, type);
-    });
+    return this.builder.buildLazy(ast.range, ast.name, () =>
+      this.builder.buildFunctionDeclaration(
+        ast.range,
+        ast.name,
+        ast.parameters.map(p => this.evaluateAssignable(p)),
+        selfType,
+        this.evaluateType(ast.returnType)
+      )
+    );
   }
 
   evaluateInterface(ast: InterfaceAST) {
