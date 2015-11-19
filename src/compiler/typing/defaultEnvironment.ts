@@ -1,7 +1,6 @@
 import Environment from "./Environment";
 import Member, {Constness} from "./Member";
 import InterfaceType from "./type/InterfaceType";
-import MetaType from "./type/MetaType";
 import ConstValueType from "./type/ConstValueType";
 import CallSignature from "./CallSignature";
 import {NativeOperator} from "./Operator";
@@ -61,11 +60,11 @@ addNativeUnaryOp(booleanType, "!");
 
 addNativeBinaryOp(stringType, "+");
 
-defaultEnvironment.addVariable("number", new Member(Constness.Constant, MetaType.typeOnly(numberType)));
-defaultEnvironment.addVariable("boolean", new Member(Constness.Constant, MetaType.typeOnly(booleanType)));
-defaultEnvironment.addVariable("string", new Member(Constness.Constant, MetaType.typeOnly(stringType)));
-defaultEnvironment.addVariable("void", new Member(Constness.Constant, MetaType.typeOnly(voidType)));
-defaultEnvironment.addVariable("any", new Member(Constness.Constant, MetaType.typeOnly(voidType)));
+defaultEnvironment.addType("number", numberType);
+defaultEnvironment.addType("boolean", booleanType);
+defaultEnvironment.addType("string", stringType);
+defaultEnvironment.addType("void", voidType);
+defaultEnvironment.addType("any", voidType);
 
 defaultEnvironment.addVariable("true", new Member(Constness.Builtin, new ConstValueType(booleanType, true, defaultEnvironment, emptyRange)));
 defaultEnvironment.addVariable("false", new Member(Constness.Builtin, new ConstValueType(booleanType, false, defaultEnvironment, emptyRange)));

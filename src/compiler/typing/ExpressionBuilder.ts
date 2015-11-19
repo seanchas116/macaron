@@ -29,7 +29,6 @@ import UnionType from "./type/UnionType";
 import FunctionType from "./type/FunctionType";
 import GenericsParameterType from "./type/GenericsParameterType";
 import GenericsType from "./type/GenericsType";
-import MetaType from "./type/MetaType";
 import CallSignature from "./CallSignature";
 import Thunk from "./Thunk";
 import Operator from "./Operator";
@@ -266,8 +265,7 @@ class ExpressionBuilder {
     const params = evalParams(subEnv);
 
     for (const param of params) {
-      subEnv.addGenericsPlaceholder(param.metaType);
-      subEnv.checkAddVariable(Constness.Constant, param.name, MetaType.typeOnly(param.metaType));
+      subEnv.checkAddType(param.name, param.metaType);
     }
     const value = evalValue(subEnv);
     return this.buildLazy(
@@ -370,6 +368,7 @@ class InterfaceExpressionBuilder {
   }
 
   buildInterface() {
+    this.environment.checkAddType(this.name, this.selfType);
     return new InterfaceExpression(
       this.range,
       this.name,
@@ -402,10 +401,6 @@ class ClassExpressionBuilder extends InterfaceExpressionBuilder {
   }
 
   buildClass() {
-    const valueType = new MetaType(
-      this.classType, this.selfType,
-      this.environment, this.range
-    );
     let newSignatures = [new CallSignature(voidType, [], this.selfType)];
     for (const [constness, expr] of this.members) {
       const {name} = expr;
@@ -416,15 +411,20 @@ class ClassExpressionBuilder extends InterfaceExpressionBuilder {
       }
     }
     this.classType.newSignatures = newSignatures;
-    return new ClassExpression(
-      this.range,
-      this.name,
-      this.superExpression,
-      this.superClassExpression,
-      this.members.map(m => m[1]),
-      this.environment,
-      valueType,
-      this.selfType
-    )
+    const thunk = new Thunk(this.range, () =>
+      new ClassExpression(
+        this.range,
+        this.name,
+        this.superExpression,
+        this.superClassExpression,
+        this.members.map(m => m[1]),
+        this.environment,
+        this.classType,
+        this.selfType
+      )
+    );
+    this.environment.checkAddVariable(Constness.Constant, this.name, thunk.map(e => e.valueType));
+    this.environment.checkAddType(this.name, thunk.map(e => e.metaType));
+    return new LazyExpression(this.range, this.name, thunk, thunk.map(e => e.valueType));
   }
 }

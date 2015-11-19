@@ -2,7 +2,6 @@ import {Expression, NamedExpression} from "./Expression";
 import TypeExpression from "./TypeExpression";
 import Type from "./Type";
 import InterfaceType from "./type/InterfaceType";
-import MetaType from "./type/MetaType";
 import Identifier from "./Identifier";
 import Environment from "./Environment";
 import Member, {Constness} from "./Member";
@@ -29,7 +28,7 @@ class ClassExpression implements TypeExpression, Expression {
     public superClassExpression: Expression,
     public members: NamedExpression[],
     public environment: Environment,
-    public valueType: MetaType,
+    public valueType: InterfaceType,
     public metaType: InterfaceType
   ) {}
 }

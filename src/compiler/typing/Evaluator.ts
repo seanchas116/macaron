@@ -37,7 +37,6 @@ import TypeExpression, {
 
 import Type from "./Type";
 import FunctionType from "./type/FunctionType";
-import MetaType from "./type/MetaType";
 import {Constness} from "./Member";
 import {voidType} from "./defaultEnvironment";
 import Environment from "./Environment";
@@ -254,30 +253,25 @@ class Evaluator {
   }
 
   evaluateClass(ast: ClassAST) {
-    const lazy = this.builder.buildLazy(ast.range, ast.name, () => {
-      let builder: ClassExpressionBuilder;
+    let builder: ClassExpressionBuilder;
 
-      if (ast.superclass) {
-        const superExpr = this.evaluate(ast.superclass);
-        const superType = this.evaluateType(ast.superclass);
-        builder = new ClassExpressionBuilder(ast.range, this.environment, ast.name, superType, superExpr);
-      } else {
-        builder = new ClassExpressionBuilder(ast.range, this.environment, ast.name, null, null);
-      }
+    if (ast.superclass) {
+      const superExpr = this.evaluate(ast.superclass);
+      const superType = this.evaluateType(ast.superclass);
+      builder = new ClassExpressionBuilder(ast.range, this.environment, ast.name, superType, superExpr);
+    } else {
+      builder = new ClassExpressionBuilder(ast.range, this.environment, ast.name, null, null);
+    }
 
-      for (const memberAST of ast.members) {
-        const member = this.builder.buildLazy(
-          memberAST.range, memberAST.name,
-          () => this.evaluateFunction(memberAST, builder.selfType)
-        );
-        builder.addMember(Constness.Constant, member);
-      }
+    for (const memberAST of ast.members) {
+      const member = this.builder.buildLazy(
+        memberAST.range, memberAST.name,
+        () => this.evaluateFunction(memberAST, builder.selfType)
+      );
+      builder.addMember(Constness.Constant, member);
+    }
 
-      return builder.buildClass();
-    });
-
-    this.environment.checkAddVariable(Constness.Constant, ast.name, lazy.valueTypeThunk);
-    return lazy;
+    return builder.buildClass();
   }
 
   evaluateDeclarationType(selfType: Type, ast: AST) {
@@ -320,7 +314,6 @@ class Evaluator {
       builder.addMember(Constness.Constant, this.evaluateDeclarationType(builder.selfType, memberAST));
     }
 
-    this.environment.checkAddVariable(Constness.Constant, ast.name, MetaType.typeOnly(builder.selfType));
     return builder.buildInterface();
   }
 
@@ -335,7 +328,7 @@ class Evaluator {
   evaluateTypeAlias(ast: TypeAliasAST) {
     const typeExpr = this.evaluateType(ast.right);
 
-    this.environment.checkAddVariable(Constness.Constant, ast.left, MetaType.typeOnly(typeExpr.metaType));
+    this.environment.checkAddType(ast.left, typeExpr.metaType);
 
     return new TypeAliasExpression(ast.range, ast.left, typeExpr);
   }
@@ -355,15 +348,8 @@ class Evaluator {
   }
 
   evaluateTypeIdentifier(ast: IdentifierAST) {
-    const {member} = this.environment.checkGetVariable(ast);
-    const type = member.type.get();
-    if (type instanceof MetaType) {
-      return new TypeIdentifierExpression(ast.range, ast, type.metaType);
-    }
-    throw CompilationError.typeError(
-      ast.range,
-      `Variable '${ast.name}' is not a type`
-    );
+    const type = this.environment.checkGetType(ast).get();
+    return new TypeIdentifierExpression(ast.range, ast, type);
   }
 
   evaluateTypeBinary(ast: BinaryAST): TypeExpression {

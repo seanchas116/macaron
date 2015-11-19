@@ -25,7 +25,7 @@ class Thunk<T> {
   }
 
   map<U>(f: (value: T) => U) {
-    return new Thunk(this.range, () => f(this.value));
+    return new Thunk(this.range, () => f(this.get()));
   }
 
   static resolve<U>(value: U|Thunk<U>) {

@@ -15,8 +15,8 @@ interface Variable {
 
 export default
 class Environment {
-  private variables = new Map<string, Member>();
-  private genericsPlaceholders = new Set<GenericsParameterType>();
+  variables = new Map<string, Member>();
+  types = new Map<string, Thunk<Type>>();
 
   constructor(public parent: Environment = null, public thisType: Type = null) {
   }
@@ -40,10 +40,9 @@ class Environment {
     }
   }
 
-  addVariable(name: string, variable: Member): void {
+  addVariable(name: string, variable: Member) {
     this.variables.set(name, variable);
   }
-
   getVariable(name: string): Variable {
     if (this.parent) {
       const parentVariable = this.parent.getVariable(name);
@@ -66,6 +65,22 @@ class Environment {
     }
   }
 
+  addType(name: string, type: Type|Thunk<Type>) {
+    this.types.set(name, Thunk.resolve(type));
+  }
+  getType(name: string): Thunk<Type> {
+    if (this.parent) {
+      const parentType = this.parent.getType(name);
+      if (parentType) {
+        return parentType;
+      }
+    }
+    return this.getOwnType(name);
+  }
+  getOwnType(name: string) {
+    return this.types.get(name);
+  }
+
   getGenericsPlaceholders(): Set<GenericsParameterType> {
     if (this.parent) {
       return union(this.getOwnGenericsPlaceholders(), this.parent.getGenericsPlaceholders());
@@ -74,10 +89,14 @@ class Environment {
     }
   }
   getOwnGenericsPlaceholders() {
-    return this.genericsPlaceholders;
-  }
-  addGenericsPlaceholder(placeholder: GenericsParameterType) {
-    this.genericsPlaceholders.add(placeholder);
+    const placeholders = new Set<GenericsParameterType>();
+    for (const typeThunk of this.types.values()) {
+      const type = typeThunk.get();
+      if (type instanceof GenericsParameterType) {
+        placeholders.add(type);
+      }
+    }
+    return placeholders;
   }
 
   checkGetVariable(name: Identifier) {
@@ -133,5 +152,26 @@ class Environment {
       );
     }
     this.addVariable(name.name, new Member(constness, typeThunk));
+  }
+
+  checkGetType(name: Identifier) {
+    const type = this.getType(name.name);
+    if (!type) {
+      throw CompilationError.typeError(
+        name.range,
+        `Type '${name.name}' not found`
+      );
+    }
+    return type;
+  }
+
+  checkAddType(name: Identifier, type: Type|Thunk<Type>) {
+    if (this.getOwnType(name.name)) {
+      throw CompilationError.typeError(
+        name.range,
+        `Type '${name.name}' already defined`
+      );
+    }
+    this.addType(name.name, type);
   }
 }
