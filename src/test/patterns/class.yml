@@ -60,13 +60,10 @@
   src: |
     class Foo(#x number, #y number) {
       z = x + y
-      init {
-        z = z + 100
-      }
-      foo() {
-        console.log(z)
+      sum() {
+        x + y + z
       }
     }
     let foo = new Foo(100, 200)
-    foo.z
-  expected: 400
+    foo.sum()
+  expected: 600
