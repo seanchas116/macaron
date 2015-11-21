@@ -21,7 +21,7 @@
     "minimist": "^1.2.0",
     "mocha": "^2.3.3",
     "power-assert": "^1.1.0",
-    "typescript": "^1.8.0-dev.20151115"
+    "typescript": "^1.8.0-dev.20151121"
   },
   "dependencies": {
     "colors": "^1.1.2",
