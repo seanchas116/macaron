@@ -58,10 +58,13 @@
 
 - title: instance initialization
   src: |
-    class Foo(.x number, .y number) {
+    class Foo(#x number, #y number) {
       z = x + y
       init {
-        z += 100
+        z = z + 100
+      }
+      foo() {
+        console.log(z)
       }
     }
     let foo = new Foo(100, 200)
