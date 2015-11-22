@@ -58,6 +58,7 @@
         "./src/compiler/typing/Identifier.ts",
         "./src/compiler/typing/Member.ts",
         "./src/compiler/typing/Operator.ts",
+        "./src/compiler/typing/Scope.ts",
         "./src/compiler/typing/Thunk.ts",
         "./src/compiler/typing/Type.ts",
         "./src/compiler/typing/type/ConstValueType.ts",
@@ -82,5 +83,8 @@
         "./typings/tsd.d.ts"
     ],
     "compileOnSave": true,
-    "exclude": []
+    "exclude": [],
+    "atom": {
+        "rewriteTsconfig": true
+    }
 }
