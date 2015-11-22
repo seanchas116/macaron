@@ -1,11 +1,13 @@
-import {
+import AST, {
+  NewVariableAST,
   FunctionAST,
   ClassAST,
   InterfaceAST
 } from "../AST";
 
-import {sequence, lazy} from "../Parser";
+import {sequence, lazy, choose} from "../Parser";
 import {keyword, separated} from "./common";
+import {parseExpression} from "./expression";
 import {parseTypeExpression} from "./typeExpression";
 import {parseIdentifier} from "./identifier";
 import {parseBlock} from "./block";
@@ -24,7 +26,20 @@ var parseMethod = lazy(() =>
     )
 );
 
-// TODO: parse property
+var parseProperty = lazy(() =>
+  sequence(
+    keyword("var").mayBe(),
+    parseIdentifier,
+    parseTypeExpression.mayBe(),
+    keyword("=").thenTake(parseExpression)
+  )
+    .withRange()
+    .map(([[isVar, name, type, expr], range]) =>
+      new NewVariableAST(range, isVar ? "var" : "let", name, type, expr)
+    )
+);
+
+//var parseMember = choose<AST>(parseMethod, parseProperty);
 var parseMember = parseMethod;
 
 var parseSuperType = lazy(() =>
