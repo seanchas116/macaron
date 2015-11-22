@@ -56,6 +56,16 @@
     bar.foo(1, 2) + bar.bar(3, 4, 5)
   expected: 15
 
+- title: property initialization
+  src: |
+    class Foo {
+      x = 100
+      y = x + 200
+    }
+    let foo = new Foo()
+    foo.y
+  expected: 300
+
 - title: instance initialization
   src: |
     class Foo(#x number, #y number) {
