@@ -29,6 +29,6 @@
     "hashmap": "^2.0.4",
     "once": "^1.3.2",
     "source-map": "^0.5.3",
-    "tparse": "github:seanchas116/tparse"
+    "tparse": "^0.1.0"
   }
 }
