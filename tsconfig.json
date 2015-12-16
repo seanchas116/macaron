@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "es6",
+        "moduleResolution": "node",
         "declaration": false,
         "noImplicitAny": true,
         "removeComments": true,
@@ -82,7 +83,7 @@
         "./typings/source-map/source-map.d.ts",
         "./typings/tsd.d.ts"
     ],
-    "compileOnSave": true,
+    "compileOnSave": false,
     "exclude": [],
     "atom": {
         "rewriteTsconfig": true
