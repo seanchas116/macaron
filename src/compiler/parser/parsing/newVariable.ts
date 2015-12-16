@@ -4,7 +4,7 @@ import {
   TypeAliasAST
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import {Parser, choose, sequence, lazy} from "tparse";
 import {parseOperator, parseBinaryExpression} from "./operator";
 import {parseAssignment} from "./assignment";
 import {parseAssignable} from "./assignable";

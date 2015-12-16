@@ -1,5 +1,5 @@
 import {LiteralAST} from "../AST";
-import {choose, string, regExp, anyChar} from "../Parser";
+import {choose, string, regExp, anyChar} from "tparse";
 import {_} from "./common";
 
 const parseEscaped =

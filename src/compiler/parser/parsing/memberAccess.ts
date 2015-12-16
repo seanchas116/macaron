@@ -3,7 +3,7 @@ import {
   MemberAccessAST,
 } from "../AST";
 
-import Parser, {lazy} from "../Parser";
+import {Parser, lazy} from "tparse";
 import {keyword} from "./common";
 import {parseIdentifier} from "./identifier";
 

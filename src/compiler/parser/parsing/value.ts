@@ -1,5 +1,5 @@
 import {ExpressionAST} from "../AST";
-import {choose, lazy} from "../Parser";
+import {choose, lazy} from "tparse";
 import {keyword} from "./common";
 import {parseExpression} from "./expression";
 import {parseIdentifier} from "./identifier";

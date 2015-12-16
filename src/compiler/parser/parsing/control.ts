@@ -3,7 +3,7 @@ import {
   IfAST
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import {Parser, choose, sequence, lazy} from "tparse";
 import {keyword} from "./common";
 import {parseExpression} from "./expression";
 import {parseBlock} from "./block";

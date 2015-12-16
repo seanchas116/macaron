@@ -3,7 +3,7 @@ import {
   FunctionCallAST
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import {Parser, choose, sequence, lazy} from "tparse";
 import {keyword} from "./common";
 import {parseArgumentList} from "./functionCall";
 import {parseValue} from "./value";

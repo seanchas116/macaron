@@ -1,5 +1,5 @@
 import {LiteralAST} from "../AST";
-import {choose, sequence, string, regExp} from "../Parser";
+import {choose, sequence, string, regExp} from "tparse";
 import {_} from "./common";
 
 const parseFloatFrac =

@@ -4,7 +4,7 @@ import {
   FunctionAST
 } from "../AST";
 
-import {choose, sequence, lazy} from "../Parser";
+import {choose, sequence, lazy} from "tparse";
 import {keyword, separated} from "./common";
 import {parseTypeExpression} from "./typeExpression";
 import {parseIdentifier} from "./identifier";

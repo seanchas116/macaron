@@ -3,7 +3,7 @@ import {
   IdentifierAssignableAST
 } from "../AST";
 
-import Parser, {sequence, lazy} from "../Parser";
+import {Parser, sequence, lazy} from "tparse";
 import {parseIdentifier} from "./identifier";
 import {parseTypeExpression} from "./typeExpression";
 

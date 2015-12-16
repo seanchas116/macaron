@@ -6,7 +6,7 @@ import {
   sequence,
   regExp,
   lazy
-} from "../Parser";
+} from "tparse";
 
 import {
   _,

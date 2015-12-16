@@ -5,7 +5,7 @@ import {
   BinaryAST,
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import {Parser, choose, sequence, lazy} from "tparse";
 import {keyword} from "./common";
 import {binaryOperators, unaryOperators} from "../operators";
 import {parseControlExpression} from "./control";

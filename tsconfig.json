@@ -27,7 +27,6 @@
         "./src/compiler/parser/AST.ts",
         "./src/compiler/parser/MacaronParser.ts",
         "./src/compiler/parser/operators.ts",
-        "./src/compiler/parser/Parser.ts",
         "./src/compiler/parser/parsing/assignable.ts",
         "./src/compiler/parser/parsing/assignment.ts",
         "./src/compiler/parser/parsing/block.ts",

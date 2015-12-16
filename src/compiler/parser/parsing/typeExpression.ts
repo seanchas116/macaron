@@ -1,4 +1,4 @@
-import {lazy} from "../Parser";
+import {lazy} from "tparse";
 import {typeBinaryOperators} from "../operators";
 import {parseIdentifier} from "./identifier";
 import {parsePostfixWith} from "./postfix";

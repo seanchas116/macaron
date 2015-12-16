@@ -3,7 +3,7 @@ import {
   GenericsCallAST,
 } from "../AST";
 
-import Parser, {lazy} from "../Parser";
+import {Parser, lazy} from "tparse";
 import {keyword, separated} from "./common";
 import {parsePostfix} from "./postfix";
 

@@ -4,7 +4,7 @@ import {
   NewVariableAST
 } from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import {Parser, choose, sequence, lazy} from "tparse";
 import {parseOperator, parseBinaryExpression} from "./operator";
 import {parseAssignable} from "./assignable";
 import {keyword} from "./common";

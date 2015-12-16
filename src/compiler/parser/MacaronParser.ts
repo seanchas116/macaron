@@ -1,5 +1,5 @@
 import CompilationError from "../common/CompilationError";
-import {SyntaxError} from "./Parser";
+import {SyntaxError} from "tparse";
 import {parseLines} from "./parsing/block";
 
 export default

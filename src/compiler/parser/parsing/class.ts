@@ -5,7 +5,7 @@ import AST, {
   InterfaceAST
 } from "../AST";
 
-import {sequence, lazy, choose} from "../Parser";
+import {sequence, lazy, choose} from "tparse";
 import {keyword, separated} from "./common";
 import {parseExpression} from "./expression";
 import {parseTypeExpression} from "./typeExpression";

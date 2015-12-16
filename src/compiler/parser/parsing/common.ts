@@ -1,9 +1,10 @@
-import Parser, {
+import {
+  Parser,
   choose,
   sequence,
   string,
   regExp
-} from "../Parser";
+} from "tparse";
 
 export
 const whitespace = regExp(/[\t\v\f ]/);

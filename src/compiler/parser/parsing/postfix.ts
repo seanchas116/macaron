@@ -1,6 +1,6 @@
 import {ExpressionAST} from "../AST";
 
-import Parser, {choose, sequence, lazy} from "../Parser";
+import {Parser, choose, sequence, lazy} from "tparse";
 import {parseNew} from "./new";
 import {parseFunctionCall} from "./functionCall";
 import {parseGenericsCall} from "./genericsCall";
