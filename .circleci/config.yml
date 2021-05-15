@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: Install lerna
-          command: npm install -g lerna
+          command: sudo npm install -g lerna
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
